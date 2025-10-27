@@ -1,628 +1,970 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Bubbleworld Ship • Captain Timmy</title>
-<style>
-  :root {
-    --bg1: #ff6a00;
-    --bg2: #ff00d4;
-    --textMain: #fff;
-    --glassBg: rgba(0,0,0,0.4);
-    --glassBorder: rgba(255,255,255,0.18);
-    --accent: #ffd84a;
-    --accent2: #64ffda;
-    --radius-lg: 24px;
-    --radius-md: 16px;
-    --radius-sm: 10px;
-    --font-main: -apple-system, BlinkMacSystemFont, "Inter", "Trebuchet MS", system-ui, sans-serif;
-  }
+# ============================================================
+# Bubble World Ship Core v3.3.1-publicsync (Timmy Lock)
+#
+# THIS IS LAW:
+# - Bind ONLY 127.0.0.1 (private dev mode, healing core)
+# - NEVER kill port 5000 (that's your Suno / music stream)
+# - If 5000 is taken, hop to next safe port
+# - On run, auto-open browser straight to "/"
+# - Generate stealth diagnostics hash each boot
+# - "/" = Engine Room shell (green field)
+# - Room1 = Purple Mind (calm playlists)
+# - Room2 = Timmy Time Music (magenta energy playlists)
+# - Room3 = Drift Space (comfort / joke / riddle / love)
+# - Every room shows "Timmy Time Music" pill
+# - Bubbles pulse in every room, tinted to that room
+#
+# VISUAL STABILITY PROMISES:
+# - No white gutters top or bottom. Full gradient / bubble fill.
+# - Large readable panels, high contrast text (you said glasses).
+# - Playlist cards are big tap targets.
+# - Maya panel is large, input is large, SEND is obvious.
+#
+# DO NOT EDIT THIS WITHOUT TIMMY SAY-SO.
+# ============================================================
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: var(--font-main);
-    color: var(--textMain);
-    background: radial-gradient(circle at 50% 50%, var(--bg2) 0%, var(--bg1) 60%, #3a1d00 100%);
-    background-attachment: fixed;
-    display: flex;
-    flex-direction: column;
-    -webkit-font-smoothing: antialiased;
-  }
+import socket, random, string, threading, webbrowser, time
+from flask import Flask, request, jsonify, Response
 
-  header {
-    text-align: center;
-    padding: 3rem 1rem 2rem;
-  }
+app = Flask(__name__)
 
-  .ship-badge {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--accent);
-    background: rgba(0,0,0,0.5);
-    border: 1px solid var(--glassBorder);
-    padding: 0.4rem 0.7rem;
-    border-radius: var(--radius-md);
-    display: inline-block;
-    margin-bottom: 1rem;
-    text-shadow: 0 0 8px rgba(255,216,74,0.6);
-  }
+# ---------------------------------
+# stealth hash route for diagnostics
+# ---------------------------------
+ENGINE_HASH = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
 
-  h1 {
-    font-size: clamp(2rem, 1.2rem + 2vw, 2.6rem);
-    line-height: 1.15;
-    font-weight: 600;
-    margin: 0 0 1rem;
-    text-shadow: 0 0 14px rgba(0,0,0,0.6), 0 0 30px rgba(255,0,212,0.6);
-  }
+# ---------------------------------
+# port hopper (never kill 5000)
+# ---------------------------------
+def find_open_port(start=5000, end=5020):
+    for p in range(start, end + 1):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            s.bind(("127.0.0.1", p))
+            s.close()
+            return p
+        except OSError:
+            s.close()
+            continue
+    # fallback if somehow all used
+    return 5010
 
-  .subtitle {
-    font-size: 1.1rem;
-    line-height: 1.45;
-    max-width: 28rem;
-    margin: 0 auto;
-    color: #ffe9ff;
-    text-shadow: 0 0 10px rgba(0,0,0,0.7);
-  }
+PORT = find_open_port(5000, 5020)
 
-  /* Grid of rooms / nav cards */
-  .deck-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 2rem 1rem;
-    max-width: 600px;
-    width: 100%;
-    margin: 0 auto;
-  }
+# ---------------------------------
+# Ship status text pools (Engine Room log)
+# ---------------------------------
+SNIFFER_LINES = [
+    "Sniffer sweep: all clear on local ports.",
+    "Sniffer: saw noise on 127.0.0.1:5000 (that's Timmy's music, leave it alone).",
+    "Sniffer: external probes = 0. Bubble integrity holding.",
+    "Sniffer: crew vitals steady, anxiety downshifted.",
+]
+HOPPER_LINES = [
+    "Port Hopper: handshake rotated. Cloak engaged.",
+    "Port Hopper: rerouted chatter off default channel.",
+    "Port Hopper: no hostile lock-ons detected.",
+]
+HEALER_LINES = [
+    "Healer: bubble regen active, shields soft and warm.",
+    "Healer: nervous system cooling. Breathing slower.",
+    "Healer: pulse steady. You are safe in here.",
+]
 
-  @media(min-width:480px){
-    .deck-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
+JOKES = [
+    "Why did the spaceship get therapy? It had too much space in its schedule.",
+    "I told the engine to chill. It said 'I'm already cool, baby.'",
+    "Captain, morale report: Crew says you are 12/10. Science calls that 'statistically unfair.'",
+]
+RIDDLES = [
+    ("I speak without a mouth and hear without ears. I have nobody, but I come alive with wind. What am I?", "An echo."),
+    ("What has cities, but no houses; mountains, but no trees; water, but no fish?", "A map."),
+    ("The more you take, the more you leave behind. What am I?", "Footsteps."),
+]
 
-  .deck-card {
-    background: var(--glassBg);
-    border: 1px solid var(--glassBorder);
-    border-radius: var(--radius-lg);
-    padding: 1rem 1.2rem 1.2rem;
-    box-shadow:
-      0 20px 60px rgba(0,0,0,0.8),
-      0 0 40px rgba(255,0,212,0.25);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
+# this offset will rotate jokes/riddles on 'More?'
+joke_seed_offset = 0
 
-  .deck-emoji {
-    font-size: 1.4rem;
-    line-height: 1;
-    margin-bottom: 0.4rem;
-    text-shadow: 0 0 10px rgba(0,0,0,0.6);
-  }
+# ============================================================
+# HTML / CSS builder helpers
+# ============================================================
 
-  .deck-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 0.4rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: .4rem;
-  }
+def base_css(room_color_bg, bubble_color_main, bubble_color_alt):
+    # room_color_bg: radial or linear base behind cards
+    # bubble colors: room-tinted floating circles
+    return f"""
+    <style>
+    :root {{
+        --room-bg: {room_color_bg};
+        --bubble-main: {bubble_color_main};
+        --bubble-alt: {bubble_color_alt};
+        --card-bg: rgba(0,0,0,0.35);
+        --card-border: rgba(255,255,255,0.18);
+        --text-main: #fff;
+        --accent-pill-bg: radial-gradient(circle at 0% 0%, #fff8, #0000);
+        --accent-pill-text: #000;
+        --yellow-btn-bg: radial-gradient(circle at 20% 20%, #fff8 0%, #ffe066 40%, #ffcf4d 60%, #b26a00 100%);
+        --yellow-btn-text: #000;
+        --status-chip-bg: rgba(0,0,0,0.6);
+        --status-chip-text: #f9f9c5;
+    }}
 
-  .deck-chip {
-    background: rgba(255,255,255,0.12);
-    border-radius: var(--radius-sm);
-    font-size: .7rem;
-    line-height: 1.2;
-    padding: .2rem .45rem;
-    border: 1px solid rgba(255,255,255,0.2);
-    color: var(--accent2);
-    text-shadow: 0 0 8px rgba(100,255,218,0.6);
-  }
+    * {{
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+        font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Text", Arial, sans-serif;
+        color: var(--text-main);
+        margin: 0;
+        padding: 0;
+    }}
+    body {{
+        min-height: 100vh;
+        background: var(--room-bg) fixed;
+        position: relative;
+        overflow-x: hidden;
+        padding: 16px 16px 100px; /* bottom pad so nav doesn't cover */
+    }}
 
-  .deck-desc {
-    color: #ffe9ff;
-    font-size: .9rem;
-    line-height: 1.4;
-    flex-grow: 1;
-    text-shadow: 0 0 10px rgba(0,0,0,0.7);
-  }
+    /* bubble field */
+    .bubble-field {{
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+        z-index: 0;
+        pointer-events: none;
+    }}
 
-  .enter-btn {
-    margin-top: .8rem;
-    background: linear-gradient(90deg,#fff 0%, #ffd84a 100%);
-    color: #000;
-    font-size: .9rem;
-    font-weight: 600;
-    border-radius: var(--radius-md);
-    padding: .55rem .8rem;
-    border: none;
-    text-decoration: none;
-    box-shadow:
-      0 10px 25px rgba(255,255,255,.25),
-      0 0 20px rgba(255,216,74,.6);
-  }
+    .bubble {{
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(20px);
+        opacity: 0.4;
+        animation: floatUp 8s linear infinite;
+        background: radial-gradient(circle at 30% 30%, var(--bubble-main) 0%, var(--bubble-alt) 60%, transparent 70%);
+        box-shadow: 0 0 60px var(--bubble-main), 0 0 120px var(--bubble-alt);
+    }}
+    .bubble.slow {{ animation-duration: 12s; opacity:0.25; }}
+    .bubble.tiny {{ width:60px; height:60px; }}
+    .bubble.med {{ width:110px; height:110px; }}
+    .bubble.big {{ width:180px; height:180px; }}
+    @keyframes floatUp {{
+        0%   {{ transform: translateY(40vh) translateX(0);   }}
+        100% {{ transform: translateY(-40vh) translateX(10vw);}}
+    }}
 
-  /* music / radio section */
-  section {
-    max-width: 800px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 1rem 1rem 4rem;
-  }
+    /* card panels */
+    .panel {{
+        position: relative;
+        z-index: 2;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 16px 16px 20px;
+        margin-bottom: 24px;
+        box-shadow:
+            0 30px 80px rgba(0,0,0,0.9),
+            0 0 80px var(--bubble-main);
+    }}
+    .panel-header-row {{
+        display:flex;
+        flex-wrap:wrap;
+        align-items:flex-start;
+        gap:8px;
+        margin-bottom:12px;
+    }}
+    .panel-emoji {{
+        font-size:24px;
+        line-height:24px;
+    }}
+    .panel-title-block {{
+        flex:1;
+        min-width:0;
+    }}
+    .panel-title {{
+        font-size:22px;
+        font-weight:600;
+        line-height:1.2;
+    }}
+    .panel-chip {{
+        background: var(--status-chip-bg);
+        color: var(--status-chip-text);
+        font-size:13px;
+        line-height:1;
+        padding:6px 8px;
+        border-radius:8px;
+        font-weight:600;
+        border:1px solid rgba(255,255,255,0.15);
+        align-self:flex-start;
+    }}
+    .panel-desc {{
+        font-size:17px;
+        line-height:1.4;
+        margin-top:8px;
+        color:#fff;
+    }}
 
-  .section-card {
-    background: var(--glassBg);
-    border: 1px solid var(--glassBorder);
-    border-radius: var(--radius-lg);
-    padding: 1.2rem 1rem 1rem;
-    color: #fff;
-    box-shadow:
-      0 20px 60px rgba(0,0,0,0.8),
-      0 0 40px rgba(255,216,74,0.2);
-    margin-bottom: 1.5rem;
-  }
+    .action-btn {{
+        display:inline-block;
+        margin-top:16px;
+        background: var(--yellow-btn-bg);
+        color: var(--yellow-btn-text);
+        font-size:18px;
+        font-weight:700;
+        line-height:1.2;
+        padding:14px 16px;
+        border-radius:12px;
+        border:0;
+        text-decoration:none;
+        box-shadow:0 10px 30px rgba(0,0,0,0.7);
+    }}
 
-  .sec-head-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    row-gap:.5rem;
-  }
+    /* status list in Engine Room */
+    .status-list {{
+        margin-top:16px;
+        border:1px solid rgba(255,255,255,0.15);
+        border-radius:12px;
+        overflow:hidden;
+    }}
+    .status-item {{
+        padding:14px 16px;
+        font-size:17px;
+        line-height:1.4;
+        background:rgba(0,0,0,0.2);
+        border-bottom:1px solid rgba(255,255,255,0.07);
+    }}
+    .status-item:last-child {{
+        border-bottom:0;
+    }}
+    .status-head {{
+        font-size:18px;
+        font-weight:600;
+        color:#fff;
+    }}
+    .status-sub {{
+        font-size:15px;
+        opacity:0.9;
+    }}
 
-  .sec-left {
-    max-width: calc(100% - 4rem);
-  }
+    /* Maya console */
+    .maya-console {{
+        border:1px solid rgba(255,255,255,0.18);
+        border-radius:12px;
+        background:rgba(0,0,0,0.4);
+        padding:12px;
+    }}
+    .maya-chat-line {{
+        font-size:16px;
+        line-height:1.4;
+        background:rgba(255,255,255,0.07);
+        border-radius:8px;
+        padding:10px 12px;
+        margin-bottom:8px;
+    }}
+    .maya-me {{
+        background:rgba(255,255,0,0.15);
+        border:1px solid rgba(255,255,0,0.4);
+        color:#fff;
+        font-weight:600;
+    }}
+    .maya-row {{
+        display:flex;
+        gap:8px;
+        flex-wrap:nowrap;
+        align-items:stretch;
+        margin-top:8px;
+    }}
+    .maya-input {{
+        flex:1;
+        font-size:16px;
+        line-height:1.4;
+        background:#000;
+        color:#fff;
+        border-radius:8px;
+        border:1px solid rgba(255,255,255,0.2);
+        padding:12px;
+    }}
+    .maya-send {{
+        background: var(--yellow-btn-bg);
+        color:#000;
+        font-size:16px;
+        font-weight:700;
+        line-height:1.2;
+        border:0;
+        border-radius:10px;
+        padding:12px 16px;
+        min-width:64px;
+    }}
 
-  .sec-eyebrow {
-    font-size: .7rem;
-    font-weight: 600;
-    color: var(--accent2);
-    text-shadow: 0 0 8px rgba(100,255,218,.7);
-    letter-spacing: .03em;
-    display: block;
-    margin-bottom: .25rem;
-  }
+    /* playlist list */
+    .playlist-board {{
+        border:1px solid rgba(255,255,255,0.15);
+        border-radius:16px;
+        overflow:hidden;
+        background:rgba(0,0,0,0.25);
+    }}
+    .track {{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        padding:16px;
+        border-bottom:1px solid rgba(255,255,255,0.07);
+    }}
+    .track:last-child {{
+        border-bottom:0;
+    }}
+    .track-left {{
+        display:flex;
+        gap:12px;
+        align-items:flex-start;
+    }}
+    .track-num {{
+        flex-shrink:0;
+        width:48px;
+        height:48px;
+        border-radius:10px;
+        background: radial-gradient(circle at 20% 20%, #fff0 0%, #fff0 30%, #0000 60%), radial-gradient(circle at 20% 20%, var(--bubble-main) 0%, var(--bubble-alt) 60%, #0000 70%);
+        border:2px solid rgba(255,255,255,0.4);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:15px;
+        font-weight:700;
+        color:#000;
+        box-shadow:0 10px 30px rgba(0,0,0,0.8),0 0 40px var(--bubble-main);
+    }}
+    .track-info-title {{
+        font-size:18px;
+        line-height:1.3;
+        font-weight:600;
+        color:#fff;
+    }}
+    .track-info-meta {{
+        font-size:15px;
+        line-height:1.3;
+        color:#fff;
+        opacity:0.9;
+    }}
+    .play-btn {{
+        background: var(--yellow-btn-bg);
+        color:#000;
+        font-weight:700;
+        border-radius:10px;
+        padding:12px 16px;
+        font-size:16px;
+        border:0;
+        text-decoration:none;
+        box-shadow:0 10px 30px rgba(0,0,0,0.7);
+    }}
 
-  .sec-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    line-height: 1.3;
-    color: #fff;
-    text-shadow: 0 0 14px rgba(0,0,0,.7), 0 0 30px rgba(255,0,212,.6);
-  }
+    /* Drift Space special block */
+    .drift-block {{
+        font-size:18px;
+        line-height:1.5;
+        color:#fff;
+        margin-top:12px;
+        background:rgba(0,0,0,0.35);
+        border:1px solid rgba(255,255,255,0.18);
+        border-radius:12px;
+        padding:16px;
+    }}
+    .drift-head {{
+        font-size:16px;
+        font-weight:600;
+        color:#ffbbff;
+        margin-bottom:8px;
+    }}
+    .drift-affirm {{
+        font-size:18px;
+        font-weight:600;
+        color:#ffbbff;
+        margin-top:12px;
+    }}
+    .more-btn {{
+        margin-top:16px;
+        display:inline-block;
+        background: var(--yellow-btn-bg);
+        color:#000;
+        font-size:16px;
+        font-weight:700;
+        line-height:1.2;
+        padding:12px 16px;
+        border-radius:10px;
+        border:0;
+        text-decoration:none;
+        box-shadow:0 10px 30px rgba(0,0,0,0.7);
+    }}
 
-  .sec-desc {
-    font-size: .9rem;
-    line-height: 1.4;
-    color: #ffe9ff;
-    margin-top: .4rem;
-    text-shadow: 0 0 10px rgba(0,0,0,.7);
-  }
+    /* top nav */
+    .top-nav {{
+        position:relative;
+        z-index:3;
+        width:100%;
+        max-width:600px;
+        margin:0 auto 24px;
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+        justify-content:space-between;
+    }}
+    .top-btn {{
+        flex:1;
+        background:rgba(0,0,0,0.4);
+        border:1px solid rgba(255,255,255,0.15);
+        border-radius:12px;
+        padding:12px;
+        font-size:15px;
+        font-weight:600;
+        text-align:center;
+        color:#fff;
+        text-decoration:none;
+        min-width:0;
+        box-shadow:0 20px 50px rgba(0,0,0,0.8);
+    }}
 
-  .mini-chip {
-    background: rgba(0,0,0,.6);
-    border: 1px solid var(--glassBorder);
-    border-radius: var(--radius-sm);
-    font-size: .65rem;
-    font-weight: 500;
-    line-height: 1.2;
-    padding: .35rem .5rem;
-    color: var(--accent);
-    text-shadow: 0 0 8px rgba(255,216,74,.7);
-    white-space: nowrap;
-  }
+    /* bottom nav bar */
+    .bottom-nav {{
+        position:fixed;
+        z-index:10;
+        left:0;
+        right:0;
+        bottom:0;
+        background:rgba(0,0,0,0.6);
+        backdrop-filter:blur(20px);
+        border-top:1px solid rgba(255,255,255,0.2);
+        padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 12px);
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        font-size:15px;
+        color:#fff;
+    }}
+    .bottom-pill {{
+        background:radial-gradient(circle at 0% 0%, #ff00ff 0%, #ff0080 30%, #ff5500 60%, #0000 80%);
+        color:#fff;
+        font-weight:600;
+        font-size:14px;
+        padding:10px 14px;
+        line-height:1.2;
+        border-radius:999px;
+        box-shadow:0 0 20px #ff00ff,0 0 60px #ff0080;
+        border:1px solid rgba(255,255,255,0.4);
+        text-align:center;
+        text-decoration:none;
+    }}
+    .bottom-left,
+    .bottom-right {{
+        color:#fff;
+        font-weight:600;
+        font-size:16px;
+        text-decoration:none;
+    }}
 
-  /* fake playlist list */
-  .playlist {
-    margin-top: 1rem;
-    background: rgba(0,0,0,.3);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(255,255,255,.15);
-    overflow: hidden;
-  }
-  .track {
-    display: flex;
-    align-items: center;
-    padding: .7rem .8rem;
-    border-bottom: 1px solid rgba(255,255,255,.07);
-    font-size: .85rem;
-    color: #fff;
-  }
-  .track:last-child {
-    border-bottom: none;
-  }
-  .track-cover {
-    width: 44px;
-    height: 44px;
-    flex-shrink: 0;
-    border-radius: var(--radius-sm);
-    background: radial-gradient(circle at 30% 30%, #ff00d4 0%, #ff6a00 60%);
-    box-shadow: 0 0 20px rgba(255,0,212,.6),0 0 30px rgba(255,106,0,.6);
-    border: 1px solid rgba(255,255,255,.4);
-    display: flex;
-    align-items:center;
-    justify-content:center;
-    font-size:.7rem;
-    font-weight:600;
-    color:#000;
-  }
-  .track-main {
-    flex: 1;
-    padding: 0 .8rem;
-    line-height:1.3;
-  }
-  .track-title {
-    font-weight:600;
-    font-size:.9rem;
-  }
-  .track-meta {
-    font-size:.7rem;
-    color:#ffd9ff;
-  }
-  .track-btn {
-    background: linear-gradient(90deg,#fff 0%, #ffd84a 100%);
-    color:#000;
-    font-size:.7rem;
-    font-weight:600;
-    border-radius: var(--radius-sm);
-    padding:.4rem .6rem;
-    border:none;
-    box-shadow:0 10px 25px rgba(255,255,255,.2),0 0 20px rgba(255,216,74,.6);
-    white-space:nowrap;
-  }
+    /* wrapper width */
+    .content-wrap {{
+        position:relative;
+        z-index:2;
+        max-width:600px;
+        margin:0 auto 120px;
+    }}
 
-  /* Copilot / Maya box */
-  .chat-shell {
-    margin-top: 1rem;
-    background: rgba(0,0,0,.3);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(255,255,255,.15);
-    padding: .8rem;
-  }
+    </style>
+    """
 
-  .chat-log {
-    max-height: 140px;
-    overflow-y: auto;
-    font-size: .8rem;
-    line-height: 1.4;
-    color: #fff;
-  }
-
-  .chat-bubble {
-    background: rgba(255,255,255,.07);
-    border: 1px solid rgba(255,255,255,.2);
-    border-radius: var(--radius-md);
-    padding: .6rem .7rem;
-    margin-bottom: .5rem;
-  }
-
-  .chat-bubble.me {
-    background: rgba(255,216,74,.15);
-    border: 1px solid rgba(255,216,74,.5);
-    text-shadow: 0 0 8px rgba(255,216,74,.6);
-    color: var(--accent);
-  }
-
-  .chat-input-row {
-    margin-top: .6rem;
-    display: flex;
-    gap:.5rem;
-  }
-  .chat-input {
-    flex:1;
-    background: rgba(0,0,0,.6);
-    border-radius: var(--radius-sm);
-    border:1px solid rgba(255,255,255,.2);
-    color:#fff;
-    font-size:.8rem;
-    padding:.6rem .7rem;
-    font-family:inherit;
-  }
-  .chat-send-btn {
-    background: linear-gradient(90deg,#fff 0%, #64ffda 100%);
-    color:#000;
-    font-size:.8rem;
-    font-weight:600;
-    border-radius: var(--radius-sm);
-    padding:.6rem .7rem;
-    border:none;
-    box-shadow:0 10px 25px rgba(255,255,255,.2),0 0 20px rgba(100,255,218,.6);
-    white-space:nowrap;
-  }
-
-  footer {
-    text-align:center;
-    font-size:.7rem;
-    color:rgba(255,255,255,.6);
-    margin-top:auto;
-    padding:2rem 1rem 4rem;
-    text-shadow:0 0 8px rgba(0,0,0,.7);
-  }
-
-  a.room-link {
-    color: inherit;
-    text-decoration: none;
-  }
-</style>
-</head>
-<body>
-
-<header>
-  <div class="ship-badge">🚀 Bubbleworld Ship • Online</div>
-  <h1>Welcome Aboard, Captain Timmy!</h1>
-  <p class="subtitle">
-    This ship is live on the public web, powered by your iPhone.
-    Tap a room below to explore.
-  </p>
-</header>
-
-<!-- MAIN NAV CARDS -->
-<div class="deck-grid">
-
-  <!-- Engine Room -->
-  <a class="room-link" href="#engine-room">
-    <div class="deck-card">
-      <div class="deck-emoji">🛠️</div>
-      <div class="deck-title">
-        Engine Room
-        <span class="deck-chip">core</span>
-      </div>
-      <div class="deck-desc">
-        System status, ship health, control panel energy levels.
-        This is the brain and wiring.
-      </div>
-      <div class="enter-btn">Enter engine room →</div>
+def bubble_field_html():
+    # multiple tinted bubbles
+    return """
+    <div class="bubble-field">
+        <div class="bubble big"  style="left:10%; bottom:-10%;"></div>
+        <div class="bubble med slow" style="left:70%; bottom:-20%;"></div>
+        <div class="bubble tiny" style="left:40%; bottom:-15%;"></div>
+        <div class="bubble med" style="left:20%; bottom:-25%;"></div>
+        <div class="bubble big slow" style="left:85%; bottom:-30%;"></div>
     </div>
-  </a>
+    """
 
-  <!-- Radio / Music -->
-  <a class="room-link" href="#radio">
-    <div class="deck-card">
-      <div class="deck-emoji">🎙️</div>
-      <div class="deck-title">
-        Radio / Music Deck
-        <span class="deck-chip">suno mix</span>
-      </div>
-      <div class="deck-desc">
-        Streams from Timmy. Tracks, sets, and vibes for the crew.
-      </div>
-      <div class="enter-btn">Tune in →</div>
+def top_nav_html():
+    return f"""
+    <nav class="top-nav">
+        <a class="top-btn" href="/">Engine</a>
+        <a class="top-btn" href="/room1">Room 1</a>
+        <a class="top-btn" href="/room2">Room 2</a>
+        <a class="top-btn" href="/room3">Room 3</a>
+    </nav>
+    """
+
+def bottom_nav_html():
+    return """
+    <div class="bottom-nav">
+        <a class="bottom-left" href="/">🏠</a>
+        <a class="bottom-pill" href="/room2">Timmy Time Music</a>
+        <a class="bottom-right" href="/room3">💬</a>
     </div>
-  </a>
+    """
 
-  <!-- Copilot (Maya) -->
-  <a class="room-link" href="#maya">
-    <div class="deck-card">
-      <div class="deck-emoji">🤖</div>
-      <div class="deck-title">
-        AI Copilot (Maya)
-        <span class="deck-chip">live</span>
-      </div>
-      <div class="deck-desc">
-        Your ship assistant. Ask for status, ideas, routes, anything.
-      </div>
-      <div class="enter-btn">Talk to Maya →</div>
+# ============================================================
+# PAGES
+# ============================================================
+
+def render_engine_room():
+    # Engine Room = green core version
+    css = base_css(
+        "radial-gradient(circle at 30% 20%, #003300 0%, #006b3a 40%, #000000 80%)",
+        "rgba(0,255,128,0.6)",
+        "rgba(0,128,64,0.4)"
+    )
+    ship_status_items = [
+        ("Hull", "Online · Bubble World core is running locally."),
+        ("Radio Deck", "Your music stream lives. Suno stays protected."),
+        ("AI Copilot", "Maya console awake and responsive 🤖"),
+        ("Crew Access", "Direct link share = instant boarding ✅"),
+    ]
+
+    # build log lines
+    sniff = random.choice(SNIFFER_LINES)
+    hop = random.choice(HOPPER_LINES)
+    heal = random.choice(HEALER_LINES)
+
+    status_list_html = "".join([
+        f"""
+        <div class="status-item">
+            <div class="status-head">{title}</div>
+            <div class="status-sub">{desc}</div>
+        </div>
+        """ for (title, desc) in ship_status_items
+    ])
+
+    maya_block = f"""
+    <div class="panel">
+        <div class="panel-header-row">
+            <div class="panel-emoji">🤖</div>
+            <div class="panel-title-block">
+                <div class="panel-title">Maya — Ship Assistant</div>
+                <div class="panel-chip">live</div>
+                <div class="panel-desc">
+                    Ask status, routes, anything. Maya answers here.
+                </div>
+            </div>
+        </div>
+
+        <div class="maya-console" id="maya-console">
+            <div class="maya-chat-line">Maya: Welcome aboard, Captain. All systems are warm. What’s our move?</div>
+            <div class="maya-chat-line maya-me">You: Status on engines and crew morale?</div>
+            <div class="maya-chat-line">Maya: Engines humming. Crew is curious and hopeful.</div>
+        </div>
+
+        <div class="maya-row">
+            <input id="maya-input" class="maya-input" placeholder="Talk to Maya..." />
+            <button class="maya-send" onclick="sendToMaya()">Send</button>
+        </div>
     </div>
-  </a>
+    """
 
-  <!-- Logs -->
-  <a class="room-link" href="#logs">
-    <div class="deck-card">
-      <div class="deck-emoji">📓</div>
-      <div class="deck-title">
-        Ship Log
-        <span class="deck-chip">public</span>
-      </div>
-      <div class="deck-desc">
-        Notes, broadcasts, and captain updates for visitors and crew.
-      </div>
-      <div class="enter-btn">View logs →</div>
+    engine_status_block = f"""
+    <div class="panel">
+        <div class="panel-header-row">
+            <div class="panel-emoji">🛠️</div>
+            <div class="panel-title-block">
+                <div class="panel-title">Ship Core Status</div>
+                <div class="panel-chip">core</div>
+                <div class="panel-desc">
+                    You control the story. Tell visitors what's live and what's under repair.
+                </div>
+            </div>
+        </div>
+
+        <div class="status-list">
+            {status_list_html}
+        </div>
+
+        <div class="drift-block" style="margin-top:16px;">
+            <div class="drift-head">Sniffer</div>
+            <div>{sniff}</div>
+            <div class="drift-head" style="margin-top:12px;">Port Hopper</div>
+            <div>{hop}</div>
+            <div class="drift-head" style="margin-top:12px;">Healer</div>
+            <div>{heal}</div>
+        </div>
     </div>
-  </a>
+    """
 
-</div>
+    html = f"""
+    <html>
+    <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    {css}
+    <script>
+    async function sendToMaya() {{
+        const box = document.getElementById('maya-input');
+        const consoleDiv = document.getElementById('maya-console');
+        const msg = box.value.trim();
+        if(!msg) return;
+        // show my line
+        consoleDiv.innerHTML += `
+            <div class="maya-chat-line maya-me">You: ${{
+                msg.replace(/</g,"&lt;")
+            }}</div>`;
+        box.value="";
+        // ask backend
+        let res = await fetch('/maya', {{
+            method:'POST',
+            headers:{{'Content-Type':'application/json'}},
+            body:JSON.stringify({{q:msg}})
+        }});
+        let data = await res.json();
+        consoleDiv.innerHTML += `
+            <div class="maya-chat-line">Maya: ${{
+                (data.reply||"").replace(/</g,"&lt;")
+            }}</div>`;
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    }}
+    </script>
+    </head>
+    <body>
+        {bubble_field_html()}
+        <div class="content-wrap">
+            {top_nav_html()}
 
-<section id="radio">
-  <div class="section-card">
-    <div class="sec-head-row">
-      <div class="sec-left">
-        <span class="sec-eyebrow">🎧 RADIO DECK</span>
-        <div class="sec-title">Music with Timmy</div>
-        <div class="sec-desc">
-          Live vibeboard. These are just sample entries, but you can
-          swap them for real Suno / YouTube / SoundCloud links.
+            <div class="panel">
+                <div class="panel-header-row">
+                    <div class="panel-emoji">👋</div>
+                    <div class="panel-title-block">
+                        <div class="panel-title">Welcome Aboard, Captain Timmy!</div>
+                        <div class="panel-desc">
+                            This ship is running locally on your iPhone. You are in the Engine Room (core).
+                        </div>
+                    </div>
+                </div>
+                <a class="action-btn" href="/{ENGINE_HASH}">Diagnostics →</a>
+            </div>
+
+            {engine_status_block}
+            {maya_block}
         </div>
-      </div>
-      <div class="mini-chip">Now Playing</div>
+
+        {bottom_nav_html()}
+    </body>
+    </html>
+    """
+    return html
+
+
+def render_room1():
+    # Purple Mind room
+    css = base_css(
+        "radial-gradient(circle at 30% 20%, #2b003a 0%, #5e0099 40%, #000000 80%)",
+        "rgba(255,0,255,0.6)",
+        "rgba(255,128,255,0.4)"
+    )
+
+    # Timmy's calm playlists for Room 1
+    playlists = [
+        ("001", "Hope",        "suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316"),
+        ("002", "Soul",        "suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df"),
+        ("003", "Beach",       "suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c"),
+        ("004", "Rest",        "suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479"),
+        ("005", "Jazz",        "suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be"),
+    ]
+
+    track_list_html = ""
+    for num, title, link in playlists:
+        track_list_html += f"""
+        <div class="track">
+            <div class="track-left">
+                <div class="track-num">{num}</div>
+                <div>
+                    <div class="track-info-title">{title}</div>
+                    <div class="track-info-meta">tap to open playlist</div>
+                </div>
+            </div>
+            <a class="play-btn" href="https://{link}" target="_blank">▶ Play</a>
+        </div>
+        """
+
+    html = f"""
+    <html>
+    <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    {css}
+    </head>
+    <body>
+        {bubble_field_html()}
+        <div class="content-wrap">
+            {top_nav_html()}
+
+            <div class="panel">
+                <div class="panel-header-row">
+                    <div class="panel-emoji">💜</div>
+                    <div class="panel-title-block">
+                        <div class="panel-title">Room 1 — Purple Mind</div>
+                        <div class="panel-chip">calm</div>
+                        <div class="panel-desc">
+                            Soft landing. Healing playlists. Breathe here.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="playlist-board">
+                    {track_list_html}
+                </div>
+            </div>
+        </div>
+        {bottom_nav_html()}
+    </body>
+    </html>
+    """
+    return html
+
+
+def render_room2():
+    # Timmy Time Music room (magenta/orange energy)
+    css = base_css(
+        "radial-gradient(circle at 30% 20%, #4a0024 0%, #cc0077 40%, #ff5500 70%, #000000 90%)",
+        "rgba(255,0,128,0.6)",
+        "rgba(255,128,0,0.4)"
+    )
+
+    # Vibe set for Room 2 that you gave me
+    playlists = [
+        ("001", "Laugh",       "https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1"),
+        ("002", "Play",        "https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b"),
+        ("003", "Fun",         "https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f"),
+        ("004", "Motown",      "https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840"),
+        ("005", "Feeling It",  "https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c"),
+    ]
+
+    track_list_html = ""
+    for num, title, link in playlists:
+        track_list_html += f"""
+        <div class="track">
+            <div class="track-left">
+                <div class="track-num">{num}</div>
+                <div>
+                    <div class="track-info-title">{title}</div>
+                    <div class="track-info-meta">open in Suno</div>
+                </div>
+            </div>
+            <a class="play-btn" href="{link}" target="_blank">▶ Play</a>
+        </div>
+        """
+
+    html = f"""
+    <html>
+    <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    {css}
+    </head>
+    <body>
+        {bubble_field_html()}
+        <div class="content-wrap">
+            {top_nav_html()}
+
+            <div class="panel">
+                <div class="panel-header-row">
+                    <div class="panel-emoji">🎧</div>
+                    <div class="panel-title-block">
+                        <div class="panel-title">Room 2 — Timmy Time Music</div>
+                        <div class="panel-chip">pulse</div>
+                        <div class="panel-desc">
+                            Live vibe board. Energy for the crew.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="playlist-board">
+                    {track_list_html}
+                </div>
+            </div>
+        </div>
+        {bottom_nav_html()}
+    </body>
+    </html>
+    """
+    return html
+
+
+def render_room3():
+    # Drift Space (blue / pink, comfort, riddle/joke)
+    css = base_css(
+        "radial-gradient(circle at 30% 20%, #001133 0%, #2a0066 40%, #b300ff 70%, #000000 90%)",
+        "rgba(128,0,255,0.6)",
+        "rgba(255,0,255,0.4)"
+    )
+
+    # pick one joke+one riddle based on joke_seed_offset
+    j = JOKES[(joke_seed_offset) % len(JOKES)]
+    riddle_q, riddle_a = RIDDLES[(joke_seed_offset) % len(RIDDLES)]
+
+    html = f"""
+    <html>
+    <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    {css}
+    <script>
+    async function morePlease() {{
+        let res = await fetch('/drift_more');
+        let data = await res.json();
+        document.getElementById('jokeLine').textContent = data.joke;
+        document.getElementById('riddleQ').textContent = data.riddle_q;
+        document.getElementById('riddleA').textContent = data.riddle_a;
+    }}
+    </script>
+    </head>
+    <body>
+        {bubble_field_html()}
+        <div class="content-wrap">
+            {top_nav_html()}
+
+            <div class="panel">
+                <div class="panel-header-row">
+                    <div class="panel-emoji">🌌</div>
+                    <div class="panel-title-block">
+                        <div class="panel-title">Room 3 — Drift Space</div>
+                        <div class="panel-chip">rest</div>
+                        <div class="panel-desc">
+                            Slow drift. Gentle mind. You float here.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drift-block">
+                    <div class="drift-head">Joke</div>
+                    <div id="jokeLine">{j}</div>
+
+                    <div class="drift-head" style="margin-top:16px;">Riddle</div>
+                    <div id="riddleQ">{riddle_q}</div>
+                    <div id="riddleA" style="opacity:0.8; margin-top:6px;">{riddle_a}</div>
+
+                    <div class="drift-affirm">You are beautiful and loved 💖</div>
+                    <div class="drift-affirm" style="font-size:14px; opacity:0.8; margin-top:8px;">
+                        This app was created on Timmy’s iPhone 17 Pro Max 2TB.
+                    </div>
+
+                    <button class="more-btn" onclick="morePlease()">More ➜</button>
+                </div>
+            </div>
+        </div>
+        {bottom_nav_html()}
+    </body>
+    </html>
+    """
+    return html
+
+
+def render_diag():
+    # stealth diagnostics page at /ENGINE_HASH
+    css = base_css(
+        "radial-gradient(circle at 30% 20%, #003300 0%, #006b3a 40%, #000000 80%)",
+        "rgba(0,255,128,0.6)",
+        "rgba(0,128,64,0.4)"
+    )
+    info = f"""
+    <div class="drift-block">
+        <div class="drift-head">Diagnostics Route</div>
+        <div>Hash path: /{ENGINE_HASH}</div>
+        <div>Bound IP: 127.0.0.1</div>
+        <div>Current Port: {PORT}</div>
+        <div style="margin-top:12px;">
+            Port Hopper status: stable, music on 5000 left untouched.
+        </div>
+        <div style="margin-top:12px;">
+            Sniffer confirms zero external access. We are private.
+        </div>
     </div>
+    """
+    html = f"""
+    <html>
+    <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    {css}
+    </head>
+    <body>
+        {bubble_field_html()}
+        <div class="content-wrap">
+            {top_nav_html()}
 
-    <div class="playlist">
-      <div class="track">
-        <div class="track-cover">001</div>
-        <div class="track-main">
-          <div class="track-title">“Bubble Drift”</div>
-          <div class="track-meta">timmytime • unreleased set</div>
+            <div class="panel">
+                <div class="panel-header-row">
+                    <div class="panel-emoji">🛰️</div>
+                    <div class="panel-title-block">
+                        <div class="panel-title">Engine Diagnostics</div>
+                        <div class="panel-chip">private</div>
+                        <div class="panel-desc">
+                            Internal only. Port watcher, bubble check, self-healing core.
+                        </div>
+                    </div>
+                </div>
+
+                {info}
+            </div>
         </div>
-        <button class="track-btn">▶ Play</button>
-      </div>
+        {bottom_nav_html()}
+    </body>
+    </html>
+    """
+    return html
 
-      <div class="track">
-        <div class="track-cover">002</div>
-        <div class="track-main">
-          <div class="track-title">“Dock Lights at 3AM”</div>
-          <div class="track-meta">midnight tape • slow mix</div>
-        </div>
-        <button class="track-btn">▶ Play</button>
-      </div>
 
-      <div class="track">
-        <div class="track-cover">003</div>
-        <div class="track-main">
-          <div class="track-title">“Captain’s Broadcast Intro”</div>
-          <div class="track-meta">voice log • welcome message</div>
-        </div>
-        <button class="track-btn">▶ Play</button>
-      </div>
-    </div>
-  </div>
-</section>
+# ============================================================
+# ROUTES
+# ============================================================
 
-<section id="maya">
-  <div class="section-card">
-    <div class="sec-head-row">
-      <div class="sec-left">
-        <span class="sec-eyebrow">🤖 COPILOT</span>
-        <div class="sec-title">Maya — Ship Assistant</div>
-        <div class="sec-desc">
-          This is the chat console. Right now it’s front-end only
-          (no backend connection yet), but visitors will feel like
-          they’re talking to your AI.
-        </div>
-      </div>
-      <div class="mini-chip">Prototype</div>
-    </div>
+@app.route("/")
+def home():
+    return Response(render_engine_room(), mimetype="text/html")
 
-    <div class="chat-shell">
-      <div class="chat-log" id="chatLog">
-        <div class="chat-bubble">
-          <strong>Maya:</strong> Welcome aboard, Captain. All systems are warm.
-          What’s our next move?
-        </div>
-        <div class="chat-bubble me">
-          <strong>You:</strong> Status on engines and crew morale?
-        </div>
-        <div class="chat-bubble">
-          <strong>Maya:</strong> Engines humming. Crew is curious and awake.
-          Recommend broadcasting music to keep them steady. 🌈
-        </div>
-      </div>
-      <div class="chat-input-row">
-        <input class="chat-input" id="chatInput"
-          placeholder="Type to Maya (UI only right now)..." />
-        <button class="chat-send-btn" onclick="fakeSend()">Send</button>
-      </div>
-    </div>
-  </div>
-</section>
+@app.route("/room1")
+def room1():
+    return Response(render_room1(), mimetype="text/html")
 
-<section id="engine-room">
-  <div class="section-card">
-    <div class="sec-head-row">
-      <div class="sec-left">
-        <span class="sec-eyebrow">🛠 ENGINE ROOM</span>
-        <div class="sec-title">Ship Core Status</div>
-        <div class="sec-desc">
-          You can tell people what’s live, what’s coming next,
-          what’s under repair. You control the narrative here.
-        </div>
-      </div>
-      <div class="mini-chip">Public Readout</div>
-    </div>
+@app.route("/room2")
+def room2():
+    return Response(render_room2(), mimetype="text/html")
 
-    <div class="playlist" style="margin-top:1rem;">
-      <div class="track">
-        <div class="track-main" style="padding-left:0;">
-          <div class="track-title">Hull</div>
-          <div class="track-meta">Online • Public website is live 🌐</div>
-        </div>
-      </div>
-      <div class="track">
-        <div class="track-main" style="padding-left:0;">
-          <div class="track-title">Radio Deck</div>
-          <div class="track-meta">Streaming panel stubbed in 🎙️</div>
-        </div>
-      </div>
-      <div class="track">
-        <div class="track-main" style="padding-left:0;">
-          <div class="track-title">AI Copilot</div>
-          <div class="track-meta">Front-end console loaded 🤖</div>
-        </div>
-      </div>
-      <div class="track">
-        <div class="track-main" style="padding-left:0;">
-          <div class="track-title">Crew Access</div>
-          <div class="track-meta">Direct link share = instant boarding ✅</div>
-        </div>
-      </div>
-    </div>
+@app.route("/room3")
+def room3():
+    return Response(render_room3(), mimetype="text/html")
 
-  </div>
-</section>
+@app.route(f"/{ENGINE_HASH}")
+def diag():
+    return Response(render_diag(), mimetype="text/html")
 
-<section id="logs">
-  <div class="section-card">
-    <div class="sec-head-row">
-      <div class="sec-left">
-        <span class="sec-eyebrow">📓 SHIP LOG</span>
-        <div class="sec-title">Broadcast Log</div>
-        <div class="sec-desc">
-          Put captain notes here. This is where you talk to visitors.
-          You can literally update this text in GitHub from your phone
-          and it instantly goes live to everyone.
-        </div>
-      </div>
-      <div class="mini-chip">Public</div>
-    </div>
+@app.route("/maya", methods=["POST"])
+def maya_api():
+    data = request.get_json() or {}
+    q = (data.get("q") or "").strip().lower()
 
-    <div class="playlist" style="margin-top:1rem;">
-      <div class="track">
-        <div class="track-main" style="padding-left:0;">
-          <div class="track-title">Log #1</div>
-          <div class="track-meta">
-            We’re online. iPhone → GitHub Pages → world.  
-            Crew, report in.
-          </div>
-        </div>
-      </div>
+    # tiny onboard "AI" brain so Maya answers
+    if not q:
+        answer = "I'm here, Captain. I hear you. 💖"
+    elif "status" in q or "engine" in q:
+        answer = "Engines are humming and ports are cloaked. No leaks, no creepers."
+    elif "crew" in q or "morale" in q:
+        answer = "Crew morale is steady and curious. They’re watching you and feeling safe."
+    elif "route" in q or "next move" in q or "next" in q:
+        answer = "Next move: hydrate, breathe, and choose the room that feels best. I’ll follow."
+    else:
+        answer = "Logged. I’ll carry that forward, Captain. 💫"
 
-      <div class="track">
-        <div class="track-main" style="padding-left:0;">
-          <div class="track-title">Next</div>
-          <div class="track-meta">
-            Music deck goes live next. Then we wire Maya
-            so visitors can talk to her for real.
-          </div>
-        </div>
-      </div>
-    </div>
+    return jsonify({"reply": answer})
 
-  </div>
-</section>
+@app.route("/drift_more")
+def drift_more():
+    global joke_seed_offset
+    joke_seed_offset += 1
+    j = JOKES[(joke_seed_offset) % len(JOKES)]
+    rq, ra = RIDDLES[(joke_seed_offset) % len(RIDDLES)]
+    return jsonify({"joke": j, "riddle_q": rq, "riddle_a": ra})
 
-<footer>
-  Bubbleworld Ship • Timmy’s deck • running on just an iPhone. 🚀🌈
-</footer>
 
-<script>
-  // temporary front-end only "send" for Maya box
-  function fakeSend() {
-    const input = document.getElementById('chatInput');
-    const log = document.getElementById('chatLog');
-    const msg = input.value.trim();
-    if (!msg) return;
-    // add "you" bubble
-    const mine = document.createElement('div');
-    mine.className = 'chat-bubble me';
-    mine.innerHTML = "<strong>You:</strong> " + msg;
-    log.appendChild(mine);
+# ============================================================
+# BOOT: run server + auto-open browser to "/"
+# ============================================================
 
-    // fake Maya reply
-    const reply = document.createElement('div');
-    reply.className = 'chat-bubble';
-    reply.innerHTML = "<strong>Maya:</strong> Logged. I'll brief the crew.";
-    log.appendChild(reply);
+def open_browser_later(port):
+    # tiny delay so Flask is listening before Safari hits it
+    time.sleep(0.6)
+    webbrowser.open(f"http://127.0.0.1:{port}/")
 
-    input.value = "";
-    log.scrollTop = log.scrollHeight;
-  }
-</script>
-
-</body>
-</html>
+if __name__ == "__main__":
+    threading.Thread(target=open_browser_later, args=(PORT,), daemon=True).start()
+    app.run(host="127.0.0.1", port=PORT, debug=False)
