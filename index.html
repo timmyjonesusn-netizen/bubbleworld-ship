@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bubble World · Timmy Ship</title>
+<title>Bubble World · Timmy Time Music</title>
+
 <style>
     *{
         box-sizing:border-box;
@@ -25,28 +26,94 @@
         min-height:100dvh;
         position:relative;
         overflow-x:hidden;
+        padding-bottom:9rem; /* space for bottom pill */
     }
 
-    /* top badge */
+    /* soft glow background blobs */
+    .orb{
+        position:absolute;
+        border-radius:50%;
+        background:radial-gradient(circle at 30% 30%,
+            rgba(255,255,255,.9)0%,
+            rgba(255,0,170,.55)30%,
+            rgba(80,0,120,.4)60%,
+            rgba(0,0,0,0)70%);
+        box-shadow:
+            0 0 20px 4px rgba(255,0,170,.6),
+            0 0 60px 12px rgba(255,140,0,.4),
+            0 0 120px 24px rgba(170,0,255,.3);
+        filter:blur(.2px);
+        opacity:.5;
+        pointer-events:none;
+    }
+    .orb.big-center{
+        width:55vh;height:55vh;
+        max-width:520px;max-height:520px;
+        left:50%;top:6rem;
+        transform:translateX(-50%);
+        opacity:.28;
+    }
+    .orb.side-top{
+        width:200px;height:200px;
+        right:0;top:1rem;
+        opacity:.45;
+    }
+    .orb.low-left{
+        width:220px;height:220px;
+        left:1rem;bottom:10rem;
+        opacity:.7;
+    }
+    .orb.low-right{
+        width:260px;height:260px;
+        right:0;bottom:10rem;
+        opacity:.55;
+    }
+    .orb.floater1{
+        width:140px;height:140px;
+        left:55%;top:18rem;
+        transform:translateX(-50%);
+        opacity:.7;
+    }
+    .orb.floater2{
+        width:130px;height:130px;
+        left:40%;top:23rem;
+        transform:translateX(-50%);
+        opacity:.6;
+    }
+    .orb.floater3{
+        width:150px;height:150px;
+        right:2rem;top:22rem;
+        opacity:.5;
+    }
+
+    /* badge */
     .badge-wrap{
         display:flex;
         justify-content:center;
         margin-top:1.5rem;
+        position:relative;
+        z-index:3;
+        padding:0 1rem;
     }
     .badge{
         border-radius:999px;
         border:1px solid rgba(255,255,255,.3);
         background:rgba(0,0,0,.4);
         padding:.6rem 1rem;
-        font-size:.8rem;
+        font-size:.75rem;
         font-weight:500;
         letter-spacing:.08em;
         color:#fff;
-        text-shadow:0 0 6px rgba(255,0,170,.6),0 0 24px rgba(170,0,255,.5);
-        box-shadow:0 30px 60px rgba(0,0,0,.8),
-                   0 0 30px rgba(255,0,200,.4),
-                   0 0 80px rgba(255,128,0,.2);
+        text-transform:uppercase;
+        text-shadow:
+            0 0 6px rgba(255,0,170,.6),
+            0 0 24px rgba(170,0,255,.5);
+        box-shadow:
+            0 30px 60px rgba(0,0,0,.8),
+            0 0 30px rgba(255,0,200,.4),
+            0 0 80px rgba(255,128,0,.2);
         backdrop-filter:blur(10px);
+        text-align:center;
     }
 
     /* hero text */
@@ -55,6 +122,8 @@
         padding:1.5rem 1rem 0 1rem;
         max-width:34rem;
         margin:0 auto;
+        position:relative;
+        z-index:3;
     }
     .title{
         font-size:clamp(2rem,2.5vw,2.6rem);
@@ -70,11 +139,13 @@
         margin-top:1rem;
     }
     .desc{
-        font-size:1.25rem;
+        font-size:1.2rem;
         line-height:1.4;
         font-weight:500;
         color:#fff;
-        text-shadow:0 0 8px rgba(0,0,0,.8),0 0 16px rgba(255,0,150,.4);
+        text-shadow:
+            0 0 8px rgba(0,0,0,.8),
+            0 0 16px rgba(255,0,150,.4);
         margin-top:1rem;
     }
     .note{
@@ -86,70 +157,92 @@
         margin-top:1rem;
     }
 
-    /* bubble art clusters (static SVG-ish blobs using gradients) */
-    .bubbles-bg{
-        position:absolute;
-        inset:0;
-        overflow:hidden;
-        pointer-events:none;
-        z-index:0;
-    }
-    .orb{
-        position:absolute;
-        border-radius:50%;
-        background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.9)0%,rgba(255,0,170,.55)30%,rgba(80,0,120,.4)60%,rgba(0,0,0,0)70%);
-        box-shadow:
-            0 0 20px 4px rgba(255,0,170,.6),
-            0 0 60px 12px rgba(255,140,0,.4),
-            0 0 120px 24px rgba(170,0,255,.3);
-        filter:blur(0.2px);
-        opacity:.8;
-    }
-    /* manual layout of some foreground bubbles to match your screenshot */
-    .orb.big-center{
-        width:55vh;
-        height:55vh;
-        max-width:520px;
-        max-height:520px;
-        left:50%;
-        top:9rem;
-        transform:translateX(-50%);
-        opacity:.3;
-    }
-    .orb.side-top{
-        width:200px;height:200px;
-        right:0;top:2rem;
-        opacity:.5;
-    }
-    .orb.low-left{
-        width:220px;height:220px;
-        left:1rem;bottom:8rem;
-        opacity:.8;
-    }
-    .orb.low-right{
-        width:260px;height:260px;
-        right:0;bottom:8rem;
-        opacity:.6;
-    }
-    .orb.floater1{
-        width:140px;height:140px;
-        left:55%;top:22rem;
-        transform:translateX(-50%);
-        opacity:.7;
-    }
-    .orb.floater2{
-        width:130px;height:130px;
-        left:40%;top:27rem;
-        transform:translateX(-50%);
-        opacity:.6;
-    }
-    .orb.floater3{
-        width:150px;height:150px;
-        right:2rem;top:26rem;
-        opacity:.5;
+    /* playlist section wrapper */
+    .playlists-block{
+        position:relative;
+        z-index:3;
+        max-width:34rem;
+        margin:2rem auto 0 auto;
+        padding:0 1rem 2rem 1rem;
     }
 
-    /* music pill */
+    .section-label{
+        font-size:.8rem;
+        font-weight:600;
+        text-transform:uppercase;
+        letter-spacing:.08em;
+        color:#fff;
+        text-shadow:
+            0 0 8px rgba(255,0,170,.8),
+            0 0 24px rgba(170,0,255,.8);
+        margin-bottom:.75rem;
+        display:flex;
+        justify-content:center;
+        text-align:center;
+    }
+
+    /* grid for playlists */
+    .playlist-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(min(150px,48%),1fr));
+        gap:0.75rem 0.75rem;
+    }
+
+    .playlist-card{
+        background:radial-gradient(circle at 20% 20%,rgba(30,0,30,.8)0%,rgba(0,0,0,.6)60%);
+        border-radius:.9rem;
+        border:1px solid rgba(255,255,255,.35);
+        box-shadow:
+            0 20px 40px rgba(0,0,0,.9),
+            0 0 20px rgba(255,0,200,.4),
+            0 0 60px rgba(255,128,0,.25),
+            0 0 120px rgba(170,0,255,.25);
+        backdrop-filter:blur(10px);
+        padding:.9rem .9rem 1rem .9rem;
+        display:flex;
+        flex-direction:column;
+        justify-content:space-between;
+        min-height:110px;
+        text-decoration:none;
+        color:#fff;
+    }
+    .playlist-name{
+        font-size:1rem;
+        font-weight:600;
+        line-height:1.2;
+        color:#fff;
+        text-shadow:
+            0 0 6px rgba(255,0,170,.8),
+            0 0 18px rgba(170,0,255,.8);
+    }
+    .playlist-desc{
+        font-size:.8rem;
+        line-height:1.4;
+        color:rgba(255,255,255,.7);
+        margin-top:.5rem;
+        text-shadow:
+            0 0 6px rgba(0,0,0,.8),
+            0 0 12px rgba(255,0,170,.4);
+    }
+    .playlist-button{
+        margin-top:.75rem;
+        align-self:flex-start;
+        background:radial-gradient(circle at 20% 20%,rgba(255,0,187,.6)0%,rgba(120,0,255,.4)60%);
+        color:#fff;
+        font-size:.8rem;
+        font-weight:600;
+        padding:.6rem .8rem;
+        border-radius:.7rem;
+        border:1px solid rgba(255,255,255,.4);
+        text-shadow:0 0 4px rgba(0,0,0,.8);
+        box-shadow:
+            0 0 12px rgba(255,0,187,.8),
+            0 0 40px rgba(140,0,255,.8);
+        display:inline-block;
+        text-decoration:none;
+    }
+
+    /* bottom pill */
     .music-pill-wrap{
         width:100%;
         display:flex;
@@ -157,8 +250,9 @@
         position:fixed;
         left:0;
         bottom:1rem;
+        z-index:10;
         pointer-events:none;
-        z-index:5;
+        padding:0 1rem;
     }
     .music-pill{
         pointer-events:auto;
@@ -170,6 +264,7 @@
             0 0 30px rgba(255,0,200,.4),
             0 0 80px rgba(255,128,0,.2),
             0 0 140px rgba(170,0,255,.3);
+        backdrop-filter:blur(10px);
         padding:1rem 1rem;
         min-width:min(90%,28rem);
         max-width:28rem;
@@ -178,7 +273,6 @@
         align-items:center;
         flex-wrap:wrap;
         row-gap:.75rem;
-        backdrop-filter:blur(10px);
     }
     .music-left{
         display:flex;
@@ -188,7 +282,9 @@
         font-size:1.1rem;
         font-weight:600;
         color:#fff;
-        text-shadow:0 0 6px rgba(255,0,170,.8),0 0 18px rgba(170,0,255,.8);
+        text-shadow:
+            0 0 6px rgba(255,0,170,.8),
+            0 0 18px rgba(170,0,255,.8);
     }
     .music-sub{
         font-size:1rem;
@@ -211,166 +307,121 @@
             0 0 12px rgba(255,0,187,.8),
             0 0 40px rgba(140,0,255,.8);
     }
-    .music-btn:active{scale:.97;}
-
-    /* ENGINE ROOM PANEL (inserted under pill when local ship is reachable) */
-    .engine-panel-wrap{
-        width:100%;
-        display:flex;
-        justify-content:center;
-        position:fixed;
-        left:0;
-        bottom:7.5rem; /* sits above music pill */
-        z-index:4;
-        pointer-events:none;
-    }
-    .engine-panel{
-        pointer-events:auto;
-        background:rgba(0,0,0,.4);
-        border:1px solid rgba(0,255,140,.4);
-        border-radius:1rem;
-        box-shadow:
-            0 0 12px rgba(0,255,170,.8),
-            0 0 40px rgba(0,200,120,.4),
-            0 30px 60px rgba(0,0,0,.9);
-        min-width:min(90%,28rem);
-        max-width:28rem;
-        padding:1rem 1rem 1.2rem;
-        font-size:.9rem;
-        line-height:1.4;
-        color:#d8ffe8;
-        font-weight:500;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        display:none; /* hidden by default, JS will show if data loads */
-        backdrop-filter:blur(10px);
-    }
-    .engine-title{
-        font-size:.8rem;
-        font-weight:600;
-        text-transform:uppercase;
-        letter-spacing:.08em;
-        color:#7bffc5;
-        text-shadow:0 0 8px rgba(0,255,200,.8),0 0 24px rgba(0,140,80,.8);
-        margin-bottom:.5rem;
-    }
-    .engine-line{
-        margin-bottom:.4rem;
-        color:#d8ffe8;
-    }
-    .engine-ok{
-        color:#7bffc5;
-    }
-    .engine-warn{
-        color:#ffd27b;
-    }
-    .engine-bad{
-        color:#ff7b7b;
-    }
 </style>
 </head>
 <body>
 
-<!-- STATIC ORBS, MATCH YOUR SCREENSHOT -->
-<div class="bubbles-bg">
-    <div class="orb big-center"></div>
-    <div class="orb side-top"></div>
-    <div class="orb low-left"></div>
-    <div class="orb low-right"></div>
-    <div class="orb floater1"></div>
-    <div class="orb floater2"></div>
-    <div class="orb floater3"></div>
-</div>
+<!-- glow orbs -->
+<div class="orb big-center"></div>
+<div class="orb side-top"></div>
+<div class="orb low-left"></div>
+<div class="orb low-right"></div>
+<div class="orb floater1"></div>
+<div class="orb floater2"></div>
+<div class="orb floater3"></div>
 
-<!-- HERO TEXT -->
+<!-- header badge -->
 <div class="badge-wrap">
-    <div class="badge">ENGINE ROOM // SAFE MODE</div>
+    <div class="badge">TIMMY TIME MUSIC · LIVE ROOM</div>
 </div>
 
+<!-- hero -->
 <section class="hero">
     <div class="title">Bubble World</div>
-
     <div class="desc">
-        Private calm space. Port-hopping shield.
         You are loved. You are protected. You are still here.
     </div>
-
     <div class="note">
-        Public shell preview. Live core + Maya stay local.
+        Tap a mood below. Music launches in a new tab.
     </div>
 </section>
 
-<!-- THIS PANEL IS YOUR LIVE CORE STATUS -->
-<div class="engine-panel-wrap">
-    <div class="engine-panel" id="enginePanel">
-        <div class="engine-title">ENGINE TELEMETRY (LOCAL LINK)</div>
-        <div class="engine-line" id="snifferLine">Sniffer: …</div>
-        <div class="engine-line" id="hopperLine">Hopper: …</div>
-        <div class="engine-line" id="healerLine">Healer: …</div>
-        <div class="engine-line" id="mayaLine">Maya: …</div>
-    </div>
-</div>
+<!-- playlists -->
+<section class="playlists-block">
 
-<!-- TIMMY TIME MUSIC PILL -->
+    <div class="section-label">Room 1 · Purple Mind</div>
+    <div class="playlist-grid">
+        <a class="playlist-card" href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316" target="_blank" rel="noopener noreferrer">
+            <div class="playlist-name">Hope</div>
+            <div class="playlist-desc">Lift. Warm light. Shoulders down.</div>
+            <div class="playlist-button">Play Hope →</div>
+        </a>
+
+        <a class="playlist-card" href="https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df" target="_blank" rel="noopener noreferrer">
+            <div class="playlist-name">Soul</div>
+            <div class="playlist-desc">Deep heart / grounded / true you.</div>
+            <div class="playlist-button">Play Soul →</div>
+        </a>
+
+        <a class="playlist-card" href="https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c" target="_blank" rel="noopener noreferrer">
+            <div class="playlist-name">Beach</div>
+            <div class="playlist-desc">Sun on face. Waves in ear. Breathe.</div>
+            <div class="playlist-button">Play Beach →</div>
+        </a>
+
+        <a class="playlist-card" href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479" target="_blank" rel="noopener noreferrer">
+            <div class="playlist-name">Rest</div>
+            <div class="playlist-desc">Slow down. Release jaw. Close eyes.</div>
+            <div class="playlist-button">Play Rest →</div>
+        </a>
+
+        <a class="playlist-card" href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank" rel="noopener noreferrer">
+            <div class="playlist-name">Jazz</div>
+            <div class="playlist-desc">Late night calm. Soft chair energy.</div>
+            <div class="playlist-button">Play Jazz →</div>
+        </a>
+    </div>
+
+    <div class="section-label" style="margin-top:2rem;">Room 2 · Timmy Time</div>
+    <div class="playlist-grid">
+        <a class="playlist-card" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank" rel="noopener noreferrer">
+            <div class="playlist-name">Laugh</div>
+            <div class="playlist-desc">Stupid fun. Smile on purpose.</div>
+            <div class="playlist-button">Play Laugh →</div>
+        </a>
+
+        <a class="playlist-card" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank" rel="noopener noreferrer">
+            <div class="playlist-name">Play</div>
+            <div class="playlist-desc">Move your body / bounce / playful.</div>
+            <div class="playlist-button">Play Play →</div>
+        </a>
+
+        <a class="playlist-card" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank" rel="noopener noreferrer">
+            <div class="playlist-name">Fun</div>
+            <div class="playlist-desc">You’re allowed to enjoy this part.</div>
+            <div class="playlist-button">Play Fun →</div>
+        </a>
+
+        <a class="playlist-card" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank" rel="noopener noreferrer">
+            <div class="playlist-name">Motown</div>
+            <div class="playlist-desc">Classic groove. Head bob. Soul roots.</div>
+            <div class="playlist-button">Play Motown →</div>
+        </a>
+
+        <a class="playlist-card" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank" rel="noopener noreferrer">
+            <div class="playlist-name">Feeling It</div>
+            <div class="playlist-desc">Full charge. I’m still here.</div>
+            <div class="playlist-button">Play Feeling It →</div>
+        </a>
+    </div>
+
+</section>
+
+<!-- bottom pill stays for identity -->
 <div class="music-pill-wrap">
     <div class="music-pill">
         <div class="music-left">
             <div class="music-label">Timmy Time Music</div>
-            <div class="music-sub">tap to vibe 💜</div>
+            <div class="music-sub">Ragland · Live Core · iPhone 17 Pro Max 2TB</div>
         </div>
         <a class="music-btn"
            href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b"
-           target="_blank" rel="noopener noreferrer">
+           target="_blank"
+           rel="noopener noreferrer">
            Play
         </a>
     </div>
 </div>
-
-<script>
-/*
-GOAL:
-- Try to talk to your live local Flask ship.
-- If it answers, we show engine panel with real data.
-- If not, we stay quiet (public just sees the pretty shell).
-HOW IT WORKS:
-We call http://127.0.0.1:PORT/telemetry (you run this route locally).
-We do not expose port hopper logic or stealth hash to the public.
-*/
-
-const ENGINE_PORTS_TO_TRY = [5000,5001,5002,5003,5004,5005,5010,5011]; // hop-safe window
-async function tryFetchTelemetry() {
-    for (const port of ENGINE_PORTS_TO_TRY) {
-        try {
-            const res = await fetch(`http://127.0.0.1:${port}/telemetry`, {
-                method: 'GET'
-            });
-            if (res.ok) {
-                const data = await res.json();
-                applyTelemetry(data, port);
-                break;
-            }
-        } catch (e) {
-            // ignore error, try next port
-        }
-    }
-}
-
-function applyTelemetry(data, port){
-    const panel = document.getElementById('enginePanel');
-    panel.style.display = 'block';
-
-    document.getElementById('snifferLine').textContent =
-        `Sniffer: ${data.sniffer || "ok"} [port ${port}]`;
-    document.getElementById('hopperLine').textContent =
-        `Hopper: ${data.hopper || "stable"}`;
-    document.getElementById('healerLine').textContent =
-        `Healer: ${data.healer || "bubble field holding"}`;
-    document.getElementById('mayaLine').textContent =
-        `Maya: ${data.maya || "online 💖"}`;
-}
-
-// run check after page load
-tryFetchTelemetry();
-</script>
 
 </body>
 </html>
