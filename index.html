@@ -2,426 +2,737 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bubble World · Timmy Time Music</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bubble World Ship</title>
 <style>
-    *{
-        box-sizing:border-box;
-        margin:0;
-        padding:0;
-        -webkit-font-smoothing:antialiased;
-    }
-    body{
-        font-family:-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;
-        color:#fff;
-        min-height:100vh;
-        background:radial-gradient(circle at 50% 30%,rgba(255,0,128,0.25)0%,rgba(0,0,0,0)60%),
-                   radial-gradient(circle at 20% 80%,rgba(255,140,0,0.18)0%,rgba(0,0,0,0)60%),
-                   radial-gradient(circle at 80% 70%,rgba(138,43,226,0.35)0%,rgba(0,0,0,0)70%),
-                   #000014;
-        background-attachment:fixed;
-        display:flex;
-        flex-direction:column;
-        min-height:100dvh;
-        position:relative;
-        overflow-x:hidden;
-        padding-bottom:9rem; /* space for bottom pill */
-    }
+/* CORE DESIGN TOKENS */
+:root {
+    --room-bg: radial-gradient(circle at 30% 20%, #003300 0%, #006b3a 40%, #000000 80%);
+    --bubble-main: rgba(0,255,128,0.6);
+    --bubble-alt: rgba(0,128,64,0.4);
+    --card-bg: rgba(0,0,0,0.35);
+    --card-border: rgba(255,255,255,0.18);
+    --text-main: #fff;
+    --status-chip-bg: rgba(0,0,0,0.6);
+    --status-chip-text: #f9f9c5;
+    --yellow-btn-bg: radial-gradient(circle at 20% 20%, #fff8 0%, #ffe066 40%, #ffcf4d 60%, #b26a00 100%);
+    --yellow-btn-text: #000;
+}
 
-    /* soft glow background blobs */
-    .orb{
-        position:absolute;
-        border-radius:50%;
-        background:radial-gradient(circle at 30% 30%,
-            rgba(255,255,255,.9)0%,
-            rgba(255,0,170,.55)30%,
-            rgba(80,0,120,.4)60%,
-            rgba(0,0,0,0)70%);
-        box-shadow:
-            0 0 20px 4px rgba(255,0,170,.6),
-            0 0 60px 12px rgba(255,140,0,.4),
-            0 0 120px 24px rgba(170,0,255,.3);
-        filter:blur(.2px);
-        opacity:.5;
-        pointer-events:none;
-    }
-    .orb.big-center{
-        width:55vh;height:55vh;
-        max-width:520px;max-height:520px;
-        left:50%;top:6rem;
-        transform:translateX(-50%);
-        opacity:.28;
-    }
-    .orb.side-top{
-        width:200px;height:200px;
-        right:0;top:1rem;
-        opacity:.45;
-    }
-    .orb.low-left{
-        width:220px;height:220px;
-        left:1rem;bottom:10rem;
-        opacity:.7;
-    }
-    .orb.low-right{
-        width:260px;height:260px;
-        right:0;bottom:10rem;
-        opacity:.55;
-    }
-    .orb.floater1{
-        width:140px;height:140px;
-        left:55%;top:18rem;
-        transform:translateX(-50%);
-        opacity:.7;
-    }
-    .orb.floater2{
-        width:130px;height:130px;
-        left:40%;top:23rem;
-        transform:translateX(-50%);
-        opacity:.6;
-    }
-    .orb.floater3{
-        width:150px;height:150px;
-        right:2rem;top:22rem;
-        opacity:.5;
-    }
+* {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Text", Arial, sans-serif;
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+}
 
-    /* badge */
-    .badge-wrap{
-        display:flex;
-        justify-content:center;
-        margin-top:1.5rem;
-        position:relative;
-        z-index:3;
-        padding:0 1rem;
-    }
-    .badge{
-        border-radius:999px;
-        border:1px solid rgba(255,255,255,.3);
-        background:rgba(0,0,0,.4);
-        padding:.6rem 1rem;
-        font-size:.75rem;
-        font-weight:500;
-        letter-spacing:.08em;
-        color:#fff;
-        text-transform:uppercase;
-        text-shadow:
-            0 0 6px rgba(255,0,170,.6),
-            0 0 24px rgba(170,0,255,.5);
-        box-shadow:
-            0 30px 60px rgba(0,0,0,.8),
-            0 0 30px rgba(255,0,200,.4),
-            0 0 80px rgba(255,128,0,.2);
-        backdrop-filter:blur(10px);
-        text-align:center;
-    }
+body {
+    min-height: 100vh;
+    background: var(--room-bg) fixed;
+    position: relative;
+    overflow-x: hidden;
+    padding: 16px 16px 100px; /* bottom space so nav doesn't cover content */
+}
 
-    /* hero text */
-    .hero{
-        text-align:center;
-        padding:1.5rem 1rem 0 1rem;
-        max-width:34rem;
-        margin:0 auto;
-        position:relative;
-        z-index:3;
-    }
-    .title{
-        font-size:clamp(2rem,2.5vw,2.6rem);
-        line-height:1.15;
-        font-weight:700;
-        background:radial-gradient(circle at 20% 20%,#fff 0%,#ff00dd 30%,#ff7300 60%,#7a00ff 100%);
-        -webkit-background-clip:text;
-        color:transparent;
-        text-shadow:
-            0 0 12px rgba(255,0,170,.6),
-            0 0 32px rgba(255,140,0,.4),
-            0 0 64px rgba(170,0,255,.4);
-        margin-top:1rem;
-    }
-    .desc{
-        font-size:1.2rem;
-        line-height:1.4;
-        font-weight:500;
-        color:#fff;
-        text-shadow:
-            0 0 8px rgba(0,0,0,.8),
-            0 0 16px rgba(255,0,150,.4);
-        margin-top:1rem;
-    }
-    .note{
-        font-size:1rem;
-        line-height:1.4;
-        font-weight:400;
-        color:rgba(255,255,255,.75);
-        text-shadow:0 0 8px rgba(0,0,0,.7);
-        margin-top:1rem;
-    }
+/* bubble field */
+.bubble-field {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(20px);
+    opacity: 0.4;
+    animation: floatUp 8s linear infinite;
+    background: radial-gradient(circle at 30% 30%, var(--bubble-main) 0%, var(--bubble-alt) 60%, transparent 70%);
+    box-shadow: 0 0 60px var(--bubble-main), 0 0 120px var(--bubble-alt);
+}
+.bubble.slow { animation-duration: 12s; opacity:0.25; }
+.bubble.tiny { width:60px; height:60px; }
+.bubble.med { width:110px; height:110px; }
+.bubble.big { width:180px; height:180px; }
 
-    /* playlist section wrapper */
-    .playlists-block{
-        position:relative;
-        z-index:3;
-        max-width:34rem;
-        margin:2rem auto 0 auto;
-        padding:0 1rem 2rem 1rem;
-    }
+@keyframes floatUp {
+    0%   { transform: translateY(40vh) translateX(0);   }
+    100% { transform: translateY(-40vh) translateX(10vw);}
+}
 
-    .section-label{
-        font-size:.8rem;
-        font-weight:600;
-        text-transform:uppercase;
-        letter-spacing:.08em;
-        color:#fff;
-        text-shadow:
-            0 0 8px rgba(255,0,170,.8),
-            0 0 24px rgba(170,0,255,.8);
-        margin-bottom:.75rem;
-        display:flex;
-        justify-content:center;
-        text-align:center;
-    }
+/* shared layout wrappers */
+.content-wrap {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    margin: 0 auto 120px;
+}
 
-    /* grid for playlists */
-    .playlist-grid{
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(min(150px,48%),1fr));
-        gap:0.75rem 0.75rem;
-    }
+/* top nav bar */
+.top-nav {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: space-between;
+}
+.top-btn {
+    flex: 1;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    color: #fff;
+    text-decoration: none;
+    min-width: 0;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+.top-btn.active {
+    outline: 2px solid rgba(255,255,255,0.6);
+    background: rgba(0,0,0,0.6);
+}
 
-    .playlist-card{
-        background:radial-gradient(circle at 20% 20%,rgba(30,0,30,.8)0%,rgba(0,0,0,.6)60%);
-        border-radius:.9rem;
-        border:1px solid rgba(255,255,255,.35);
-        box-shadow:
-            0 20px 40px rgba(0,0,0,.9),
-            0 0 20px rgba(255,0,200,.4),
-            0 0 60px rgba(255,128,0,.25),
-            0 0 120px rgba(170,0,255,.25);
-        backdrop-filter:blur(10px);
-        padding:.9rem .9rem 1rem .9rem;
-        display:flex;
-        flex-direction:column;
-        justify-content:space-between;
-        min-height:110px;
-        text-decoration:none;
-        color:#fff;
-    }
-    .playlist-name{
-        font-size:1rem;
-        font-weight:600;
-        line-height:1.2;
-        color:#fff;
-        text-shadow:
-            0 0 6px rgba(255,0,170,.8),
-            0 0 18px rgba(170,0,255,.8);
-    }
-    .playlist-desc{
-        font-size:.8rem;
-        line-height:1.4;
-        color:rgba(255,255,255,.7);
-        margin-top:.5rem;
-        text-shadow:
-            0 0 6px rgba(0,0,0,.8),
-            0 0 12px rgba(255,0,170,.4);
-    }
-    .playlist-button{
-        margin-top:.75rem;
-        align-self:flex-start;
-        background:radial-gradient(circle at 20% 20%,rgba(255,0,187,.6)0%,rgba(120,0,255,.4)60%);
-        color:#fff;
-        font-size:.8rem;
-        font-weight:600;
-        padding:.6rem .8rem;
-        border-radius:.7rem;
-        border:1px solid rgba(255,255,255,.4);
-        text-shadow:0 0 4px rgba(0,0,0,.8);
-        box-shadow:
-            0 0 12px rgba(255,0,187,.8),
-            0 0 40px rgba(140,0,255,.8);
-        display:inline-block;
-        text-decoration:none;
-    }
+/* bottom nav */
+.bottom-nav {
+    position: fixed;
+    z-index: 10;
+    left:0;
+    right:0;
+    bottom:0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(20px);
+    border-top:1px solid rgba(255,255,255,0.2);
+    padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 12px);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:15px;
+    color:#fff;
+}
+.bottom-left,
+.bottom-right {
+    color:#fff;
+    font-weight:600;
+    font-size:16px;
+    text-decoration:none;
+}
+.bottom-pill {
+    background:radial-gradient(circle at 0% 0%, #ff00ff 0%, #ff0080 30%, #ff5500 60%, #0000 80%);
+    color:#fff;
+    font-weight:600;
+    font-size:14px;
+    padding:10px 14px;
+    line-height:1.2;
+    border-radius:999px;
+    box-shadow:0 0 20px #ff00ff,0 0 60px #ff0080;
+    border:1px solid rgba(255,255,255,0.4);
+    text-align:center;
+    text-decoration:none;
+}
 
-    /* bottom pill */
-    .music-pill-wrap{
-        width:100%;
-        display:flex;
-        justify-content:center;
-        position:fixed;
-        left:0;
-        bottom:1rem;
-        z-index:10;
-        pointer-events:none;
-        padding:0 1rem;
-    }
-    .music-pill{
-        pointer-events:auto;
-        background:radial-gradient(circle at 20% 20%,rgba(30,0,30,.8)0%,rgba(0,0,0,.6)60%);
-        border-radius:1rem;
-        border:1px solid rgba(255,255,255,.3);
-        box-shadow:
-            0 30px 60px rgba(0,0,0,.9),
-            0 0 30px rgba(255,0,200,.4),
-            0 0 80px rgba(255,128,0,.2),
-            0 0 140px rgba(170,0,255,.3);
-        backdrop-filter:blur(10px);
-        padding:1rem 1rem;
-        min-width:min(90%,28rem);
-        max-width:28rem;
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        flex-wrap:wrap;
-        row-gap:.75rem;
-    }
-    .music-left{
-        display:flex;
-        flex-direction:column;
-    }
-    .music-label{
-        font-size:1.1rem;
-        font-weight:600;
-        color:#fff;
-        text-shadow:
-            0 0 6px rgba(255,0,170,.8),
-            0 0 18px rgba(170,0,255,.8);
-    }
-    .music-sub{
-        font-size:1rem;
-        font-weight:400;
-        color:rgba(255,255,255,.7);
-    }
-    .music-btn{
-        background:radial-gradient(circle at 20% 20%,rgba(255,0,187,.6)0%,rgba(120,0,255,.4)60%);
-        color:#fff;
-        font-size:1rem;
-        font-weight:600;
-        padding:.7rem 1rem;
-        min-width:5rem;
-        text-align:center;
-        border-radius:.8rem;
-        border:1px solid rgba(255,255,255,.4);
-        text-decoration:none;
-        text-shadow:0 0 4px rgba(0,0,0,.8);
-        box-shadow:
-            0 0 12px rgba(255,0,187,.8),
-            0 0 40px rgba(140,0,255,.8);
-    }
+/* panels / cards */
+.panel {
+    position: relative;
+    z-index: 2;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 16px 16px 20px;
+    margin-bottom: 24px;
+    box-shadow:
+        0 30px 80px rgba(0,0,0,0.9),
+        0 0 80px var(--bubble-main);
+}
+.panel-header-row {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-start;
+    gap:8px;
+    margin-bottom:12px;
+}
+.panel-emoji {
+    font-size:24px;
+    line-height:24px;
+}
+.panel-title-block {
+    flex:1;
+    min-width:0;
+}
+.panel-title {
+    font-size:22px;
+    font-weight:600;
+    line-height:1.2;
+    color:#fff;
+}
+.panel-chip {
+    background: var(--status-chip-bg);
+    color: var(--status-chip-text);
+    font-size:13px;
+    line-height:1;
+    padding:6px 8px;
+    border-radius:8px;
+    font-weight:600;
+    border:1px solid rgba(255,255,255,0.15);
+    align-self:flex-start;
+    display:inline-block;
+    margin-top:4px;
+}
+.panel-desc {
+    font-size:17px;
+    line-height:1.4;
+    margin-top:8px;
+    color:#fff;
+}
+
+/* small info list in Engine Room */
+.status-list {
+    margin-top:16px;
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:12px;
+    overflow:hidden;
+}
+.status-item {
+    padding:14px 16px;
+    font-size:17px;
+    line-height:1.4;
+    background:rgba(0,0,0,0.2);
+    border-bottom:1px solid rgba(255,255,255,0.07);
+    color:#fff;
+}
+.status-item:last-child {
+    border-bottom:0;
+}
+.status-head {
+    font-size:18px;
+    font-weight:600;
+    color:#fff;
+}
+.status-sub {
+    font-size:15px;
+    opacity:0.9;
+}
+
+/* drift space block */
+.drift-block {
+    font-size:18px;
+    line-height:1.5;
+    color:#fff;
+    margin-top:12px;
+    background:rgba(0,0,0,0.35);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:12px;
+    padding:16px;
+}
+.drift-head {
+    font-size:16px;
+    font-weight:600;
+    color:#ffbbff;
+    margin-bottom:8px;
+}
+.drift-affirm {
+    font-size:18px;
+    font-weight:600;
+    color:#ffbbff;
+    margin-top:12px;
+}
+
+/* playlists */
+.playlist-board {
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:16px;
+    overflow:hidden;
+    background:rgba(0,0,0,0.25);
+}
+.track {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    padding:16px;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+    color:#fff;
+}
+.track:last-child {
+    border-bottom:0;
+}
+.track-left {
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+}
+.track-num {
+    flex-shrink:0;
+    width:48px;
+    height:48px;
+    border-radius:10px;
+    background:
+        radial-gradient(circle at 20% 20%, #fff0 0%, #fff0 30%, #0000 60%),
+        radial-gradient(circle at 20% 20%, var(--bubble-main) 0%, var(--bubble-alt) 60%, #0000 70%);
+    border:2px solid rgba(255,255,255,0.4);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    font-weight:700;
+    color:#000;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.8),
+        0 0 40px var(--bubble-main);
+}
+.track-info-title {
+    font-size:18px;
+    line-height:1.3;
+    font-weight:600;
+    color:#fff;
+}
+.track-info-meta {
+    font-size:15px;
+    line-height:1.3;
+    color:#fff;
+    opacity:0.9;
+}
+.play-btn {
+    background: var(--yellow-btn-bg);
+    color:#000;
+    font-weight:700;
+    border-radius:10px;
+    padding:12px 16px;
+    font-size:16px;
+    border:0;
+    text-decoration:none;
+    box-shadow:0 10px 30px rgba(0,0,0,0.7);
+}
+
+/* show/hide rooms */
+.room-section {
+    display:none;
+    animation: fadeRoom 0.4s ease both;
+}
+.room-section.active {
+    display:block;
+}
+@keyframes fadeRoom {
+    0% { opacity:0; transform:translateY(10px) scale(0.98); }
+    100% { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* helper for footer spacing */
+.footer-spacer {
+    height:80px;
+}
 </style>
 </head>
 <body>
 
-<!-- glow orbs -->
-<div class="orb big-center"></div>
-<div class="orb side-top"></div>
-<div class="orb low-left"></div>
-<div class="orb low-right"></div>
-<div class="orb floater1"></div>
-<div class="orb floater2"></div>
-<div class="orb floater3"></div>
-
-<!-- header badge -->
-<div class="badge-wrap">
-    <div class="badge">TIMMY TIME MUSIC · LIVE ROOM</div>
+<!-- bubble field (colors update via JS by changing CSS variables) -->
+<div class="bubble-field" id="bubbleField">
+    <div class="bubble big"  style="left:10%; bottom:-10%;"></div>
+    <div class="bubble med slow" style="left:70%; bottom:-20%;"></div>
+    <div class="bubble tiny" style="left:40%; bottom:-15%;"></div>
+    <div class="bubble med" style="left:20%; bottom:-25%;"></div>
+    <div class="bubble big slow" style="left:85%; bottom:-30%;"></div>
 </div>
 
-<!-- hero -->
-<section class="hero">
-    <div class="title">Bubble World</div>
-    <div class="desc">
-        You are loved. You are protected. You are still here.
-    </div>
-    <div class="note">
-        Tap a mood below. Music launches in a new tab.
-    </div>
-</section>
+<div class="content-wrap">
 
-<!-- playlists -->
-<section class="playlists-block">
+    <!-- top nav -->
+    <nav class="top-nav">
+        <button class="top-btn" id="btn-engine" onclick="goRoom('engine')">Engine</button>
+        <button class="top-btn" id="btn-room1" onclick="goRoom('room1')">Room 1</button>
+        <button class="top-btn" id="btn-room2" onclick="goRoom('room2')">Room 2</button>
+        <button class="top-btn" id="btn-room3" onclick="goRoom('room3')">Room 3</button>
+    </nav>
 
-    <div class="section-label">Room 1 · Purple Mind</div>
-    <div class="playlist-grid">
-        <a class="playlist-card" href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316" target="_blank" rel="noopener noreferrer">
-            <div class="playlist-name">Hope</div>
-            <div class="playlist-desc">Lift. Warm light. Shoulders down.</div>
-            <div class="playlist-button">Play Hope →</div>
-        </a>
-
-        <a class="playlist-card" href="https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df" target="_blank" rel="noopener noreferrer">
-            <div class="playlist-name">Soul</div>
-            <div class="playlist-desc">Deep heart / grounded / true you.</div>
-            <div class="playlist-button">Play Soul →</div>
-        </a>
-
-        <a class="playlist-card" href="https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c" target="_blank" rel="noopener noreferrer">
-            <div class="playlist-name">Beach</div>
-            <div class="playlist-desc">Sun on face. Waves in ear. Breathe.</div>
-            <div class="playlist-button">Play Beach →</div>
-        </a>
-
-        <a class="playlist-card" href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479" target="_blank" rel="noopener noreferrer">
-            <div class="playlist-name">Rest</div>
-            <div class="playlist-desc">Slow down. Release jaw. Close eyes.</div>
-            <div class="playlist-button">Play Rest →</div>
-        </a>
-
-        <a class="playlist-card" href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank" rel="noopener noreferrer">
-            <div class="playlist-name">Jazz</div>
-            <div class="playlist-desc">Late night calm. Soft chair energy.</div>
-            <div class="playlist-button">Play Jazz →</div>
-        </a>
-    </div>
-
-    <div class="section-label" style="margin-top:2rem;">Room 2 · Timmy Time</div>
-    <div class="playlist-grid">
-        <a class="playlist-card" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank" rel="noopener noreferrer">
-            <div class="playlist-name">Laugh</div>
-            <div class="playlist-desc">Stupid fun. Smile on purpose.</div>
-            <div class="playlist-button">Play Laugh →</div>
-        </a>
-
-        <a class="playlist-card" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank" rel="noopener noreferrer">
-            <div class="playlist-name">Play</div>
-            <div class="playlist-desc">Move your body / bounce / playful.</div>
-            <div class="playlist-button">Play Play →</div>
-        </a>
-
-        <a class="playlist-card" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank" rel="noopener noreferrer">
-            <div class="playlist-name">Fun</div>
-            <div class="playlist-desc">You’re allowed to enjoy this part.</div>
-            <div class="playlist-button">Play Fun →</div>
-        </a>
-
-        <a class="playlist-card" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank" rel="noopener noreferrer">
-            <div class="playlist-name">Motown</div>
-            <div class="playlist-desc">Classic groove. Head bob. Soul roots.</div>
-            <div class="playlist-button">Play Motown →</div>
-        </a>
-
-        <a class="playlist-card" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank" rel="noopener noreferrer">
-            <div class="playlist-name">Feeling It</div>
-            <div class="playlist-desc">Full charge. I’m still here.</div>
-            <div class="playlist-button">Play Feeling It →</div>
-        </a>
-    </div>
-
-</section>
-
-<!-- bottom pill stays for identity -->
-<div class="music-pill-wrap">
-    <div class="music-pill">
-        <div class="music-left">
-            <div class="music-label">Timmy Time Music</div>
-            <div class="music-sub">Ragland · Live Core · iPhone 17 Pro Max 2TB</div>
+    <!-- ============================= -->
+    <!-- ENGINE ROOM (green core)      -->
+    <!-- ============================= -->
+    <section class="room-section" id="engine">
+        <div class="panel">
+            <div class="panel-header-row">
+                <div class="panel-emoji">👋</div>
+                <div class="panel-title-block">
+                    <div class="panel-title">Welcome Aboard, Captain Timmy!</div>
+                    <div class="panel-chip">core</div>
+                    <div class="panel-desc">
+                        This ship is alive. You’re in the Engine Room (green core).
+                    </div>
+                </div>
+            </div>
+            <div class="panel-desc" style="font-size:15px;opacity:.9;">
+                Sniffer: all clear on ports.<br/>
+                Hopper: cloak engaged, we never kill 5000 (music stays safe).<br/>
+                Healer: bubble regen active, shields soft and warm.<br/>
+            </div>
         </div>
-        <a class="music-btn"
-           href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b"
-           target="_blank"
-           rel="noopener noreferrer">
-           Play
-        </a>
-    </div>
+
+        <div class="panel">
+            <div class="panel-header-row">
+                <div class="panel-emoji">🛠️</div>
+                <div class="panel-title-block">
+                    <div class="panel-title">Ship Core Status</div>
+                    <div class="panel-chip">online</div>
+                    <div class="panel-desc">
+                        You control the story. Tell visitors what's live and what's under repair.
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-list">
+                <div class="status-item">
+                    <div class="status-head">Hull</div>
+                    <div class="status-sub">
+                        Online · Bubble World core running in protective mode.
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-head">Radio Deck</div>
+                    <div class="status-sub">
+                        Music stream lives. Suno is honored.
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-head">Crew Access</div>
+                    <div class="status-sub">
+                        Direct link share = instant boarding ✅
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-head">Bubble Integrity</div>
+                    <div class="status-sub">
+                        External probes = 0. We are private.
+                    </div>
+                </div>
+            </div>
+
+            <div class="drift-block" style="margin-top:16px;">
+                <div class="drift-head">Sniffer</div>
+                <div>Sniffer sweep: no creepers detected. Anxiety level dropping.</div>
+
+                <div class="drift-head" style="margin-top:12px;">Port Hopper</div>
+                <div>Handshake rotated. Cloak engaged. 5000 protected.</div>
+
+                <div class="drift-head" style="margin-top:12px;">Healer</div>
+                <div>Bubble regen active. Nervous system cooling. You’re safe in here.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================= -->
+    <!-- ROOM 1 (Purple Mind / calm)   -->
+    <!-- ============================= -->
+    <section class="room-section" id="room1">
+        <div class="panel">
+            <div class="panel-header-row">
+                <div class="panel-emoji">💜</div>
+                <div class="panel-title-block">
+                    <div class="panel-title">Room 1 — Purple Mind</div>
+                    <div class="panel-chip">calm</div>
+                    <div class="panel-desc">
+                        Soft landing. Healing playlists. Breathe here.
+                    </div>
+                </div>
+            </div>
+
+            <div class="playlist-board">
+
+                <div class="track">
+                    <div class="track-left">
+                        <div class="track-num">001</div>
+                        <div>
+                            <div class="track-info-title">Hope</div>
+                            <div class="track-info-meta">tap to open playlist</div>
+                        </div>
+                    </div>
+                    <a class="play-btn" href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316" target="_blank">▶ Play</a>
+                </div>
+
+                <div class="track">
+                    <div class="track-left">
+                        <div class="track-num">002</div>
+                        <div>
+                            <div class="track-info-title">Soul</div>
+                            <div class="track-info-meta">tap to open playlist</div>
+                        </div>
+                    </div>
+                    <a class="play-btn" href="https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df" target="_blank">▶ Play</a>
+                </div>
+
+                <div class="track">
+                    <div class="track-left">
+                        <div class="track-num">003</div>
+                        <div>
+                            <div class="track-info-title">Beach</div>
+                            <div class="track-info-meta">tap to open playlist</div>
+                        </div>
+                    </div>
+                    <a class="play-btn" href="https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c" target="_blank">▶ Play</a>
+                </div>
+
+                <div class="track">
+                    <div class="track-left">
+                        <div class="track-num">004</div>
+                        <div>
+                            <div class="track-info-title">Rest</div>
+                            <div class="track-info-meta">tap to open playlist</div>
+                        </div>
+                    </div>
+                    <a class="play-btn" href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479" target="_blank">▶ Play</a>
+                </div>
+
+                <div class="track">
+                    <div class="track-left">
+                        <div class="track-num">005</div>
+                        <div>
+                            <div class="track-info-title">Jazz</div>
+                            <div class="track-info-meta">tap to open playlist</div>
+                        </div>
+                    </div>
+                    <a class="play-btn" href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank">▶ Play</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================= -->
+    <!-- ROOM 2 (Timmy Time Music)     -->
+    <!-- ============================= -->
+    <section class="room-section" id="room2">
+        <div class="panel">
+            <div class="panel-header-row">
+                <div class="panel-emoji">🎧</div>
+                <div class="panel-title-block">
+                    <div class="panel-title">Room 2 — Timmy Time Music</div>
+                    <div class="panel-chip">pulse</div>
+                    <div class="panel-desc">
+                        Live vibe board. Energy for the crew.
+                    </div>
+                </div>
+            </div>
+
+            <div class="playlist-board">
+
+                <div class="track">
+                    <div class="track-left">
+                        <div class="track-num">001</div>
+                        <div>
+                            <div class="track-info-title">Laugh</div>
+                            <div class="track-info-meta">open in Suno</div>
+                        </div>
+                    </div>
+                    <a class="play-btn" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">▶ Play</a>
+                </div>
+
+                <div class="track">
+                    <div class="track-left">
+                        <div class="track-num">002</div>
+                        <div>
+                            <div class="track-info-title">Play</div>
+                            <div class="track-info-meta">open in Suno</div>
+                        </div>
+                    </div>
+                    <a class="play-btn" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">▶ Play</a>
+                </div>
+
+                <div class="track">
+                    <div class="track-left">
+                        <div class="track-num">003</div>
+                        <div>
+                            <div class="track-info-title">Fun</div>
+                            <div class="track-info-meta">open in Suno</div>
+                        </div>
+                    </div>
+                    <a class="play-btn" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">▶ Play</a>
+                </div>
+
+                <div class="track">
+                    <div class="track-left">
+                        <div class="track-num">004</div>
+                        <div>
+                            <div class="track-info-title">Motown</div>
+                            <div class="track-info-meta">open in Suno</div>
+                        </div>
+                    </div>
+                    <a class="play-btn" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">▶ Play</a>
+                </div>
+
+                <div class="track">
+                    <div class="track-left">
+                        <div class="track-num">005</div>
+                        <div>
+                            <div class="track-info-title">Feeling It</div>
+                            <div class="track-info-meta">open in Suno</div>
+                        </div>
+                    </div>
+                    <a class="play-btn" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">▶ Play</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================= -->
+    <!-- ROOM 3 (Drift Space)          -->
+    <!-- ============================= -->
+    <section class="room-section" id="room3">
+        <div class="panel">
+            <div class="panel-header-row">
+                <div class="panel-emoji">🌌</div>
+                <div class="panel-title-block">
+                    <div class="panel-title">Room 3 — Drift Space</div>
+                    <div class="panel-chip">rest</div>
+                    <div class="panel-desc">
+                        Slow drift. Gentle mind. You float here.
+                    </div>
+                </div>
+            </div>
+
+            <div class="drift-block">
+                <div class="drift-head">Joke</div>
+                <div id="jokeLine">
+                    Why did the spaceship get therapy? It had too much space in its schedule.
+                </div>
+
+                <div class="drift-head" style="margin-top:16px;">Riddle</div>
+                <div id="riddleQ">
+                    I speak without a mouth and hear without ears. I have nobody, but I come alive with wind. What am I?
+                </div>
+                <div id="riddleA" style="opacity:0.8; margin-top:6px;">
+                    An echo.
+                </div>
+
+                <div class="drift-affirm">You are beautiful and loved 💖</div>
+                <div class="drift-affirm" style="font-size:14px; opacity:0.8; margin-top:8px;">
+                    This app was created on Timmy’s iPhone 17 Pro Max 2TB.
+                </div>
+
+                <button class="play-btn" style="margin-top:16px;" onclick="morePlease()">More ➜</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-spacer"></div>
 </div>
 
+<!-- bottom nav (persists across rooms) -->
+<div class="bottom-nav">
+    <a class="bottom-left" onclick="goRoom('engine')">🏠</a>
+    <a class="bottom-pill" onclick="goRoom('room2')">Timmy Time Music</a>
+    <a class="bottom-right" onclick="goRoom('room3')">💬</a>
+</div>
+
+<script>
+/* -----------------------------------
+   State
+----------------------------------- */
+const jokes = [
+    "Why did the spaceship get therapy? It had too much space in its schedule.",
+    "Captain, crew morale is at 12/10. Science calls that 'statistically unfair.'",
+    "I told the engine to chill. It said 'I'm already cool, baby.'",
+    "Port Hopper report: we dipped so hard even Sunday couldn't find us.",
+];
+const riddles = [
+    { q: "I speak without a mouth and hear without ears. I have nobody, but I come alive with wind. What am I?", a: "An echo." },
+    { q: "What has cities, but no houses; mountains, but no trees; water, but no fish?", a: "A map." },
+    { q: "The more you take, the more you leave behind. What am I?", a: "Footsteps." }
+];
+
+let driftIndex = 0;
+
+/* -----------------------------------
+   Drift Space 'More ➜'
+----------------------------------- */
+function morePlease() {
+    driftIndex = (driftIndex + 1) % jokes.length;
+    const jokeSpot = document.getElementById("jokeLine");
+    const rQ = document.getElementById("riddleQ");
+    const rA = document.getElementById("riddleA");
+
+    const pickJoke = jokes[driftIndex % jokes.length];
+    const pickRiddle = riddles[driftIndex % riddles.length];
+
+    jokeSpot.textContent = pickJoke;
+    rQ.textContent = pickRiddle.q;
+    rA.textContent = pickRiddle.a;
+}
+
+/* -----------------------------------
+   Room Switching Logic
+----------------------------------- */
+function setThemeFor(roomName) {
+    // We update CSS variables on :root
+    const root = document.documentElement;
+
+    if (roomName === "engine") {
+        root.style.setProperty('--room-bg', 'radial-gradient(circle at 30% 20%, #003300 0%, #006b3a 40%, #000000 80%)');
+        root.style.setProperty('--bubble-main', 'rgba(0,255,128,0.6)');
+        root.style.setProperty('--bubble-alt', 'rgba(0,128,64,0.4)');
+    }
+    if (roomName === "room1") {
+        root.style.setProperty('--room-bg', 'radial-gradient(circle at 30% 20%, #2b003a 0%, #5e0099 40%, #000000 80%)');
+        root.style.setProperty('--bubble-main', 'rgba(255,0,255,0.6)');
+        root.style.setProperty('--bubble-alt', 'rgba(255,128,255,0.4)');
+    }
+    if (roomName === "room2") {
+        root.style.setProperty('--room-bg', 'radial-gradient(circle at 30% 20%, #4a0024 0%, #cc0077 40%, #ff5500 70%, #000000 90%)');
+        root.style.setProperty('--bubble-main', 'rgba(255,0,128,0.6)');
+        root.style.setProperty('--bubble-alt', 'rgba(255,128,0,0.4)');
+    }
+    if (roomName === "room3") {
+        root.style.setProperty('--room-bg', 'radial-gradient(circle at 30% 20%, #001133 0%, #2a0066 40%, #b300ff 70%, #000000 90%)');
+        root.style.setProperty('--bubble-main', 'rgba(128,0,255,0.6)');
+        root.style.setProperty('--bubble-alt', 'rgba(255,0,255,0.4)');
+    }
+}
+
+function highlightNav(roomName) {
+    const ids = ["btn-engine","btn-room1","btn-room2","btn-room3"];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove("active");
+    });
+    if (roomName==="engine") document.getElementById("btn-engine").classList.add("active");
+    if (roomName==="room1") document.getElementById("btn-room1").classList.add("active");
+    if (roomName==="room2") document.getElementById("btn-room2").classList.add("active");
+    if (roomName==="room3") document.getElementById("btn-room3").classList.add("active");
+}
+
+function goRoom(roomName) {
+    // hide all sections
+    const rooms = ["engine","room1","room2","room3"];
+    rooms.forEach(r => {
+        const sec = document.getElementById(r);
+        if (sec) sec.classList.remove("active");
+    });
+
+    // show requested
+    const activeSec = document.getElementById(roomName);
+    if (activeSec) activeSec.classList.add("active");
+
+    // retheme bubbles + bg
+    setThemeFor(roomName);
+
+    // update nav highlight
+    highlightNav(roomName);
+
+    // scroll to top (feels like jump-cut room change)
+    window.scrollTo({top:0, left:0, behavior:"instant"});
+}
+
+/* -----------------------------------
+   Boot up in Engine Room
+----------------------------------- */
+goRoom("engine");
+</script>
 </body>
 </html>
