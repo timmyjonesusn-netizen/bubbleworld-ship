@@ -4,9 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Bubble World Ship</title>
-
 <style>
-    /* ---- RESET / BASE ---- */
     * {
         box-sizing: border-box;
         -webkit-font-smoothing: antialiased;
@@ -25,7 +23,6 @@
                     #000014;
     }
 
-    /* ---- GLOW OVERLAY LAYERS ---- */
     .aura {
         position: absolute;
         inset: 0;
@@ -35,13 +32,11 @@
         mix-blend-mode: screen;
         animation: pulseGlow 6s infinite;
     }
-
     @keyframes pulseGlow {
         0%,100% {opacity: 0.6;}
         50%     {opacity: 1;}
     }
 
-    /* ---- FLOATING BUBBLES FIELD ---- */
     .bubble-field {
         position: absolute;
         inset: 0;
@@ -64,8 +59,6 @@
         opacity: 0.7;
         animation: drift linear infinite;
     }
-
-    /* bubble drift keyframes */
     @keyframes drift {
         0%   { transform: translateY(0) translateX(0) scale(1);   opacity: 0.0; }
         10%  { opacity: 0.8; }
@@ -73,7 +66,6 @@
         100% { transform: translateY(-120vh) translateX(20vw) scale(1.2); opacity: 0; }
     }
 
-    /* ---- MAIN WRAPPER ---- */
     .shell {
         position: relative;
         z-index: 2;
@@ -82,14 +74,8 @@
         flex-direction: column;
         justify-content: space-between;
         padding: clamp(1.5rem, 2vw, 2rem);
-    }
-
-    /* ---- HEADER / TITLE AREA ---- */
-    .top-block {
         text-align: center;
-        padding-top: 1rem;
     }
-
     .ship-label {
         font-size: clamp(0.7rem, 0.4vw, 0.8rem);
         font-weight: 500;
@@ -102,8 +88,8 @@
         border-radius: 999px;
         padding: 0.4rem 0.8rem;
         backdrop-filter: blur(8px);
+        margin-top: 1rem;
     }
-
     .main-title {
         font-size: clamp(2rem, 2.5vw, 2.6rem);
         font-weight: 600;
@@ -117,7 +103,6 @@
             0 0 32px rgba(255,140,0,0.4),
             0 0 64px rgba(170,0,255,0.4);
     }
-
     .subtitle {
         margin-top: 0.75rem;
         font-size: clamp(0.95rem, 1vw, 1.05rem);
@@ -129,113 +114,15 @@
         color: rgba(255,255,255,0.8);
         text-shadow: 0 0 8px rgba(255,0,170,0.4);
     }
-
-    /* ---- ROOM BUTTON GRID ---- */
-    .rooms {
-        display: grid;
-        grid-template-columns: repeat(auto-fit,minmax(min(10rem,100%),1fr));
-        gap: 1rem;
-        width: 100%;
-        max-width: 32rem;
-        margin: 2.5rem auto 0 auto;
-    }
-
-    .room-card {
-        position: relative;
-        border-radius: 1rem;
-        padding: 1rem 1rem 1.2rem;
-        background: rgba(0,0,0,0.35);
-        border: 1px solid rgba(255,255,255,0.18);
-        box-shadow:
-            0 20px 40px rgba(0,0,0,0.8),
-            0 0 30px rgba(255,0,200,0.4),
-            0 0 80px rgba(255,128,0,0.2);
-        backdrop-filter: blur(10px);
-        min-height: 7rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        cursor: pointer;
-        text-decoration: none;
-        color: #fff;
-    }
-
-    .room-card:active {
-        scale: 0.98;
-    }
-
-    .room-top-row {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        flex-wrap: nowrap;
-        gap: .5rem;
-    }
-
-    .room-name {
-        font-size: 1rem;
-        font-weight: 600;
-        line-height: 1.2;
-        color: #fff;
-        text-shadow: 0 0 8px rgba(255,0,170,0.6), 0 0 24px rgba(170,0,255,0.5);
-    }
-
-    .room-chip {
+    .tiny {
         font-size: .7rem;
-        line-height: 1;
-        font-weight: 500;
-        padding: .4rem .6rem;
-        border-radius: 999px;
-        background: radial-gradient(circle at 20% 20%, rgba(255,0,187,0.6) 0%, rgba(120,0,255,0.4) 60%);
-        border: 1px solid rgba(255,255,255,0.3);
-        box-shadow: 0 0 12px rgba(255,0,187,0.8), 0 0 40px rgba(140,0,255,0.7);
-        text-shadow: 0 0 4px rgba(0,0,0,0.6);
-        white-space: nowrap;
-    }
-
-    .room-desc {
-        font-size: .8rem;
         line-height: 1.4;
-        margin-top: .75rem;
-        color: rgba(255,255,255,0.7);
-        text-shadow: 0 0 6px rgba(255,0,170,0.4);
+        color: rgba(255,255,255,0.5);
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+        text-shadow: 0 0 6px rgba(0,0,0,0.8);
     }
 
-    /* specific vibe hints */
-    .purple {color:#e0c9ff;}
-    .pink   {color:#ffc9f0;}
-    .blue   {color:#c9e7ff;}
-
-    /* ---- FOOTER / MUSIC PILL ---- */
-    .footer-area {
-        width: 100%;
-        max-width: 32rem;
-        margin-left: auto;
-        margin-right: auto;
-        text-align: center;
-        margin-bottom: 5rem; /* room for pill */
-        margin-top: 3rem;
-    }
-
-    .comfort {
-        font-size: .8rem;
-        line-height: 1.4;
-        color: rgba(255,255,255,0.6);
-        text-shadow: 0 0 8px rgba(255,0,170,0.4);
-    }
-
-    .love {
-        font-size: .9rem;
-        margin-top: .5rem;
-        color: #fff;
-        font-weight: 500;
-        text-shadow:
-            0 0 6px rgba(255,0,170,0.8),
-            0 0 18px rgba(138,43,226,0.8),
-            0 0 38px rgba(255,140,0,0.6);
-    }
-
-    /* ---- FLOATING MUSIC PILL ---- */
     .music-pill {
         position: fixed;
         left: 50%;
@@ -244,7 +131,6 @@
         display: flex;
         align-items: center;
         gap: .6rem;
-
         background: rgba(0,0,0,0.4);
         border: 1px solid rgba(255,255,255,0.25);
         border-radius: 999px;
@@ -253,16 +139,14 @@
         max-width: 90%;
         justify-content: center;
         backdrop-filter: blur(10px);
-
         box-shadow:
             0 12px 40px rgba(0,0,0,0.9),
             0 0 20px rgba(255,0,170,0.7),
             0 0 60px rgba(255,140,0,0.5),
             0 0 120px rgba(140,0,255,0.4);
-
         animation: pillPulse 2.8s infinite;
+        z-index: 5;
     }
-
     @keyframes pillPulse {
         0%,100% { box-shadow:
             0 12px 40px rgba(0,0,0,0.9),
@@ -275,12 +159,12 @@
             0 0 80px rgba(255,140,0,0.8),
             0 0 160px rgba(140,0,255,0.6); }
     }
-
     .music-left {
         display: flex;
         flex-direction: column;
         font-size: .7rem;
         line-height: 1.2;
+        text-align: left;
     }
     .music-label {
         font-weight: 600;
@@ -290,7 +174,6 @@
     .music-sub {
         color: rgba(255,255,255,0.6);
     }
-
     .music-btn {
         font-size: .7rem;
         font-weight: 600;
@@ -299,96 +182,35 @@
         border: 1px solid rgba(255,255,255,0.4);
         background: radial-gradient(circle at 20% 20%, rgba(255,0,187,0.6) 0%, rgba(120,0,255,0.4) 60%);
         color: #fff;
+        text-decoration: none;
         text-shadow: 0 0 4px rgba(0,0,0,0.8);
         box-shadow:
             0 0 12px rgba(255,0,187,0.8),
             0 0 40px rgba(140,0,255,0.8);
         cursor: pointer;
-        text-decoration: none;
         white-space: nowrap;
     }
-    .music-btn:active {
-        scale: .97;
-    }
-
-    /* ---- SMALL PRINT ---- */
-    .tiny {
-        font-size: .65rem;
-        line-height: 1.4;
-        color: rgba(255,255,255,0.4);
-        margin-top: 1rem;
-        text-align: center;
-        text-shadow: 0 0 6px rgba(0,0,0,0.8);
-    }
+    .music-btn:active { scale: .97; }
 </style>
 </head>
 <body>
 
-<!-- animated glow overlay -->
 <div class="aura"></div>
-
-<!-- bubble field lives behind content -->
 <div class="bubble-field" id="bubbleField"></div>
 
-<!-- MAIN CONTENT -->
 <div class="shell">
-    <header class="top-block">
-        <div class="ship-label">ENGINE ROOM LINK // SAFE MODE</div>
-
+    <div>
+        <div class="ship-label">ENGINE ROOM // SAFE MODE</div>
         <h1 class="main-title">Bubble&nbsp;World</h1>
-
         <p class="subtitle">
-            Personal ship core. Private calm space. Port-hopping shield.  
-            You are loved. You are protected. You are still here.
+            Private calm space. Port-hopping shield. You are loved. You are protected. You are still here.
         </p>
-
-        <div class="rooms">
-            <a class="room-card" href="#room1">
-                <div class="room-top-row">
-                    <div class="room-name">Room&nbsp;1</div>
-                    <div class="room-chip">Purple Mind</div>
-                </div>
-                <div class="room-desc purple">
-                    Soft healing playlists. Breathe. Shoulders down. You’re safe.
-                </div>
-            </a>
-
-            <a class="room-card" href="#room2">
-                <div class="room-top-row">
-                    <div class="room-name">Room&nbsp;2</div>
-                    <div class="room-chip">Warm Core</div>
-                </div>
-                <div class="room-desc pink">
-                    Timmy Time Music energy. Laugh / Play / Fun / Motown / Feeling It.
-                </div>
-            </a>
-
-            <a class="room-card" href="#room3">
-                <div class="room-top-row">
-                    <div class="room-name">Room&nbsp;3</div>
-                    <div class="room-chip">Drift Space</div>
-                </div>
-                <div class="room-desc blue">
-                    Maya link. Joke + riddle. “You are beautiful and loved 💖”
-                </div>
-            </a>
-        </div>
-    </header>
-
-    <footer class="footer-area">
-        <div class="comfort">
-            Shield status: stable · Sniffer quiet · Hopper cloaked
-        </div>
-        <div class="love">
-            “This app was created on Timmy’s iPhone&nbsp;17 Pro Max&nbsp;2TB.”
-        </div>
-        <div class="tiny">
-            Public display shell. Internal engine and live AI run locally only.
-        </div>
-    </footer>
+        <p class="tiny">
+            Public shell preview. Live core + Maya stay local.
+        </p>
+    </div>
 </div>
 
-<!-- floating Timmy Time Music pill -->
 <div class="music-pill">
     <div class="music-left">
         <div class="music-label">Timmy Time Music</div>
@@ -400,62 +222,29 @@
 </div>
 
 <script>
-/*
-    Bubble generator:
-    - random size
-    - random horizontal start
-    - slow upward drift
-    - constant feed (so page feels alive)
-*/
 const field = document.getElementById('bubbleField');
 
 function spawnBubble() {
     const b = document.createElement('div');
     b.className = 'bubble';
-
-    // random size between 40px and 160px
     const size = 40 + Math.random() * 120;
     b.style.width = size + 'px';
     b.style.height = size + 'px';
-
-    // random horizontal position (0-100vw)
     b.style.left = Math.random() * 100 + 'vw';
-
-    // start just below the bottom
     b.style.bottom = '-160px';
-
-    // animation duration between 10s and 22s
     const dur = 10 + Math.random() * 12;
     b.style.animationDuration = dur + 's';
-
-    // slight horizontal drift direction random (-20vw to +20vw)
-    // handled via keyframes translateX(20vw). we randomize sign here with scaleX
     if (Math.random() < 0.5) {
         b.style.transform = 'scaleX(-1)';
     }
-
     field.appendChild(b);
-
-    // cleanup after it floats away
-    setTimeout(() => {
-        field.removeChild(b);
-    }, dur * 1000 + 1000);
+    setTimeout(() => { field.removeChild(b); }, dur * 1000 + 1000);
 }
 
-// make a stream of bubbles
 setInterval(() => {
-    // a couple at a time feels rich
     spawnBubble();
     if (Math.random() < 0.4) spawnBubble();
 }, 1200);
-
-// OPTIONAL: hooks for future routing
-function goRoom(roomId){
-    alert(roomId + " (placeholder). Live engine runs local only right now.");
-}
-document.querySelector('a[href="#room1"]').addEventListener('click', e => {e.preventDefault(); goRoom('Room 1');});
-document.querySelector('a[href="#room2"]').addEventListener('click', e => {e.preventDefault(); goRoom('Room 2');});
-document.querySelector('a[href="#room3"]').addEventListener('click', e => {e.preventDefault(); goRoom('Room 3');});
 </script>
 
 </body>
