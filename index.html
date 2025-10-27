@@ -5,16 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Bubble World Ship</title>
 <style>
-/* CORE DESIGN TOKENS */
 :root {
+    /* defaults (Engine Room theme) */
     --room-bg: radial-gradient(circle at 30% 20%, #003300 0%, #006b3a 40%, #000000 80%);
     --bubble-main: rgba(0,255,128,0.6);
     --bubble-alt: rgba(0,128,64,0.4);
+
     --card-bg: rgba(0,0,0,0.35);
     --card-border: rgba(255,255,255,0.18);
     --text-main: #fff;
+
     --status-chip-bg: rgba(0,0,0,0.6);
     --status-chip-text: #f9f9c5;
+
     --yellow-btn-bg: radial-gradient(circle at 20% 20%, #fff8 0%, #ffe066 40%, #ffcf4d 60%, #b26a00 100%);
     --yellow-btn-text: #000;
 }
@@ -28,15 +31,16 @@
     padding: 0;
 }
 
-body {
+html, body {
     min-height: 100vh;
     background: var(--room-bg) fixed;
     position: relative;
     overflow-x: hidden;
-    padding: 16px 16px 100px; /* bottom space so nav doesn't cover content */
+    padding: 0;
+    margin: 0;
 }
 
-/* bubble field */
+/* bubble backdrop */
 .bubble-field {
     position: fixed;
     inset: 0;
@@ -51,7 +55,9 @@ body {
     opacity: 0.4;
     animation: floatUp 8s linear infinite;
     background: radial-gradient(circle at 30% 30%, var(--bubble-main) 0%, var(--bubble-alt) 60%, transparent 70%);
-    box-shadow: 0 0 60px var(--bubble-main), 0 0 120px var(--bubble-alt);
+    box-shadow:
+        0 0 60px var(--bubble-main),
+        0 0 120px var(--bubble-alt);
 }
 .bubble.slow { animation-duration: 12s; opacity:0.25; }
 .bubble.tiny { width:60px; height:60px; }
@@ -63,25 +69,28 @@ body {
     100% { transform: translateY(-40vh) translateX(10vw);}
 }
 
-/* shared layout wrappers */
+/* main view area */
 .content-wrap {
     position: relative;
     z-index: 2;
     max-width: 600px;
-    margin: 0 auto 120px;
+    margin: 0 auto;
+    padding: 16px 16px 120px; /* bottom space above nav */
+    min-height: calc(100vh - 100px); /* cover screen even if content is short */
+    display: flex;
+    flex-direction: column;
 }
 
-/* top nav bar */
+/* top nav */
 .top-nav {
     position: relative;
     z-index: 3;
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto 24px;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     justify-content: space-between;
+    margin-bottom: 24px;
 }
 .top-btn {
     flex: 1;
@@ -109,7 +118,7 @@ body {
     left:0;
     right:0;
     bottom:0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.65);
     backdrop-filter: blur(20px);
     border-top:1px solid rgba(255,255,255,0.2);
     padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 12px);
@@ -118,6 +127,8 @@ body {
     align-items:center;
     font-size:15px;
     color:#fff;
+    box-shadow:0 -20px 60px rgba(0,0,0,0.9),
+               0 0 60px var(--bubble-main);
 }
 .bottom-left,
 .bottom-right {
@@ -134,16 +145,26 @@ body {
     padding:10px 14px;
     line-height:1.2;
     border-radius:999px;
-    box-shadow:0 0 20px #ff00ff,0 0 60px #ff0080;
+    box-shadow:
+        0 0 20px #ff00ff,
+        0 0 60px #ff0080,
+        0 0 100px #ff5500;
     border:1px solid rgba(255,255,255,0.4);
     text-align:center;
     text-decoration:none;
+    min-width: 180px;
+}
+.bottom-pill small {
+    font-size:12px;
+    font-weight:500;
+    display:block;
+    line-height:1.2;
+    opacity:.9;
 }
 
 /* panels / cards */
 .panel {
     position: relative;
-    z-index: 2;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 16px;
@@ -152,6 +173,7 @@ body {
     box-shadow:
         0 30px 80px rgba(0,0,0,0.9),
         0 0 80px var(--bubble-main);
+    animation:fadeRoom .4s ease both;
 }
 .panel-header-row {
     display:flex;
@@ -169,15 +191,15 @@ body {
     min-width:0;
 }
 .panel-title {
-    font-size:22px;
-    font-weight:600;
-    line-height:1.2;
+    font-size:28px;
+    font-weight:700;
+    line-height:1.25;
     color:#fff;
 }
 .panel-chip {
     background: var(--status-chip-bg);
     color: var(--status-chip-text);
-    font-size:13px;
+    font-size:14px;
     line-height:1;
     padding:6px 8px;
     border-radius:8px;
@@ -185,16 +207,34 @@ body {
     border:1px solid rgba(255,255,255,0.15);
     align-self:flex-start;
     display:inline-block;
-    margin-top:4px;
+    margin-top:8px;
 }
 .panel-desc {
-    font-size:17px;
+    font-size:20px;
     line-height:1.4;
-    margin-top:8px;
+    margin-top:16px;
     color:#fff;
+    font-weight:500;
 }
 
-/* small info list in Engine Room */
+/* ship map card */
+.map-block {
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:12px;
+    padding:16px;
+    margin-top:16px;
+    font-size:17px;
+    line-height:1.45;
+}
+.map-head {
+    font-size:15px;
+    font-weight:600;
+    color:#ffbbff;
+    margin-bottom:8px;
+}
+
+/* status list */
 .status-list {
     margin-top:16px;
     border:1px solid rgba(255,255,255,0.15);
@@ -203,7 +243,7 @@ body {
 }
 .status-item {
     padding:14px 16px;
-    font-size:17px;
+    font-size:18px;
     line-height:1.4;
     background:rgba(0,0,0,0.2);
     border-bottom:1px solid rgba(255,255,255,0.07);
@@ -213,13 +253,15 @@ body {
     border-bottom:0;
 }
 .status-head {
-    font-size:18px;
+    font-size:20px;
     font-weight:600;
     color:#fff;
 }
 .status-sub {
-    font-size:15px;
+    font-size:16px;
     opacity:0.9;
+    line-height:1.4;
+    padding-top:4px;
 }
 
 /* drift space block */
@@ -240,10 +282,16 @@ body {
     margin-bottom:8px;
 }
 .drift-affirm {
-    font-size:18px;
+    font-size:20px;
     font-weight:600;
     color:#ffbbff;
     margin-top:12px;
+}
+.drift-note {
+    font-size:14px;
+    opacity:.8;
+    margin-top:8px;
+    color:#fff;
 }
 
 /* playlists */
@@ -252,6 +300,9 @@ body {
     border-radius:16px;
     overflow:hidden;
     background:rgba(0,0,0,0.25);
+    box-shadow:
+        0 20px 60px rgba(0,0,0,0.8),
+        0 0 60px var(--bubble-main);
 }
 .track {
     display:flex;
@@ -289,7 +340,7 @@ body {
         0 0 40px var(--bubble-main);
 }
 .track-info-title {
-    font-size:18px;
+    font-size:20px;
     line-height:1.3;
     font-weight:600;
     color:#fff;
@@ -310,30 +361,36 @@ body {
     border:0;
     text-decoration:none;
     box-shadow:0 10px 30px rgba(0,0,0,0.7);
+    min-width:74px;
+    text-align:center;
 }
 
-/* show/hide rooms */
+/* show/hide rooms + fade */
 .room-section {
     display:none;
-    animation: fadeRoom 0.4s ease both;
+    animation: fadeRoom 0.45s ease both;
 }
 .room-section.active {
     display:block;
 }
+
 @keyframes fadeRoom {
     0% { opacity:0; transform:translateY(10px) scale(0.98); }
     100% { opacity:1; transform:translateY(0) scale(1); }
 }
-
-/* helper for footer spacing */
-.footer-spacer {
-    height:80px;
+@keyframes fadeRoomPanel {
+    0% { opacity:0; transform:translateY(6px) scale(0.99); }
+    100% { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes fadeRoom {
+    0% { opacity:0; transform:translateY(8px) scale(.98); }
+    100% { opacity:1; transform:translateY(0) scale(1); }
 }
 </style>
 </head>
 <body>
 
-<!-- bubble field (colors update via JS by changing CSS variables) -->
+<!-- animated bubbles behind everything -->
 <div class="bubble-field" id="bubbleField">
     <div class="bubble big"  style="left:10%; bottom:-10%;"></div>
     <div class="bubble med slow" style="left:70%; bottom:-20%;"></div>
@@ -343,50 +400,56 @@ body {
 </div>
 
 <div class="content-wrap">
-
     <!-- top nav -->
     <nav class="top-nav">
         <button class="top-btn" id="btn-engine" onclick="goRoom('engine')">Engine</button>
-        <button class="top-btn" id="btn-room1" onclick="goRoom('room1')">Room 1</button>
-        <button class="top-btn" id="btn-room2" onclick="goRoom('room2')">Room 2</button>
-        <button class="top-btn" id="btn-room3" onclick="goRoom('room3')">Room 3</button>
+        <button class="top-btn" id="btn-room1" onclick="goRoom('room1')">Room&nbsp;1</button>
+        <button class="top-btn" id="btn-room2" onclick="goRoom('room2')">Room&nbsp;2</button>
+        <button class="top-btn" id="btn-room3" onclick="goRoom('room3')">Room&nbsp;3</button>
     </nav>
 
-    <!-- ============================= -->
-    <!-- ENGINE ROOM (green core)      -->
-    <!-- ============================= -->
+    <!-- ENGINE ROOM -->
     <section class="room-section" id="engine">
+        <!-- welcome / status -->
         <div class="panel">
             <div class="panel-header-row">
                 <div class="panel-emoji">👋</div>
                 <div class="panel-title-block">
                     <div class="panel-title">Welcome Aboard, Captain Timmy!</div>
                     <div class="panel-chip">core</div>
-                    <div class="panel-desc">
-                        This ship is alive. You’re in the Engine Room (green core).
-                    </div>
                 </div>
             </div>
-            <div class="panel-desc" style="font-size:15px;opacity:.9;">
+            <div class="panel-desc">
+                This ship is alive. You’re in the Engine Room (green core).<br/><br/>
                 Sniffer: all clear on ports.<br/>
                 Hopper: cloak engaged, we never kill 5000 (music stays safe).<br/>
-                Healer: bubble regen active, shields soft and warm.<br/>
+                Healer: bubble regen active, shields soft and warm.
+            </div>
+
+            <!-- Ship Map -->
+            <div class="map-block">
+                <div class="map-head">Ship Map</div>
+                <div><strong>Room 1 — Purple Mind:</strong> Quiet / Healing playlists / Soft landings</div>
+                <div style="margin-top:8px;"><strong>Room 2 — Timmy Time Music:</strong> Live vibe for the crew / Energy / Playlists</div>
+                <div style="margin-top:8px;"><strong>Room 3 — Drift Space:</strong> Float / Laugh / You are loved 💖</div>
             </div>
         </div>
 
+        <!-- core status block -->
         <div class="panel">
             <div class="panel-header-row">
                 <div class="panel-emoji">🛠️</div>
                 <div class="panel-title-block">
                     <div class="panel-title">Ship Core Status</div>
                     <div class="panel-chip">online</div>
-                    <div class="panel-desc">
-                        You control the story. Tell visitors what's live and what's under repair.
-                    </div>
                 </div>
             </div>
 
-            <div class="status-list">
+            <div class="panel-desc">
+                You control the story. Tell visitors what's live and what's under repair.
+            </div>
+
+            <div class="status-list" style="margin-top:16px;">
                 <div class="status-item">
                     <div class="status-head">Hull</div>
                     <div class="status-sub">
@@ -413,37 +476,38 @@ body {
                 </div>
             </div>
 
-            <div class="drift-block" style="margin-top:16px;">
-                <div class="drift-head">Sniffer</div>
-                <div>Sniffer sweep: no creepers detected. Anxiety level dropping.</div>
-
-                <div class="drift-head" style="margin-top:12px;">Port Hopper</div>
-                <div>Handshake rotated. Cloak engaged. 5000 protected.</div>
-
-                <div class="drift-head" style="margin-top:12px;">Healer</div>
-                <div>Bubble regen active. Nervous system cooling. You’re safe in here.</div>
+            <div class="map-block" style="margin-top:16px;">
+                <div class="map-head">Vitals</div>
+                <div><span style="color:#9dff9d; font-weight:600;">Sniffer</span>: No creepers detected. Anxiety dropping.</div>
+                <div style="margin-top:8px;"><span style="color:#9dff9d; font-weight:600;">Hopper</span>: Handshake rotated. Cloak engaged. 5000 protected.</div>
+                <div style="margin-top:8px;"><span style="color:#ffbbff; font-weight:600;">Healer</span>: Bubble regen active. Nervous system cooling. You’re safe in here.</div>
             </div>
         </div>
     </section>
 
-    <!-- ============================= -->
-    <!-- ROOM 1 (Purple Mind / calm)   -->
-    <!-- ============================= -->
+    <!-- ROOM 1 -->
     <section class="room-section" id="room1">
         <div class="panel">
             <div class="panel-header-row">
                 <div class="panel-emoji">💜</div>
                 <div class="panel-title-block">
                     <div class="panel-title">Room 1 — Purple Mind</div>
-                    <div class="panel-chip">calm</div>
-                    <div class="panel-desc">
-                        Soft landing. Healing playlists. Breathe here.
-                    </div>
+                    <div class="panel-chip">calm deck</div>
+                </div>
+            </div>
+            <div class="panel-desc">
+                Soft landing. Healing playlists. Breathe here.
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header-row">
+                <div class="panel-title-block">
+                    <div class="panel-title" style="font-size:22px;">Healing Mixes · Now Available</div>
                 </div>
             </div>
 
             <div class="playlist-board">
-
                 <div class="track">
                     <div class="track-left">
                         <div class="track-num">001</div>
@@ -470,7 +534,7 @@ body {
                     <div class="track-left">
                         <div class="track-num">003</div>
                         <div>
-                            <div class="track-info-title">Beach</div>
+                            <class class="track-info-title">Beach</class>
                             <div class="track-info-meta">tap to open playlist</div>
                         </div>
                     </div>
@@ -498,29 +562,39 @@ body {
                     </div>
                     <a class="play-btn" href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank">▶ Play</a>
                 </div>
+            </div>
 
+            <div class="map-block" style="margin-top:16px;">
+                <div class="map-head">You are in the Mind Room</div>
+                Gentle frequencies only. Hydrate, breathe, stay soft.
             </div>
         </div>
     </section>
 
-    <!-- ============================= -->
-    <!-- ROOM 2 (Timmy Time Music)     -->
-    <!-- ============================= -->
+    <!-- ROOM 2 -->
     <section class="room-section" id="room2">
         <div class="panel">
             <div class="panel-header-row">
                 <div class="panel-emoji">🎧</div>
                 <div class="panel-title-block">
                     <div class="panel-title">Room 2 — Timmy Time Music</div>
-                    <div class="panel-chip">pulse</div>
-                    <div class="panel-desc">
-                        Live vibe board. Energy for the crew.
-                    </div>
+                    <div class="panel-chip">live deck</div>
+                </div>
+            </div>
+            <div class="panel-desc">
+                🎵 Timmy Time Music · Now Playing for Crew  
+                Your vibe board. Your energy. Your sound.
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header-row">
+                <div class="panel-title-block">
+                    <div class="panel-title" style="font-size:22px;">Crew Rotation · Tap to Listen</div>
                 </div>
             </div>
 
             <div class="playlist-board">
-
                 <div class="track">
                     <div class="track-left">
                         <div class="track-num">001</div>
@@ -575,27 +649,31 @@ body {
                     </div>
                     <a class="play-btn" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">▶ Play</a>
                 </div>
+            </div>
 
+            <div class="map-block" style="margin-top:16px;">
+                <div class="map-head">You are in the Music Deck</div>
+                You’re broadcasting energy to the crew. The glow you’re feeling? That’s you.
             </div>
         </div>
     </section>
 
-    <!-- ============================= -->
-    <!-- ROOM 3 (Drift Space)          -->
-    <!-- ============================= -->
+    <!-- ROOM 3 -->
     <section class="room-section" id="room3">
         <div class="panel">
             <div class="panel-header-row">
                 <div class="panel-emoji">🌌</div>
                 <div class="panel-title-block">
                     <div class="panel-title">Room 3 — Drift Space</div>
-                    <div class="panel-chip">rest</div>
-                    <div class="panel-desc">
-                        Slow drift. Gentle mind. You float here.
-                    </div>
+                    <div class="panel-chip">rest deck</div>
                 </div>
             </div>
+            <div class="panel-desc">
+                Slow drift. Gentle mind. You float here.
+            </div>
+        </div>
 
+        <div class="panel">
             <div class="drift-block">
                 <div class="drift-head">Joke</div>
                 <div id="jokeLine">
@@ -611,127 +689,110 @@ body {
                 </div>
 
                 <div class="drift-affirm">You are beautiful and loved 💖</div>
-                <div class="drift-affirm" style="font-size:14px; opacity:0.8; margin-top:8px;">
+                <div class="drift-note">
                     This app was created on Timmy’s iPhone 17 Pro Max 2TB.
                 </div>
 
                 <button class="play-btn" style="margin-top:16px;" onclick="morePlease()">More ➜</button>
             </div>
+
+            <div class="map-block" style="margin-top:16px;">
+                <div class="map-head">You are in Drift Space</div>
+                Your nervous system is allowed to chill here. Nothing is urgent. You’re safe.
+            </div>
         </div>
     </section>
-
-    <div class="footer-spacer"></div>
 </div>
 
-<!-- bottom nav (persists across rooms) -->
+<!-- bottom nav -->
 <div class="bottom-nav">
     <a class="bottom-left" onclick="goRoom('engine')">🏠</a>
-    <a class="bottom-pill" onclick="goRoom('room2')">Timmy Time Music</a>
+    <button class="bottom-pill" onclick="goRoom('room2')">
+        Timmy Time Music · Live
+        <small>tap to enter Music Deck</small>
+    </button>
     <a class="bottom-right" onclick="goRoom('room3')">💬</a>
 </div>
 
 <script>
-/* -----------------------------------
-   State
------------------------------------ */
+/* Drift Space joke/riddle rotation */
 const jokes = [
     "Why did the spaceship get therapy? It had too much space in its schedule.",
     "Captain, crew morale is at 12/10. Science calls that 'statistically unfair.'",
     "I told the engine to chill. It said 'I'm already cool, baby.'",
-    "Port Hopper report: we dipped so hard even Sunday couldn't find us.",
+    "Port Hopper report: we dipped so hard even Sunday couldn't find us."
 ];
 const riddles = [
     { q: "I speak without a mouth and hear without ears. I have nobody, but I come alive with wind. What am I?", a: "An echo." },
     { q: "What has cities, but no houses; mountains, but no trees; water, but no fish?", a: "A map." },
     { q: "The more you take, the more you leave behind. What am I?", a: "Footsteps." }
 ];
-
 let driftIndex = 0;
-
-/* -----------------------------------
-   Drift Space 'More ➜'
------------------------------------ */
 function morePlease() {
     driftIndex = (driftIndex + 1) % jokes.length;
-    const jokeSpot = document.getElementById("jokeLine");
-    const rQ = document.getElementById("riddleQ");
-    const rA = document.getElementById("riddleA");
-
-    const pickJoke = jokes[driftIndex % jokes.length];
-    const pickRiddle = riddles[driftIndex % riddles.length];
-
-    jokeSpot.textContent = pickJoke;
-    rQ.textContent = pickRiddle.q;
-    rA.textContent = pickRiddle.a;
+    document.getElementById("jokeLine").textContent = jokes[driftIndex % jokes.length];
+    const pickR = riddles[driftIndex % riddles.length];
+    document.getElementById("riddleQ").textContent = pickR.q;
+    document.getElementById("riddleA").textContent = pickR.a;
 }
 
-/* -----------------------------------
-   Room Switching Logic
------------------------------------ */
-function setThemeFor(roomName) {
-    // We update CSS variables on :root
-    const root = document.documentElement;
-
-    if (roomName === "engine") {
-        root.style.setProperty('--room-bg', 'radial-gradient(circle at 30% 20%, #003300 0%, #006b3a 40%, #000000 80%)');
-        root.style.setProperty('--bubble-main', 'rgba(0,255,128,0.6)');
-        root.style.setProperty('--bubble-alt', 'rgba(0,128,64,0.4)');
-    }
-    if (roomName === "room1") {
-        root.style.setProperty('--room-bg', 'radial-gradient(circle at 30% 20%, #2b003a 0%, #5e0099 40%, #000000 80%)');
-        root.style.setProperty('--bubble-main', 'rgba(255,0,255,0.6)');
-        root.style.setProperty('--bubble-alt', 'rgba(255,128,255,0.4)');
-    }
-    if (roomName === "room2") {
-        root.style.setProperty('--room-bg', 'radial-gradient(circle at 30% 20%, #4a0024 0%, #cc0077 40%, #ff5500 70%, #000000 90%)');
-        root.style.setProperty('--bubble-main', 'rgba(255,0,128,0.6)');
-        root.style.setProperty('--bubble-alt', 'rgba(255,128,0,0.4)');
-    }
-    if (roomName === "room3") {
-        root.style.setProperty('--room-bg', 'radial-gradient(circle at 30% 20%, #001133 0%, #2a0066 40%, #b300ff 70%, #000000 90%)');
-        root.style.setProperty('--bubble-main', 'rgba(128,0,255,0.6)');
-        root.style.setProperty('--bubble-alt', 'rgba(255,0,255,0.4)');
-    }
-}
-
-function highlightNav(roomName) {
-    const ids = ["btn-engine","btn-room1","btn-room2","btn-room3"];
-    ids.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
+/* Navigation state */
+function highlightNav(roomName){
+    const ids=["btn-engine","btn-room1","btn-room2","btn-room3"];
+    ids.forEach(id=>{
+        const el=document.getElementById(id);
+        if(!el)return;
         el.classList.remove("active");
     });
-    if (roomName==="engine") document.getElementById("btn-engine").classList.add("active");
-    if (roomName==="room1") document.getElementById("btn-room1").classList.add("active");
-    if (roomName==="room2") document.getElementById("btn-room2").classList.add("active");
-    if (roomName==="room3") document.getElementById("btn-room3").classList.add("active");
+    if(roomName==="engine") document.getElementById("btn-engine").classList.add("active");
+    if(roomName==="room1") document.getElementById("btn-room1").classList.add("active");
+    if(roomName==="room2") document.getElementById("btn-room2").classList.add("active");
+    if(roomName==="room3") document.getElementById("btn-room3").classList.add("active");
 }
 
-function goRoom(roomName) {
-    // hide all sections
-    const rooms = ["engine","room1","room2","room3"];
-    rooms.forEach(r => {
-        const sec = document.getElementById(r);
-        if (sec) sec.classList.remove("active");
+/* Theme per room */
+function setThemeFor(roomName){
+    const root=document.documentElement;
+    if(roomName==="engine"){
+        root.style.setProperty('--room-bg','radial-gradient(circle at 30% 20%, #003300 0%, #006b3a 40%, #000000 80%)');
+        root.style.setProperty('--bubble-main','rgba(0,255,128,0.6)');
+        root.style.setProperty('--bubble-alt','rgba(0,128,64,0.4)');
+    }
+    if(roomName==="room1"){
+        root.style.setProperty('--room-bg','radial-gradient(circle at 30% 20%, #2b003a 0%, #5e0099 40%, #000000 80%)');
+        root.style.setProperty('--bubble-main','rgba(255,0,255,0.6)');
+        root.style.setProperty('--bubble-alt','rgba(255,128,255,0.4)');
+    }
+    if(roomName==="room2"){
+        root.style.setProperty('--room-bg','radial-gradient(circle at 30% 20%, #4a0024 0%, #cc0077 40%, #ff5500 70%, #000000 90%)');
+        root.style.setProperty('--bubble-main','rgba(255,0,128,0.6)');
+        root.style.setProperty('--bubble-alt','rgba(255,128,0,0.4)');
+    }
+    if(roomName==="room3"){
+        root.style.setProperty('--room-bg','radial-gradient(circle at 30% 20%, #001133 0%, #2a0066 40%, #b300ff 70%, #000000 90%)');
+        root.style.setProperty('--bubble-main','rgba(128,0,255,0.6)');
+        root.style.setProperty('--bubble-alt','rgba(255,0,255,0.4)');
+    }
+}
+
+/* Switch visible section */
+function goRoom(roomName){
+    const rooms=["engine","room1","room2","room3"];
+    rooms.forEach(r=>{
+        const sec=document.getElementById(r);
+        if(sec) sec.classList.remove("active");
     });
+    const active=document.getElementById(roomName);
+    if(active) active.classList.add("active");
 
-    // show requested
-    const activeSec = document.getElementById(roomName);
-    if (activeSec) activeSec.classList.add("active");
-
-    // retheme bubbles + bg
     setThemeFor(roomName);
-
-    // update nav highlight
     highlightNav(roomName);
 
-    // scroll to top (feels like jump-cut room change)
-    window.scrollTo({top:0, left:0, behavior:"instant"});
+    // scroll to top each jump (feels like moving decks)
+    window.scrollTo({top:0,left:0,behavior:"instant"});
 }
 
-/* -----------------------------------
-   Boot up in Engine Room
------------------------------------ */
+/* boot */
 goRoom("engine");
 </script>
 </body>
