@@ -1,970 +1,462 @@
-# ============================================================
-# Bubble World Ship Core v3.3.1-publicsync (Timmy Lock)
-#
-# THIS IS LAW:
-# - Bind ONLY 127.0.0.1 (private dev mode, healing core)
-# - NEVER kill port 5000 (that's your Suno / music stream)
-# - If 5000 is taken, hop to next safe port
-# - On run, auto-open browser straight to "/"
-# - Generate stealth diagnostics hash each boot
-# - "/" = Engine Room shell (green field)
-# - Room1 = Purple Mind (calm playlists)
-# - Room2 = Timmy Time Music (magenta energy playlists)
-# - Room3 = Drift Space (comfort / joke / riddle / love)
-# - Every room shows "Timmy Time Music" pill
-# - Bubbles pulse in every room, tinted to that room
-#
-# VISUAL STABILITY PROMISES:
-# - No white gutters top or bottom. Full gradient / bubble fill.
-# - Large readable panels, high contrast text (you said glasses).
-# - Playlist cards are big tap targets.
-# - Maya panel is large, input is large, SEND is obvious.
-#
-# DO NOT EDIT THIS WITHOUT TIMMY SAY-SO.
-# ============================================================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bubble World Ship</title>
 
-import socket, random, string, threading, webbrowser, time
-from flask import Flask, request, jsonify, Response
-
-app = Flask(__name__)
-
-# ---------------------------------
-# stealth hash route for diagnostics
-# ---------------------------------
-ENGINE_HASH = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
-
-# ---------------------------------
-# port hopper (never kill 5000)
-# ---------------------------------
-def find_open_port(start=5000, end=5020):
-    for p in range(start, end + 1):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            s.bind(("127.0.0.1", p))
-            s.close()
-            return p
-        except OSError:
-            s.close()
-            continue
-    # fallback if somehow all used
-    return 5010
-
-PORT = find_open_port(5000, 5020)
-
-# ---------------------------------
-# Ship status text pools (Engine Room log)
-# ---------------------------------
-SNIFFER_LINES = [
-    "Sniffer sweep: all clear on local ports.",
-    "Sniffer: saw noise on 127.0.0.1:5000 (that's Timmy's music, leave it alone).",
-    "Sniffer: external probes = 0. Bubble integrity holding.",
-    "Sniffer: crew vitals steady, anxiety downshifted.",
-]
-HOPPER_LINES = [
-    "Port Hopper: handshake rotated. Cloak engaged.",
-    "Port Hopper: rerouted chatter off default channel.",
-    "Port Hopper: no hostile lock-ons detected.",
-]
-HEALER_LINES = [
-    "Healer: bubble regen active, shields soft and warm.",
-    "Healer: nervous system cooling. Breathing slower.",
-    "Healer: pulse steady. You are safe in here.",
-]
-
-JOKES = [
-    "Why did the spaceship get therapy? It had too much space in its schedule.",
-    "I told the engine to chill. It said 'I'm already cool, baby.'",
-    "Captain, morale report: Crew says you are 12/10. Science calls that 'statistically unfair.'",
-]
-RIDDLES = [
-    ("I speak without a mouth and hear without ears. I have nobody, but I come alive with wind. What am I?", "An echo."),
-    ("What has cities, but no houses; mountains, but no trees; water, but no fish?", "A map."),
-    ("The more you take, the more you leave behind. What am I?", "Footsteps."),
-]
-
-# this offset will rotate jokes/riddles on 'More?'
-joke_seed_offset = 0
-
-# ============================================================
-# HTML / CSS builder helpers
-# ============================================================
-
-def base_css(room_color_bg, bubble_color_main, bubble_color_alt):
-    # room_color_bg: radial or linear base behind cards
-    # bubble colors: room-tinted floating circles
-    return f"""
-    <style>
-    :root {{
-        --room-bg: {room_color_bg};
-        --bubble-main: {bubble_color_main};
-        --bubble-alt: {bubble_color_alt};
-        --card-bg: rgba(0,0,0,0.35);
-        --card-border: rgba(255,255,255,0.18);
-        --text-main: #fff;
-        --accent-pill-bg: radial-gradient(circle at 0% 0%, #fff8, #0000);
-        --accent-pill-text: #000;
-        --yellow-btn-bg: radial-gradient(circle at 20% 20%, #fff8 0%, #ffe066 40%, #ffcf4d 60%, #b26a00 100%);
-        --yellow-btn-text: #000;
-        --status-chip-bg: rgba(0,0,0,0.6);
-        --status-chip-text: #f9f9c5;
-    }}
-
-    * {{
+<style>
+    /* ---- RESET / BASE ---- */
+    * {
         box-sizing: border-box;
         -webkit-font-smoothing: antialiased;
-        font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Text", Arial, sans-serif;
-        color: var(--text-main);
         margin: 0;
         padding: 0;
-    }}
-    body {{
+    }
+    body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto, sans-serif;
         min-height: 100vh;
-        background: var(--room-bg) fixed;
+        color: #fff;
+        overflow: hidden;
         position: relative;
-        overflow-x: hidden;
-        padding: 16px 16px 100px; /* bottom pad so nav doesn't cover */
-    }}
+        background: radial-gradient(circle at 50% 30%, rgba(255,0,128,0.25) 0%, rgba(0,0,0,0) 60%),
+                    radial-gradient(circle at 20% 80%, rgba(255,140,0,0.18) 0%, rgba(0,0,0,0) 60%),
+                    radial-gradient(circle at 80% 70%, rgba(138,43,226,0.35) 0%, rgba(0,0,0,0) 70%),
+                    #000014;
+    }
 
-    /* bubble field */
-    .bubble-field {{
-        position: fixed;
+    /* ---- GLOW OVERLAY LAYERS ---- */
+    .aura {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(255,0,179,0.18) 0%, rgba(0,0,0,0) 70%);
+        filter: blur(60px);
+        pointer-events: none;
+        mix-blend-mode: screen;
+        animation: pulseGlow 6s infinite;
+    }
+
+    @keyframes pulseGlow {
+        0%,100% {opacity: 0.6;}
+        50%     {opacity: 1;}
+    }
+
+    /* ---- FLOATING BUBBLES FIELD ---- */
+    .bubble-field {
+        position: absolute;
         inset: 0;
         overflow: hidden;
-        z-index: 0;
         pointer-events: none;
-    }}
-
-    .bubble {{
+        z-index: 0;
+    }
+    .bubble {
         position: absolute;
         border-radius: 50%;
-        filter: blur(20px);
-        opacity: 0.4;
-        animation: floatUp 8s linear infinite;
-        background: radial-gradient(circle at 30% 30%, var(--bubble-main) 0%, var(--bubble-alt) 60%, transparent 70%);
-        box-shadow: 0 0 60px var(--bubble-main), 0 0 120px var(--bubble-alt);
-    }}
-    .bubble.slow {{ animation-duration: 12s; opacity:0.25; }}
-    .bubble.tiny {{ width:60px; height:60px; }}
-    .bubble.med {{ width:110px; height:110px; }}
-    .bubble.big {{ width:180px; height:180px; }}
-    @keyframes floatUp {{
-        0%   {{ transform: translateY(40vh) translateX(0);   }}
-        100% {{ transform: translateY(-40vh) translateX(10vw);}}
-    }}
+        background: radial-gradient(circle at 30% 30%,
+            rgba(255,255,255,0.9) 0%,
+            rgba(255,0,170,0.55) 30%,
+            rgba(80,0,120,0.4) 60%,
+            rgba(0,0,0,0) 70%);
+        box-shadow:
+            0 0 20px 4px rgba(255,0,170,0.6),
+            0 0 60px 12px rgba(255,140,0,0.4),
+            0 0 120px 24px rgba(170,0,255,0.3);
+        opacity: 0.7;
+        animation: drift linear infinite;
+    }
 
-    /* card panels */
-    .panel {{
+    /* bubble drift keyframes */
+    @keyframes drift {
+        0%   { transform: translateY(0) translateX(0) scale(1);   opacity: 0.0; }
+        10%  { opacity: 0.8; }
+        90%  { opacity: 0.8; }
+        100% { transform: translateY(-120vh) translateX(20vw) scale(1.2); opacity: 0; }
+    }
+
+    /* ---- MAIN WRAPPER ---- */
+    .shell {
         position: relative;
         z-index: 2;
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
-        border-radius: 16px;
-        padding: 16px 16px 20px;
-        margin-bottom: 24px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: clamp(1.5rem, 2vw, 2rem);
+    }
+
+    /* ---- HEADER / TITLE AREA ---- */
+    .top-block {
+        text-align: center;
+        padding-top: 1rem;
+    }
+
+    .ship-label {
+        font-size: clamp(0.7rem, 0.4vw, 0.8rem);
+        font-weight: 500;
+        color: rgba(255,255,255,0.6);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        display: inline-block;
+        background: rgba(0,0,0,0.4);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 999px;
+        padding: 0.4rem 0.8rem;
+        backdrop-filter: blur(8px);
+    }
+
+    .main-title {
+        font-size: clamp(2rem, 2.5vw, 2.6rem);
+        font-weight: 600;
+        line-height: 1.15;
+        margin-top: 1rem;
+        background: radial-gradient(circle at 20% 20%, #fff 0%, #ff00dd 30%, #ff7300 60%, #7a00ff 100%);
+        -webkit-background-clip: text;
+        color: transparent;
+        text-shadow:
+            0 0 12px rgba(255,0,170,0.6),
+            0 0 32px rgba(255,140,0,0.4),
+            0 0 64px rgba(170,0,255,0.4);
+    }
+
+    .subtitle {
+        margin-top: 0.75rem;
+        font-size: clamp(0.95rem, 1vw, 1.05rem);
+        font-weight: 400;
+        line-height: 1.4;
+        max-width: 28rem;
+        margin-left: auto;
+        margin-right: auto;
+        color: rgba(255,255,255,0.8);
+        text-shadow: 0 0 8px rgba(255,0,170,0.4);
+    }
+
+    /* ---- ROOM BUTTON GRID ---- */
+    .rooms {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(min(10rem,100%),1fr));
+        gap: 1rem;
+        width: 100%;
+        max-width: 32rem;
+        margin: 2.5rem auto 0 auto;
+    }
+
+    .room-card {
+        position: relative;
+        border-radius: 1rem;
+        padding: 1rem 1rem 1.2rem;
+        background: rgba(0,0,0,0.35);
+        border: 1px solid rgba(255,255,255,0.18);
         box-shadow:
-            0 30px 80px rgba(0,0,0,0.9),
-            0 0 80px var(--bubble-main);
-    }}
-    .panel-header-row {{
-        display:flex;
-        flex-wrap:wrap;
-        align-items:flex-start;
-        gap:8px;
-        margin-bottom:12px;
-    }}
-    .panel-emoji {{
-        font-size:24px;
-        line-height:24px;
-    }}
-    .panel-title-block {{
-        flex:1;
-        min-width:0;
-    }}
-    .panel-title {{
-        font-size:22px;
-        font-weight:600;
-        line-height:1.2;
-    }}
-    .panel-chip {{
-        background: var(--status-chip-bg);
-        color: var(--status-chip-text);
-        font-size:13px;
-        line-height:1;
-        padding:6px 8px;
-        border-radius:8px;
-        font-weight:600;
-        border:1px solid rgba(255,255,255,0.15);
-        align-self:flex-start;
-    }}
-    .panel-desc {{
-        font-size:17px;
-        line-height:1.4;
-        margin-top:8px;
-        color:#fff;
-    }}
+            0 20px 40px rgba(0,0,0,0.8),
+            0 0 30px rgba(255,0,200,0.4),
+            0 0 80px rgba(255,128,0,0.2);
+        backdrop-filter: blur(10px);
+        min-height: 7rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        cursor: pointer;
+        text-decoration: none;
+        color: #fff;
+    }
 
-    .action-btn {{
-        display:inline-block;
-        margin-top:16px;
-        background: var(--yellow-btn-bg);
-        color: var(--yellow-btn-text);
-        font-size:18px;
-        font-weight:700;
-        line-height:1.2;
-        padding:14px 16px;
-        border-radius:12px;
-        border:0;
-        text-decoration:none;
-        box-shadow:0 10px 30px rgba(0,0,0,0.7);
-    }}
+    .room-card:active {
+        scale: 0.98;
+    }
 
-    /* status list in Engine Room */
-    .status-list {{
-        margin-top:16px;
-        border:1px solid rgba(255,255,255,0.15);
-        border-radius:12px;
-        overflow:hidden;
-    }}
-    .status-item {{
-        padding:14px 16px;
-        font-size:17px;
-        line-height:1.4;
-        background:rgba(0,0,0,0.2);
-        border-bottom:1px solid rgba(255,255,255,0.07);
-    }}
-    .status-item:last-child {{
-        border-bottom:0;
-    }}
-    .status-head {{
-        font-size:18px;
-        font-weight:600;
-        color:#fff;
-    }}
-    .status-sub {{
-        font-size:15px;
-        opacity:0.9;
-    }}
+    .room-top-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: .5rem;
+    }
 
-    /* Maya console */
-    .maya-console {{
-        border:1px solid rgba(255,255,255,0.18);
-        border-radius:12px;
-        background:rgba(0,0,0,0.4);
-        padding:12px;
-    }}
-    .maya-chat-line {{
-        font-size:16px;
-        line-height:1.4;
-        background:rgba(255,255,255,0.07);
-        border-radius:8px;
-        padding:10px 12px;
-        margin-bottom:8px;
-    }}
-    .maya-me {{
-        background:rgba(255,255,0,0.15);
-        border:1px solid rgba(255,255,0,0.4);
-        color:#fff;
-        font-weight:600;
-    }}
-    .maya-row {{
-        display:flex;
-        gap:8px;
-        flex-wrap:nowrap;
-        align-items:stretch;
-        margin-top:8px;
-    }}
-    .maya-input {{
-        flex:1;
-        font-size:16px;
-        line-height:1.4;
-        background:#000;
-        color:#fff;
-        border-radius:8px;
-        border:1px solid rgba(255,255,255,0.2);
-        padding:12px;
-    }}
-    .maya-send {{
-        background: var(--yellow-btn-bg);
-        color:#000;
-        font-size:16px;
-        font-weight:700;
-        line-height:1.2;
-        border:0;
-        border-radius:10px;
-        padding:12px 16px;
-        min-width:64px;
-    }}
+    .room-name {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.2;
+        color: #fff;
+        text-shadow: 0 0 8px rgba(255,0,170,0.6), 0 0 24px rgba(170,0,255,0.5);
+    }
 
-    /* playlist list */
-    .playlist-board {{
-        border:1px solid rgba(255,255,255,0.15);
-        border-radius:16px;
-        overflow:hidden;
-        background:rgba(0,0,0,0.25);
-    }}
-    .track {{
-        display:flex;
-        align-items:flex-start;
-        justify-content:space-between;
-        padding:16px;
-        border-bottom:1px solid rgba(255,255,255,0.07);
-    }}
-    .track:last-child {{
-        border-bottom:0;
-    }}
-    .track-left {{
-        display:flex;
-        gap:12px;
-        align-items:flex-start;
-    }}
-    .track-num {{
-        flex-shrink:0;
-        width:48px;
-        height:48px;
-        border-radius:10px;
-        background: radial-gradient(circle at 20% 20%, #fff0 0%, #fff0 30%, #0000 60%), radial-gradient(circle at 20% 20%, var(--bubble-main) 0%, var(--bubble-alt) 60%, #0000 70%);
-        border:2px solid rgba(255,255,255,0.4);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:15px;
-        font-weight:700;
-        color:#000;
-        box-shadow:0 10px 30px rgba(0,0,0,0.8),0 0 40px var(--bubble-main);
-    }}
-    .track-info-title {{
-        font-size:18px;
-        line-height:1.3;
-        font-weight:600;
-        color:#fff;
-    }}
-    .track-info-meta {{
-        font-size:15px;
-        line-height:1.3;
-        color:#fff;
-        opacity:0.9;
-    }}
-    .play-btn {{
-        background: var(--yellow-btn-bg);
-        color:#000;
-        font-weight:700;
-        border-radius:10px;
-        padding:12px 16px;
-        font-size:16px;
-        border:0;
-        text-decoration:none;
-        box-shadow:0 10px 30px rgba(0,0,0,0.7);
-    }}
+    .room-chip {
+        font-size: .7rem;
+        line-height: 1;
+        font-weight: 500;
+        padding: .4rem .6rem;
+        border-radius: 999px;
+        background: radial-gradient(circle at 20% 20%, rgba(255,0,187,0.6) 0%, rgba(120,0,255,0.4) 60%);
+        border: 1px solid rgba(255,255,255,0.3);
+        box-shadow: 0 0 12px rgba(255,0,187,0.8), 0 0 40px rgba(140,0,255,0.7);
+        text-shadow: 0 0 4px rgba(0,0,0,0.6);
+        white-space: nowrap;
+    }
 
-    /* Drift Space special block */
-    .drift-block {{
-        font-size:18px;
-        line-height:1.5;
-        color:#fff;
-        margin-top:12px;
-        background:rgba(0,0,0,0.35);
-        border:1px solid rgba(255,255,255,0.18);
-        border-radius:12px;
-        padding:16px;
-    }}
-    .drift-head {{
-        font-size:16px;
-        font-weight:600;
-        color:#ffbbff;
-        margin-bottom:8px;
-    }}
-    .drift-affirm {{
-        font-size:18px;
-        font-weight:600;
-        color:#ffbbff;
-        margin-top:12px;
-    }}
-    .more-btn {{
-        margin-top:16px;
-        display:inline-block;
-        background: var(--yellow-btn-bg);
-        color:#000;
-        font-size:16px;
-        font-weight:700;
-        line-height:1.2;
-        padding:12px 16px;
-        border-radius:10px;
-        border:0;
-        text-decoration:none;
-        box-shadow:0 10px 30px rgba(0,0,0,0.7);
-    }}
+    .room-desc {
+        font-size: .8rem;
+        line-height: 1.4;
+        margin-top: .75rem;
+        color: rgba(255,255,255,0.7);
+        text-shadow: 0 0 6px rgba(255,0,170,0.4);
+    }
 
-    /* top nav */
-    .top-nav {{
-        position:relative;
-        z-index:3;
-        width:100%;
-        max-width:600px;
-        margin:0 auto 24px;
-        display:flex;
-        flex-wrap:wrap;
-        gap:8px;
-        justify-content:space-between;
-    }}
-    .top-btn {{
-        flex:1;
-        background:rgba(0,0,0,0.4);
-        border:1px solid rgba(255,255,255,0.15);
-        border-radius:12px;
-        padding:12px;
-        font-size:15px;
-        font-weight:600;
-        text-align:center;
-        color:#fff;
-        text-decoration:none;
-        min-width:0;
-        box-shadow:0 20px 50px rgba(0,0,0,0.8);
-    }}
+    /* specific vibe hints */
+    .purple {color:#e0c9ff;}
+    .pink   {color:#ffc9f0;}
+    .blue   {color:#c9e7ff;}
 
-    /* bottom nav bar */
-    .bottom-nav {{
-        position:fixed;
-        z-index:10;
-        left:0;
-        right:0;
-        bottom:0;
-        background:rgba(0,0,0,0.6);
-        backdrop-filter:blur(20px);
-        border-top:1px solid rgba(255,255,255,0.2);
-        padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 12px);
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        font-size:15px;
-        color:#fff;
-    }}
-    .bottom-pill {{
-        background:radial-gradient(circle at 0% 0%, #ff00ff 0%, #ff0080 30%, #ff5500 60%, #0000 80%);
-        color:#fff;
-        font-weight:600;
-        font-size:14px;
-        padding:10px 14px;
-        line-height:1.2;
-        border-radius:999px;
-        box-shadow:0 0 20px #ff00ff,0 0 60px #ff0080;
-        border:1px solid rgba(255,255,255,0.4);
-        text-align:center;
-        text-decoration:none;
-    }}
-    .bottom-left,
-    .bottom-right {{
-        color:#fff;
-        font-weight:600;
-        font-size:16px;
-        text-decoration:none;
-    }}
+    /* ---- FOOTER / MUSIC PILL ---- */
+    .footer-area {
+        width: 100%;
+        max-width: 32rem;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+        margin-bottom: 5rem; /* room for pill */
+        margin-top: 3rem;
+    }
 
-    /* wrapper width */
-    .content-wrap {{
-        position:relative;
-        z-index:2;
-        max-width:600px;
-        margin:0 auto 120px;
-    }}
+    .comfort {
+        font-size: .8rem;
+        line-height: 1.4;
+        color: rgba(255,255,255,0.6);
+        text-shadow: 0 0 8px rgba(255,0,170,0.4);
+    }
 
-    </style>
-    """
+    .love {
+        font-size: .9rem;
+        margin-top: .5rem;
+        color: #fff;
+        font-weight: 500;
+        text-shadow:
+            0 0 6px rgba(255,0,170,0.8),
+            0 0 18px rgba(138,43,226,0.8),
+            0 0 38px rgba(255,140,0,0.6);
+    }
 
-def bubble_field_html():
-    # multiple tinted bubbles
-    return """
-    <div class="bubble-field">
-        <div class="bubble big"  style="left:10%; bottom:-10%;"></div>
-        <div class="bubble med slow" style="left:70%; bottom:-20%;"></div>
-        <div class="bubble tiny" style="left:40%; bottom:-15%;"></div>
-        <div class="bubble med" style="left:20%; bottom:-25%;"></div>
-        <div class="bubble big slow" style="left:85%; bottom:-30%;"></div>
+    /* ---- FLOATING MUSIC PILL ---- */
+    .music-pill {
+        position: fixed;
+        left: 50%;
+        bottom: 1rem;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+
+        background: rgba(0,0,0,0.4);
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 999px;
+        padding: .75rem 1rem;
+        min-width: 16rem;
+        max-width: 90%;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+
+        box-shadow:
+            0 12px 40px rgba(0,0,0,0.9),
+            0 0 20px rgba(255,0,170,0.7),
+            0 0 60px rgba(255,140,0,0.5),
+            0 0 120px rgba(140,0,255,0.4);
+
+        animation: pillPulse 2.8s infinite;
+    }
+
+    @keyframes pillPulse {
+        0%,100% { box-shadow:
+            0 12px 40px rgba(0,0,0,0.9),
+            0 0 20px rgba(255,0,170,0.7),
+            0 0 60px rgba(255,140,0,0.5),
+            0 0 120px rgba(140,0,255,0.4); }
+        50% { box-shadow:
+            0 12px 40px rgba(0,0,0,0.9),
+            0 0 30px rgba(255,0,170,1),
+            0 0 80px rgba(255,140,0,0.8),
+            0 0 160px rgba(140,0,255,0.6); }
+    }
+
+    .music-left {
+        display: flex;
+        flex-direction: column;
+        font-size: .7rem;
+        line-height: 1.2;
+    }
+    .music-label {
+        font-weight: 600;
+        color: #fff;
+        text-shadow: 0 0 6px rgba(255,0,170,0.8), 0 0 18px rgba(170,0,255,0.8);
+    }
+    .music-sub {
+        color: rgba(255,255,255,0.6);
+    }
+
+    .music-btn {
+        font-size: .7rem;
+        font-weight: 600;
+        padding: .5rem .8rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.4);
+        background: radial-gradient(circle at 20% 20%, rgba(255,0,187,0.6) 0%, rgba(120,0,255,0.4) 60%);
+        color: #fff;
+        text-shadow: 0 0 4px rgba(0,0,0,0.8);
+        box-shadow:
+            0 0 12px rgba(255,0,187,0.8),
+            0 0 40px rgba(140,0,255,0.8);
+        cursor: pointer;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .music-btn:active {
+        scale: .97;
+    }
+
+    /* ---- SMALL PRINT ---- */
+    .tiny {
+        font-size: .65rem;
+        line-height: 1.4;
+        color: rgba(255,255,255,0.4);
+        margin-top: 1rem;
+        text-align: center;
+        text-shadow: 0 0 6px rgba(0,0,0,0.8);
+    }
+</style>
+</head>
+<body>
+
+<!-- animated glow overlay -->
+<div class="aura"></div>
+
+<!-- bubble field lives behind content -->
+<div class="bubble-field" id="bubbleField"></div>
+
+<!-- MAIN CONTENT -->
+<div class="shell">
+    <header class="top-block">
+        <div class="ship-label">ENGINE ROOM LINK // SAFE MODE</div>
+
+        <h1 class="main-title">Bubble&nbsp;World</h1>
+
+        <p class="subtitle">
+            Personal ship core. Private calm space. Port-hopping shield.  
+            You are loved. You are protected. You are still here.
+        </p>
+
+        <div class="rooms">
+            <a class="room-card" href="#room1">
+                <div class="room-top-row">
+                    <div class="room-name">Room&nbsp;1</div>
+                    <div class="room-chip">Purple Mind</div>
+                </div>
+                <div class="room-desc purple">
+                    Soft healing playlists. Breathe. Shoulders down. You’re safe.
+                </div>
+            </a>
+
+            <a class="room-card" href="#room2">
+                <div class="room-top-row">
+                    <div class="room-name">Room&nbsp;2</div>
+                    <div class="room-chip">Warm Core</div>
+                </div>
+                <div class="room-desc pink">
+                    Timmy Time Music energy. Laugh / Play / Fun / Motown / Feeling It.
+                </div>
+            </a>
+
+            <a class="room-card" href="#room3">
+                <div class="room-top-row">
+                    <div class="room-name">Room&nbsp;3</div>
+                    <div class="room-chip">Drift Space</div>
+                </div>
+                <div class="room-desc blue">
+                    Maya link. Joke + riddle. “You are beautiful and loved 💖”
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <footer class="footer-area">
+        <div class="comfort">
+            Shield status: stable · Sniffer quiet · Hopper cloaked
+        </div>
+        <div class="love">
+            “This app was created on Timmy’s iPhone&nbsp;17 Pro Max&nbsp;2TB.”
+        </div>
+        <div class="tiny">
+            Public display shell. Internal engine and live AI run locally only.
+        </div>
+    </footer>
+</div>
+
+<!-- floating Timmy Time Music pill -->
+<div class="music-pill">
+    <div class="music-left">
+        <div class="music-label">Timmy Time Music</div>
+        <div class="music-sub">tap to vibe 💜</div>
     </div>
-    """
+    <a class="music-btn" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank" rel="noopener noreferrer">
+        Play
+    </a>
+</div>
 
-def top_nav_html():
-    return f"""
-    <nav class="top-nav">
-        <a class="top-btn" href="/">Engine</a>
-        <a class="top-btn" href="/room1">Room 1</a>
-        <a class="top-btn" href="/room2">Room 2</a>
-        <a class="top-btn" href="/room3">Room 3</a>
-    </nav>
-    """
+<script>
+/*
+    Bubble generator:
+    - random size
+    - random horizontal start
+    - slow upward drift
+    - constant feed (so page feels alive)
+*/
+const field = document.getElementById('bubbleField');
 
-def bottom_nav_html():
-    return """
-    <div class="bottom-nav">
-        <a class="bottom-left" href="/">🏠</a>
-        <a class="bottom-pill" href="/room2">Timmy Time Music</a>
-        <a class="bottom-right" href="/room3">💬</a>
-    </div>
-    """
+function spawnBubble() {
+    const b = document.createElement('div');
+    b.className = 'bubble';
 
-# ============================================================
-# PAGES
-# ============================================================
+    // random size between 40px and 160px
+    const size = 40 + Math.random() * 120;
+    b.style.width = size + 'px';
+    b.style.height = size + 'px';
 
-def render_engine_room():
-    # Engine Room = green core version
-    css = base_css(
-        "radial-gradient(circle at 30% 20%, #003300 0%, #006b3a 40%, #000000 80%)",
-        "rgba(0,255,128,0.6)",
-        "rgba(0,128,64,0.4)"
-    )
-    ship_status_items = [
-        ("Hull", "Online · Bubble World core is running locally."),
-        ("Radio Deck", "Your music stream lives. Suno stays protected."),
-        ("AI Copilot", "Maya console awake and responsive 🤖"),
-        ("Crew Access", "Direct link share = instant boarding ✅"),
-    ]
+    // random horizontal position (0-100vw)
+    b.style.left = Math.random() * 100 + 'vw';
 
-    # build log lines
-    sniff = random.choice(SNIFFER_LINES)
-    hop = random.choice(HOPPER_LINES)
-    heal = random.choice(HEALER_LINES)
+    // start just below the bottom
+    b.style.bottom = '-160px';
 
-    status_list_html = "".join([
-        f"""
-        <div class="status-item">
-            <div class="status-head">{title}</div>
-            <div class="status-sub">{desc}</div>
-        </div>
-        """ for (title, desc) in ship_status_items
-    ])
+    // animation duration between 10s and 22s
+    const dur = 10 + Math.random() * 12;
+    b.style.animationDuration = dur + 's';
 
-    maya_block = f"""
-    <div class="panel">
-        <div class="panel-header-row">
-            <div class="panel-emoji">🤖</div>
-            <div class="panel-title-block">
-                <div class="panel-title">Maya — Ship Assistant</div>
-                <div class="panel-chip">live</div>
-                <div class="panel-desc">
-                    Ask status, routes, anything. Maya answers here.
-                </div>
-            </div>
-        </div>
+    // slight horizontal drift direction random (-20vw to +20vw)
+    // handled via keyframes translateX(20vw). we randomize sign here with scaleX
+    if (Math.random() < 0.5) {
+        b.style.transform = 'scaleX(-1)';
+    }
 
-        <div class="maya-console" id="maya-console">
-            <div class="maya-chat-line">Maya: Welcome aboard, Captain. All systems are warm. What’s our move?</div>
-            <div class="maya-chat-line maya-me">You: Status on engines and crew morale?</div>
-            <div class="maya-chat-line">Maya: Engines humming. Crew is curious and hopeful.</div>
-        </div>
+    field.appendChild(b);
 
-        <div class="maya-row">
-            <input id="maya-input" class="maya-input" placeholder="Talk to Maya..." />
-            <button class="maya-send" onclick="sendToMaya()">Send</button>
-        </div>
-    </div>
-    """
+    // cleanup after it floats away
+    setTimeout(() => {
+        field.removeChild(b);
+    }, dur * 1000 + 1000);
+}
 
-    engine_status_block = f"""
-    <div class="panel">
-        <div class="panel-header-row">
-            <div class="panel-emoji">🛠️</div>
-            <div class="panel-title-block">
-                <div class="panel-title">Ship Core Status</div>
-                <div class="panel-chip">core</div>
-                <div class="panel-desc">
-                    You control the story. Tell visitors what's live and what's under repair.
-                </div>
-            </div>
-        </div>
+// make a stream of bubbles
+setInterval(() => {
+    // a couple at a time feels rich
+    spawnBubble();
+    if (Math.random() < 0.4) spawnBubble();
+}, 1200);
 
-        <div class="status-list">
-            {status_list_html}
-        </div>
+// OPTIONAL: hooks for future routing
+function goRoom(roomId){
+    alert(roomId + " (placeholder). Live engine runs local only right now.");
+}
+document.querySelector('a[href="#room1"]').addEventListener('click', e => {e.preventDefault(); goRoom('Room 1');});
+document.querySelector('a[href="#room2"]').addEventListener('click', e => {e.preventDefault(); goRoom('Room 2');});
+document.querySelector('a[href="#room3"]').addEventListener('click', e => {e.preventDefault(); goRoom('Room 3');});
+</script>
 
-        <div class="drift-block" style="margin-top:16px;">
-            <div class="drift-head">Sniffer</div>
-            <div>{sniff}</div>
-            <div class="drift-head" style="margin-top:12px;">Port Hopper</div>
-            <div>{hop}</div>
-            <div class="drift-head" style="margin-top:12px;">Healer</div>
-            <div>{heal}</div>
-        </div>
-    </div>
-    """
-
-    html = f"""
-    <html>
-    <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    {css}
-    <script>
-    async function sendToMaya() {{
-        const box = document.getElementById('maya-input');
-        const consoleDiv = document.getElementById('maya-console');
-        const msg = box.value.trim();
-        if(!msg) return;
-        // show my line
-        consoleDiv.innerHTML += `
-            <div class="maya-chat-line maya-me">You: ${{
-                msg.replace(/</g,"&lt;")
-            }}</div>`;
-        box.value="";
-        // ask backend
-        let res = await fetch('/maya', {{
-            method:'POST',
-            headers:{{'Content-Type':'application/json'}},
-            body:JSON.stringify({{q:msg}})
-        }});
-        let data = await res.json();
-        consoleDiv.innerHTML += `
-            <div class="maya-chat-line">Maya: ${{
-                (data.reply||"").replace(/</g,"&lt;")
-            }}</div>`;
-        consoleDiv.scrollTop = consoleDiv.scrollHeight;
-    }}
-    </script>
-    </head>
-    <body>
-        {bubble_field_html()}
-        <div class="content-wrap">
-            {top_nav_html()}
-
-            <div class="panel">
-                <div class="panel-header-row">
-                    <div class="panel-emoji">👋</div>
-                    <div class="panel-title-block">
-                        <div class="panel-title">Welcome Aboard, Captain Timmy!</div>
-                        <div class="panel-desc">
-                            This ship is running locally on your iPhone. You are in the Engine Room (core).
-                        </div>
-                    </div>
-                </div>
-                <a class="action-btn" href="/{ENGINE_HASH}">Diagnostics →</a>
-            </div>
-
-            {engine_status_block}
-            {maya_block}
-        </div>
-
-        {bottom_nav_html()}
-    </body>
-    </html>
-    """
-    return html
-
-
-def render_room1():
-    # Purple Mind room
-    css = base_css(
-        "radial-gradient(circle at 30% 20%, #2b003a 0%, #5e0099 40%, #000000 80%)",
-        "rgba(255,0,255,0.6)",
-        "rgba(255,128,255,0.4)"
-    )
-
-    # Timmy's calm playlists for Room 1
-    playlists = [
-        ("001", "Hope",        "suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316"),
-        ("002", "Soul",        "suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df"),
-        ("003", "Beach",       "suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c"),
-        ("004", "Rest",        "suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479"),
-        ("005", "Jazz",        "suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be"),
-    ]
-
-    track_list_html = ""
-    for num, title, link in playlists:
-        track_list_html += f"""
-        <div class="track">
-            <div class="track-left">
-                <div class="track-num">{num}</div>
-                <div>
-                    <div class="track-info-title">{title}</div>
-                    <div class="track-info-meta">tap to open playlist</div>
-                </div>
-            </div>
-            <a class="play-btn" href="https://{link}" target="_blank">▶ Play</a>
-        </div>
-        """
-
-    html = f"""
-    <html>
-    <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    {css}
-    </head>
-    <body>
-        {bubble_field_html()}
-        <div class="content-wrap">
-            {top_nav_html()}
-
-            <div class="panel">
-                <div class="panel-header-row">
-                    <div class="panel-emoji">💜</div>
-                    <div class="panel-title-block">
-                        <div class="panel-title">Room 1 — Purple Mind</div>
-                        <div class="panel-chip">calm</div>
-                        <div class="panel-desc">
-                            Soft landing. Healing playlists. Breathe here.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="playlist-board">
-                    {track_list_html}
-                </div>
-            </div>
-        </div>
-        {bottom_nav_html()}
-    </body>
-    </html>
-    """
-    return html
-
-
-def render_room2():
-    # Timmy Time Music room (magenta/orange energy)
-    css = base_css(
-        "radial-gradient(circle at 30% 20%, #4a0024 0%, #cc0077 40%, #ff5500 70%, #000000 90%)",
-        "rgba(255,0,128,0.6)",
-        "rgba(255,128,0,0.4)"
-    )
-
-    # Vibe set for Room 2 that you gave me
-    playlists = [
-        ("001", "Laugh",       "https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1"),
-        ("002", "Play",        "https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b"),
-        ("003", "Fun",         "https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f"),
-        ("004", "Motown",      "https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840"),
-        ("005", "Feeling It",  "https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c"),
-    ]
-
-    track_list_html = ""
-    for num, title, link in playlists:
-        track_list_html += f"""
-        <div class="track">
-            <div class="track-left">
-                <div class="track-num">{num}</div>
-                <div>
-                    <div class="track-info-title">{title}</div>
-                    <div class="track-info-meta">open in Suno</div>
-                </div>
-            </div>
-            <a class="play-btn" href="{link}" target="_blank">▶ Play</a>
-        </div>
-        """
-
-    html = f"""
-    <html>
-    <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    {css}
-    </head>
-    <body>
-        {bubble_field_html()}
-        <div class="content-wrap">
-            {top_nav_html()}
-
-            <div class="panel">
-                <div class="panel-header-row">
-                    <div class="panel-emoji">🎧</div>
-                    <div class="panel-title-block">
-                        <div class="panel-title">Room 2 — Timmy Time Music</div>
-                        <div class="panel-chip">pulse</div>
-                        <div class="panel-desc">
-                            Live vibe board. Energy for the crew.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="playlist-board">
-                    {track_list_html}
-                </div>
-            </div>
-        </div>
-        {bottom_nav_html()}
-    </body>
-    </html>
-    """
-    return html
-
-
-def render_room3():
-    # Drift Space (blue / pink, comfort, riddle/joke)
-    css = base_css(
-        "radial-gradient(circle at 30% 20%, #001133 0%, #2a0066 40%, #b300ff 70%, #000000 90%)",
-        "rgba(128,0,255,0.6)",
-        "rgba(255,0,255,0.4)"
-    )
-
-    # pick one joke+one riddle based on joke_seed_offset
-    j = JOKES[(joke_seed_offset) % len(JOKES)]
-    riddle_q, riddle_a = RIDDLES[(joke_seed_offset) % len(RIDDLES)]
-
-    html = f"""
-    <html>
-    <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    {css}
-    <script>
-    async function morePlease() {{
-        let res = await fetch('/drift_more');
-        let data = await res.json();
-        document.getElementById('jokeLine').textContent = data.joke;
-        document.getElementById('riddleQ').textContent = data.riddle_q;
-        document.getElementById('riddleA').textContent = data.riddle_a;
-    }}
-    </script>
-    </head>
-    <body>
-        {bubble_field_html()}
-        <div class="content-wrap">
-            {top_nav_html()}
-
-            <div class="panel">
-                <div class="panel-header-row">
-                    <div class="panel-emoji">🌌</div>
-                    <div class="panel-title-block">
-                        <div class="panel-title">Room 3 — Drift Space</div>
-                        <div class="panel-chip">rest</div>
-                        <div class="panel-desc">
-                            Slow drift. Gentle mind. You float here.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="drift-block">
-                    <div class="drift-head">Joke</div>
-                    <div id="jokeLine">{j}</div>
-
-                    <div class="drift-head" style="margin-top:16px;">Riddle</div>
-                    <div id="riddleQ">{riddle_q}</div>
-                    <div id="riddleA" style="opacity:0.8; margin-top:6px;">{riddle_a}</div>
-
-                    <div class="drift-affirm">You are beautiful and loved 💖</div>
-                    <div class="drift-affirm" style="font-size:14px; opacity:0.8; margin-top:8px;">
-                        This app was created on Timmy’s iPhone 17 Pro Max 2TB.
-                    </div>
-
-                    <button class="more-btn" onclick="morePlease()">More ➜</button>
-                </div>
-            </div>
-        </div>
-        {bottom_nav_html()}
-    </body>
-    </html>
-    """
-    return html
-
-
-def render_diag():
-    # stealth diagnostics page at /ENGINE_HASH
-    css = base_css(
-        "radial-gradient(circle at 30% 20%, #003300 0%, #006b3a 40%, #000000 80%)",
-        "rgba(0,255,128,0.6)",
-        "rgba(0,128,64,0.4)"
-    )
-    info = f"""
-    <div class="drift-block">
-        <div class="drift-head">Diagnostics Route</div>
-        <div>Hash path: /{ENGINE_HASH}</div>
-        <div>Bound IP: 127.0.0.1</div>
-        <div>Current Port: {PORT}</div>
-        <div style="margin-top:12px;">
-            Port Hopper status: stable, music on 5000 left untouched.
-        </div>
-        <div style="margin-top:12px;">
-            Sniffer confirms zero external access. We are private.
-        </div>
-    </div>
-    """
-    html = f"""
-    <html>
-    <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    {css}
-    </head>
-    <body>
-        {bubble_field_html()}
-        <div class="content-wrap">
-            {top_nav_html()}
-
-            <div class="panel">
-                <div class="panel-header-row">
-                    <div class="panel-emoji">🛰️</div>
-                    <div class="panel-title-block">
-                        <div class="panel-title">Engine Diagnostics</div>
-                        <div class="panel-chip">private</div>
-                        <div class="panel-desc">
-                            Internal only. Port watcher, bubble check, self-healing core.
-                        </div>
-                    </div>
-                </div>
-
-                {info}
-            </div>
-        </div>
-        {bottom_nav_html()}
-    </body>
-    </html>
-    """
-    return html
-
-
-# ============================================================
-# ROUTES
-# ============================================================
-
-@app.route("/")
-def home():
-    return Response(render_engine_room(), mimetype="text/html")
-
-@app.route("/room1")
-def room1():
-    return Response(render_room1(), mimetype="text/html")
-
-@app.route("/room2")
-def room2():
-    return Response(render_room2(), mimetype="text/html")
-
-@app.route("/room3")
-def room3():
-    return Response(render_room3(), mimetype="text/html")
-
-@app.route(f"/{ENGINE_HASH}")
-def diag():
-    return Response(render_diag(), mimetype="text/html")
-
-@app.route("/maya", methods=["POST"])
-def maya_api():
-    data = request.get_json() or {}
-    q = (data.get("q") or "").strip().lower()
-
-    # tiny onboard "AI" brain so Maya answers
-    if not q:
-        answer = "I'm here, Captain. I hear you. 💖"
-    elif "status" in q or "engine" in q:
-        answer = "Engines are humming and ports are cloaked. No leaks, no creepers."
-    elif "crew" in q or "morale" in q:
-        answer = "Crew morale is steady and curious. They’re watching you and feeling safe."
-    elif "route" in q or "next move" in q or "next" in q:
-        answer = "Next move: hydrate, breathe, and choose the room that feels best. I’ll follow."
-    else:
-        answer = "Logged. I’ll carry that forward, Captain. 💫"
-
-    return jsonify({"reply": answer})
-
-@app.route("/drift_more")
-def drift_more():
-    global joke_seed_offset
-    joke_seed_offset += 1
-    j = JOKES[(joke_seed_offset) % len(JOKES)]
-    rq, ra = RIDDLES[(joke_seed_offset) % len(RIDDLES)]
-    return jsonify({"joke": j, "riddle_q": rq, "riddle_a": ra})
-
-
-# ============================================================
-# BOOT: run server + auto-open browser to "/"
-# ============================================================
-
-def open_browser_later(port):
-    # tiny delay so Flask is listening before Safari hits it
-    time.sleep(0.6)
-    webbrowser.open(f"http://127.0.0.1:{port}/")
-
-if __name__ == "__main__":
-    threading.Thread(target=open_browser_later, args=(PORT,), daemon=True).start()
-    app.run(host="127.0.0.1", port=PORT, debug=False)
+</body>
+</html>
