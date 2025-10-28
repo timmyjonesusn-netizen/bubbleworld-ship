@@ -3,797 +3,190 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Bubble World Ship</title>
+<title>Bubble World v3.3.3</title>
 <style>
-:root {
-    /* defaults (Engine Room theme) */
-    --room-bg: radial-gradient(circle at 30% 20%, #003300 0%, #006b3a 40%, #000000 80%);
-    --bubble-main: rgba(0,255,128,0.6);
-    --bubble-alt: rgba(0,128,64,0.4);
-
-    --card-bg: rgba(0,0,0,0.35);
-    --card-border: rgba(255,255,255,0.18);
-    --text-main: #fff;
-
-    --status-chip-bg: rgba(0,0,0,0.6);
-    --status-chip-text: #f9f9c5;
-
-    --yellow-btn-bg: radial-gradient(circle at 20% 20%, #fff8 0%, #ffe066 40%, #ffcf4d 60%, #b26a00 100%);
-    --yellow-btn-text: #000;
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:radial-gradient(circle at 30% 20%,#003300 0%,#006b3a 40%,#000 80%);
+  font-family:-apple-system,BlinkMacSystemFont,Inter,"SF Pro Text",Arial,sans-serif;
+  color:#fff;
 }
 
-* {
-    box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Text", Arial, sans-serif;
-    color: var(--text-main);
-    margin: 0;
-    padding: 0;
+/* bubbles */
+.bubble-field{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
+  z-index:0;
+  pointer-events:none;
 }
+.bubble{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(20px);
+  opacity:.45;
+  animation:floatUp linear infinite;
+  background:radial-gradient(circle at 30% 30%,var(--bubble-main,rgba(0,255,128,.6))0%,var(--bubble-alt,rgba(0,128,64,.4))60%,transparent70%);
+}
+@keyframes floatUp{
+  0%{transform:translateY(100vh);}
+  100%{transform:translateY(-20vh);}
+}
+@keyframes fadeRoom{0%{opacity:0;}100%{opacity:1;}}
 
-html, body {
-    min-height: 100vh;
-    background: var(--room-bg) fixed;
-    position: relative;
-    overflow-x: hidden;
-    padding: 0;
-    margin: 0;
+/* layout */
+.content{
+  position:relative;
+  z-index:1;
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  transition:background 1s ease;
 }
-
-/* bubble backdrop */
-.bubble-field {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
-    z-index: 0;
-    pointer-events: none;
+nav{
+  position:fixed;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:8px;
+  z-index:5;
 }
-.bubble {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(20px);
-    opacity: 0.4;
-    animation: floatUp 8s linear infinite;
-    background: radial-gradient(circle at 30% 30%, var(--bubble-main) 0%, var(--bubble-alt) 60%, transparent 70%);
-    box-shadow:
-        0 0 60px var(--bubble-main),
-        0 0 120px var(--bubble-alt);
+button.nav{
+  background:rgba(0,0,0,.4);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:10px;
+  color:#fff;
+  font-weight:600;
+  padding:10px 16px;
 }
-.bubble.slow { animation-duration: 12s; opacity:0.25; }
-.bubble.tiny { width:60px; height:60px; }
-.bubble.med { width:110px; height:110px; }
-.bubble.big { width:180px; height:180px; }
-
-@keyframes floatUp {
-    0%   { transform: translateY(40vh) translateX(0);   }
-    100% { transform: translateY(-40vh) translateX(10vw);}
+.bottom{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:5;
 }
-
-/* main view area */
-.content-wrap {
-    position: relative;
-    z-index: 2;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 16px 16px 120px; /* bottom space above nav */
-    min-height: calc(100vh - 100px); /* cover screen even if content is short */
-    display: flex;
-    flex-direction: column;
+.bottom-pill{
+  background:radial-gradient(circle at 0% 0%,#ff00ff 0%,#ff0080 30%,#ff5500 60%,transparent 80%);
+  padding:12px 20px;
+  border-radius:999px;
+  box-shadow:0 0 40px #ff0080;
+  border:1px solid rgba(255,255,255,.4);
+  color:#fff;
+  font-weight:600;
 }
-
-/* top nav */
-.top-nav {
-    position: relative;
-    z-index: 3;
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: space-between;
-    margin-bottom: 24px;
-}
-.top-btn {
-    flex: 1;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 12px;
-    padding: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    text-align: center;
-    color: #fff;
-    text-decoration: none;
-    min-width: 0;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-}
-.top-btn.active {
-    outline: 2px solid rgba(255,255,255,0.6);
-    background: rgba(0,0,0,0.6);
-}
-
-/* bottom nav */
-.bottom-nav {
-    position: fixed;
-    z-index: 10;
-    left:0;
-    right:0;
-    bottom:0;
-    background: rgba(0,0,0,0.65);
-    backdrop-filter: blur(20px);
-    border-top:1px solid rgba(255,255,255,0.2);
-    padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 12px);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-size:15px;
-    color:#fff;
-    box-shadow:0 -20px 60px rgba(0,0,0,0.9),
-               0 0 60px var(--bubble-main);
-}
-.bottom-left,
-.bottom-right {
-    color:#fff;
-    font-weight:600;
-    font-size:16px;
-    text-decoration:none;
-}
-.bottom-pill {
-    background:radial-gradient(circle at 0% 0%, #ff00ff 0%, #ff0080 30%, #ff5500 60%, #0000 80%);
-    color:#fff;
-    font-weight:600;
-    font-size:14px;
-    padding:10px 14px;
-    line-height:1.2;
-    border-radius:999px;
-    box-shadow:
-        0 0 20px #ff00ff,
-        0 0 60px #ff0080,
-        0 0 100px #ff5500;
-    border:1px solid rgba(255,255,255,0.4);
-    text-align:center;
-    text-decoration:none;
-    min-width: 180px;
-}
-.bottom-pill small {
-    font-size:12px;
-    font-weight:500;
-    display:block;
-    line-height:1.2;
-    opacity:.9;
-}
-
-/* panels / cards */
-.panel {
-    position: relative;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 16px 16px 20px;
-    margin-bottom: 24px;
-    box-shadow:
-        0 30px 80px rgba(0,0,0,0.9),
-        0 0 80px var(--bubble-main);
-    animation:fadeRoom .4s ease both;
-}
-.panel-header-row {
-    display:flex;
-    flex-wrap:wrap;
-    align-items:flex-start;
-    gap:8px;
-    margin-bottom:12px;
-}
-.panel-emoji {
-    font-size:24px;
-    line-height:24px;
-}
-.panel-title-block {
-    flex:1;
-    min-width:0;
-}
-.panel-title {
-    font-size:28px;
-    font-weight:700;
-    line-height:1.25;
-    color:#fff;
-}
-.panel-chip {
-    background: var(--status-chip-bg);
-    color: var(--status-chip-text);
-    font-size:14px;
-    line-height:1;
-    padding:6px 8px;
-    border-radius:8px;
-    font-weight:600;
-    border:1px solid rgba(255,255,255,0.15);
-    align-self:flex-start;
-    display:inline-block;
-    margin-top:8px;
-}
-.panel-desc {
-    font-size:20px;
-    line-height:1.4;
-    margin-top:16px;
-    color:#fff;
-    font-weight:500;
-}
-
-/* ship map card */
-.map-block {
-    background:rgba(0,0,0,0.4);
-    border:1px solid rgba(255,255,255,0.18);
-    border-radius:12px;
-    padding:16px;
-    margin-top:16px;
-    font-size:17px;
-    line-height:1.45;
-}
-.map-head {
-    font-size:15px;
-    font-weight:600;
-    color:#ffbbff;
-    margin-bottom:8px;
-}
-
-/* status list */
-.status-list {
-    margin-top:16px;
-    border:1px solid rgba(255,255,255,0.15);
-    border-radius:12px;
-    overflow:hidden;
-}
-.status-item {
-    padding:14px 16px;
-    font-size:18px;
-    line-height:1.4;
-    background:rgba(0,0,0,0.2);
-    border-bottom:1px solid rgba(255,255,255,0.07);
-    color:#fff;
-}
-.status-item:last-child {
-    border-bottom:0;
-}
-.status-head {
-    font-size:20px;
-    font-weight:600;
-    color:#fff;
-}
-.status-sub {
-    font-size:16px;
-    opacity:0.9;
-    line-height:1.4;
-    padding-top:4px;
-}
-
-/* drift space block */
-.drift-block {
-    font-size:18px;
-    line-height:1.5;
-    color:#fff;
-    margin-top:12px;
-    background:rgba(0,0,0,0.35);
-    border:1px solid rgba(255,255,255,0.18);
-    border-radius:12px;
-    padding:16px;
-}
-.drift-head {
-    font-size:16px;
-    font-weight:600;
-    color:#ffbbff;
-    margin-bottom:8px;
-}
-.drift-affirm {
-    font-size:20px;
-    font-weight:600;
-    color:#ffbbff;
-    margin-top:12px;
-}
-.drift-note {
-    font-size:14px;
-    opacity:.8;
-    margin-top:8px;
-    color:#fff;
-}
-
-/* playlists */
-.playlist-board {
-    border:1px solid rgba(255,255,255,0.15);
-    border-radius:16px;
-    overflow:hidden;
-    background:rgba(0,0,0,0.25);
-    box-shadow:
-        0 20px 60px rgba(0,0,0,0.8),
-        0 0 60px var(--bubble-main);
-}
-.track {
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    padding:16px;
-    border-bottom:1px solid rgba(255,255,255,0.07);
-    color:#fff;
-}
-.track:last-child {
-    border-bottom:0;
-}
-.track-left {
-    display:flex;
-    gap:12px;
-    align-items:flex-start;
-}
-.track-num {
-    flex-shrink:0;
-    width:48px;
-    height:48px;
-    border-radius:10px;
-    background:
-        radial-gradient(circle at 20% 20%, #fff0 0%, #fff0 30%, #0000 60%),
-        radial-gradient(circle at 20% 20%, var(--bubble-main) 0%, var(--bubble-alt) 60%, #0000 70%);
-    border:2px solid rgba(255,255,255,0.4);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:15px;
-    font-weight:700;
-    color:#000;
-    box-shadow:
-        0 10px 30px rgba(0,0,0,0.8),
-        0 0 40px var(--bubble-main);
-}
-.track-info-title {
-    font-size:20px;
-    line-height:1.3;
-    font-weight:600;
-    color:#fff;
-}
-.track-info-meta {
-    font-size:15px;
-    line-height:1.3;
-    color:#fff;
-    opacity:0.9;
-}
-.play-btn {
-    background: var(--yellow-btn-bg);
-    color:#000;
-    font-weight:700;
-    border-radius:10px;
-    padding:12px 16px;
-    font-size:16px;
-    border:0;
-    text-decoration:none;
-    box-shadow:0 10px 30px rgba(0,0,0,0.7);
-    min-width:74px;
-    text-align:center;
-}
-
-/* show/hide rooms + fade */
-.room-section {
-    display:none;
-    animation: fadeRoom 0.45s ease both;
-}
-.room-section.active {
-    display:block;
-}
-
-@keyframes fadeRoom {
-    0% { opacity:0; transform:translateY(10px) scale(0.98); }
-    100% { opacity:1; transform:translateY(0) scale(1); }
-}
-@keyframes fadeRoomPanel {
-    0% { opacity:0; transform:translateY(6px) scale(0.99); }
-    100% { opacity:1; transform:translateY(0) scale(1); }
-}
-@keyframes fadeRoom {
-    0% { opacity:0; transform:translateY(8px) scale(.98); }
-    100% { opacity:1; transform:translateY(0) scale(1); }
+.room{display:none;animation:fadeRoom .6s ease both;}
+.room.active{display:block;}
+h1{font-size:32px;margin-bottom:10px;}
+p{max-width:600px;margin:0 auto 10px;}
+a.play{
+  display:inline-block;
+  background:rgba(255,255,255,.2);
+  border:1px solid rgba(255,255,255,.3);
+  border-radius:8px;
+  padding:8px 14px;
+  color:#fff;
+  text-decoration:none;
+  margin:4px;
 }
 </style>
 </head>
 <body>
 
-<!-- animated bubbles behind everything -->
-<div class="bubble-field" id="bubbleField">
-    <div class="bubble big"  style="left:10%; bottom:-10%;"></div>
-    <div class="bubble med slow" style="left:70%; bottom:-20%;"></div>
-    <div class="bubble tiny" style="left:40%; bottom:-15%;"></div>
-    <div class="bubble med" style="left:20%; bottom:-25%;"></div>
-    <div class="bubble big slow" style="left:85%; bottom:-30%;"></div>
+<div class="bubble-field" id="bubbles"></div>
+
+<nav>
+  <button class="nav" onclick="go('engine')">Engine</button>
+  <button class="nav" onclick="go('room1')">Room 1</button>
+  <button class="nav" onclick="go('room2')">Room 2</button>
+  <button class="nav" onclick="go('room3')">Room 3</button>
+</nav>
+
+<div class="content">
+  <section id="engine" class="room active">
+    <h1>Welcome Aboard, Captain Timmy!</h1>
+    <p>Engine Room (core online). Follow the glow to the Music Deck below.</p>
+  </section>
+
+  <section id="room1" class="room">
+    <h1>💜 Room 1 — Purple Mind</h1>
+    <p>Healing Playlists:</p>
+    <a class="play" href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316" target="_blank">Hope</a>
+    <a class="play" href="https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df" target="_blank">Soul</a>
+    <a class="play" href="https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c" target="_blank">Beach</a>
+    <a class="play" href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479" target="_blank">Rest</a>
+    <a class="play" href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank">Jazz</a>
+  </section>
+
+  <section id="room2" class="room">
+    <h1>🎧 Room 2 — Timmy Time Music</h1>
+    <p>Live Vibe Deck — choose your energy:</p>
+    <a class="play" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">Laugh</a>
+    <a class="play" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">Play</a>
+    <a class="play" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">Fun</a>
+    <a class="play" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">Motown</a>
+    <a class="play" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">Feeling It</a>
+  </section>
+
+  <section id="room3" class="room">
+    <h1>🌌 Room 3 — Drift Space</h1>
+    <p>You are beautiful and loved 💖</p>
+  </section>
 </div>
 
-<div class="content-wrap">
-    <!-- top nav -->
-    <nav class="top-nav">
-        <button class="top-btn" id="btn-engine" onclick="goRoom('engine')">Engine</button>
-        <button class="top-btn" id="btn-room1" onclick="goRoom('room1')">Room&nbsp;1</button>
-        <button class="top-btn" id="btn-room2" onclick="goRoom('room2')">Room&nbsp;2</button>
-        <button class="top-btn" id="btn-room3" onclick="goRoom('room3')">Room&nbsp;3</button>
-    </nav>
-
-    <!-- ENGINE ROOM -->
-    <section class="room-section" id="engine">
-        <!-- welcome / status -->
-        <div class="panel">
-            <div class="panel-header-row">
-                <div class="panel-emoji">👋</div>
-                <div class="panel-title-block">
-                    <div class="panel-title">Welcome Aboard, Captain Timmy!</div>
-                    <div class="panel-chip">core</div>
-                </div>
-            </div>
-            <div class="panel-desc">
-                This ship is alive. You’re in the Engine Room (green core).<br/><br/>
-                Sniffer: all clear on ports.<br/>
-                Hopper: cloak engaged, we never kill 5000 (music stays safe).<br/>
-                Healer: bubble regen active, shields soft and warm.
-            </div>
-
-            <!-- Ship Map -->
-            <div class="map-block">
-                <div class="map-head">Ship Map</div>
-                <div><strong>Room 1 — Purple Mind:</strong> Quiet / Healing playlists / Soft landings</div>
-                <div style="margin-top:8px;"><strong>Room 2 — Timmy Time Music:</strong> Live vibe for the crew / Energy / Playlists</div>
-                <div style="margin-top:8px;"><strong>Room 3 — Drift Space:</strong> Float / Laugh / You are loved 💖</div>
-            </div>
-        </div>
-
-        <!-- core status block -->
-        <div class="panel">
-            <div class="panel-header-row">
-                <div class="panel-emoji">🛠️</div>
-                <div class="panel-title-block">
-                    <div class="panel-title">Ship Core Status</div>
-                    <div class="panel-chip">online</div>
-                </div>
-            </div>
-
-            <div class="panel-desc">
-                You control the story. Tell visitors what's live and what's under repair.
-            </div>
-
-            <div class="status-list" style="margin-top:16px;">
-                <div class="status-item">
-                    <div class="status-head">Hull</div>
-                    <div class="status-sub">
-                        Online · Bubble World core running in protective mode.
-                    </div>
-                </div>
-                <div class="status-item">
-                    <div class="status-head">Radio Deck</div>
-                    <div class="status-sub">
-                        Music stream lives. Suno is honored.
-                    </div>
-                </div>
-                <div class="status-item">
-                    <div class="status-head">Crew Access</div>
-                    <div class="status-sub">
-                        Direct link share = instant boarding ✅
-                    </div>
-                </div>
-                <div class="status-item">
-                    <div class="status-head">Bubble Integrity</div>
-                    <div class="status-sub">
-                        External probes = 0. We are private.
-                    </div>
-                </div>
-            </div>
-
-            <div class="map-block" style="margin-top:16px;">
-                <div class="map-head">Vitals</div>
-                <div><span style="color:#9dff9d; font-weight:600;">Sniffer</span>: No creepers detected. Anxiety dropping.</div>
-                <div style="margin-top:8px;"><span style="color:#9dff9d; font-weight:600;">Hopper</span>: Handshake rotated. Cloak engaged. 5000 protected.</div>
-                <div style="margin-top:8px;"><span style="color:#ffbbff; font-weight:600;">Healer</span>: Bubble regen active. Nervous system cooling. You’re safe in here.</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ROOM 1 -->
-    <section class="room-section" id="room1">
-        <div class="panel">
-            <div class="panel-header-row">
-                <div class="panel-emoji">💜</div>
-                <div class="panel-title-block">
-                    <div class="panel-title">Room 1 — Purple Mind</div>
-                    <div class="panel-chip">calm deck</div>
-                </div>
-            </div>
-            <div class="panel-desc">
-                Soft landing. Healing playlists. Breathe here.
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="panel-header-row">
-                <div class="panel-title-block">
-                    <div class="panel-title" style="font-size:22px;">Healing Mixes · Now Available</div>
-                </div>
-            </div>
-
-            <div class="playlist-board">
-                <div class="track">
-                    <div class="track-left">
-                        <div class="track-num">001</div>
-                        <div>
-                            <div class="track-info-title">Hope</div>
-                            <div class="track-info-meta">tap to open playlist</div>
-                        </div>
-                    </div>
-                    <a class="play-btn" href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316" target="_blank">▶ Play</a>
-                </div>
-
-                <div class="track">
-                    <div class="track-left">
-                        <div class="track-num">002</div>
-                        <div>
-                            <div class="track-info-title">Soul</div>
-                            <div class="track-info-meta">tap to open playlist</div>
-                        </div>
-                    </div>
-                    <a class="play-btn" href="https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df" target="_blank">▶ Play</a>
-                </div>
-
-                <div class="track">
-                    <div class="track-left">
-                        <div class="track-num">003</div>
-                        <div>
-                            <class class="track-info-title">Beach</class>
-                            <div class="track-info-meta">tap to open playlist</div>
-                        </div>
-                    </div>
-                    <a class="play-btn" href="https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c" target="_blank">▶ Play</a>
-                </div>
-
-                <div class="track">
-                    <div class="track-left">
-                        <div class="track-num">004</div>
-                        <div>
-                            <div class="track-info-title">Rest</div>
-                            <div class="track-info-meta">tap to open playlist</div>
-                        </div>
-                    </div>
-                    <a class="play-btn" href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479" target="_blank">▶ Play</a>
-                </div>
-
-                <div class="track">
-                    <div class="track-left">
-                        <div class="track-num">005</div>
-                        <div>
-                            <div class="track-info-title">Jazz</div>
-                            <div class="track-info-meta">tap to open playlist</div>
-                        </div>
-                    </div>
-                    <a class="play-btn" href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank">▶ Play</a>
-                </div>
-            </div>
-
-            <div class="map-block" style="margin-top:16px;">
-                <div class="map-head">You are in the Mind Room</div>
-                Gentle frequencies only. Hydrate, breathe, stay soft.
-            </div>
-        </div>
-    </section>
-
-    <!-- ROOM 2 -->
-    <section class="room-section" id="room2">
-        <div class="panel">
-            <div class="panel-header-row">
-                <div class="panel-emoji">🎧</div>
-                <div class="panel-title-block">
-                    <div class="panel-title">Room 2 — Timmy Time Music</div>
-                    <div class="panel-chip">live deck</div>
-                </div>
-            </div>
-            <div class="panel-desc">
-                🎵 Timmy Time Music · Now Playing for Crew  
-                Your vibe board. Your energy. Your sound.
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="panel-header-row">
-                <div class="panel-title-block">
-                    <div class="panel-title" style="font-size:22px;">Crew Rotation · Tap to Listen</div>
-                </div>
-            </div>
-
-            <div class="playlist-board">
-                <div class="track">
-                    <div class="track-left">
-                        <div class="track-num">001</div>
-                        <div>
-                            <div class="track-info-title">Laugh</div>
-                            <div class="track-info-meta">open in Suno</div>
-                        </div>
-                    </div>
-                    <a class="play-btn" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">▶ Play</a>
-                </div>
-
-                <div class="track">
-                    <div class="track-left">
-                        <div class="track-num">002</div>
-                        <div>
-                            <div class="track-info-title">Play</div>
-                            <div class="track-info-meta">open in Suno</div>
-                        </div>
-                    </div>
-                    <a class="play-btn" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">▶ Play</a>
-                </div>
-
-                <div class="track">
-                    <div class="track-left">
-                        <div class="track-num">003</div>
-                        <div>
-                            <div class="track-info-title">Fun</div>
-                            <div class="track-info-meta">open in Suno</div>
-                        </div>
-                    </div>
-                    <a class="play-btn" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">▶ Play</a>
-                </div>
-
-                <div class="track">
-                    <div class="track-left">
-                        <div class="track-num">004</div>
-                        <div>
-                            <div class="track-info-title">Motown</div>
-                            <div class="track-info-meta">open in Suno</div>
-                        </div>
-                    </div>
-                    <a class="play-btn" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">▶ Play</a>
-                </div>
-
-                <div class="track">
-                    <div class="track-left">
-                        <div class="track-num">005</div>
-                        <div>
-                            <div class="track-info-title">Feeling It</div>
-                            <div class="track-info-meta">open in Suno</div>
-                        </div>
-                    </div>
-                    <a class="play-btn" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">▶ Play</a>
-                </div>
-            </div>
-
-            <div class="map-block" style="margin-top:16px;">
-                <div class="map-head">You are in the Music Deck</div>
-                You’re broadcasting energy to the crew. The glow you’re feeling? That’s you.
-            </div>
-        </div>
-    </section>
-
-    <!-- ROOM 3 -->
-    <section class="room-section" id="room3">
-        <div class="panel">
-            <div class="panel-header-row">
-                <div class="panel-emoji">🌌</div>
-                <div class="panel-title-block">
-                    <div class="panel-title">Room 3 — Drift Space</div>
-                    <div class="panel-chip">rest deck</div>
-                </div>
-            </div>
-            <div class="panel-desc">
-                Slow drift. Gentle mind. You float here.
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="drift-block">
-                <div class="drift-head">Joke</div>
-                <div id="jokeLine">
-                    Why did the spaceship get therapy? It had too much space in its schedule.
-                </div>
-
-                <div class="drift-head" style="margin-top:16px;">Riddle</div>
-                <div id="riddleQ">
-                    I speak without a mouth and hear without ears. I have nobody, but I come alive with wind. What am I?
-                </div>
-                <div id="riddleA" style="opacity:0.8; margin-top:6px;">
-                    An echo.
-                </div>
-
-                <div class="drift-affirm">You are beautiful and loved 💖</div>
-                <div class="drift-note">
-                    This app was created on Timmy’s iPhone 17 Pro Max 2TB.
-                </div>
-
-                <button class="play-btn" style="margin-top:16px;" onclick="morePlease()">More ➜</button>
-            </div>
-
-            <div class="map-block" style="margin-top:16px;">
-                <div class="map-head">You are in Drift Space</div>
-                Your nervous system is allowed to chill here. Nothing is urgent. You’re safe.
-            </div>
-        </div>
-    </section>
-</div>
-
-<!-- bottom nav -->
-<div class="bottom-nav">
-    <a class="bottom-left" onclick="goRoom('engine')">🏠</a>
-    <button class="bottom-pill" onclick="goRoom('room2')">
-        Timmy Time Music · Live
-        <small>tap to enter Music Deck</small>
-    </button>
-    <a class="bottom-right" onclick="goRoom('room3')">💬</a>
+<div class="bottom">
+  <button class="bottom-pill" onclick="go('room2')">Timmy Time Music · Live</button>
 </div>
 
 <script>
-/* Drift Space joke/riddle rotation */
-const jokes = [
-    "Why did the spaceship get therapy? It had too much space in its schedule.",
-    "Captain, crew morale is at 12/10. Science calls that 'statistically unfair.'",
-    "I told the engine to chill. It said 'I'm already cool, baby.'",
-    "Port Hopper report: we dipped so hard even Sunday couldn't find us."
-];
-const riddles = [
-    { q: "I speak without a mouth and hear without ears. I have nobody, but I come alive with wind. What am I?", a: "An echo." },
-    { q: "What has cities, but no houses; mountains, but no trees; water, but no fish?", a: "A map." },
-    { q: "The more you take, the more you leave behind. What am I?", a: "Footsteps." }
-];
-let driftIndex = 0;
-function morePlease() {
-    driftIndex = (driftIndex + 1) % jokes.length;
-    document.getElementById("jokeLine").textContent = jokes[driftIndex % jokes.length];
-    const pickR = riddles[driftIndex % riddles.length];
-    document.getElementById("riddleQ").textContent = pickR.q;
-    document.getElementById("riddleA").textContent = pickR.a;
+/* bubble generator */
+const field=document.getElementById("bubbles");
+function spawnBubbles(color1,color2,count=15,speed=12){
+  field.innerHTML='';
+  for(let i=0;i<count;i++){
+    const b=document.createElement('div');
+    b.className='bubble';
+    const size=Math.random()*120+40;
+    b.style.width=b.style.height=size+'px';
+    b.style.left=Math.random()*100+'%';
+    b.style.animationDuration=speed+Math.random()*6+'s';
+    b.style.background=`radial-gradient(circle at 30% 30%,${color1}0%,${color2}60%,transparent70%)`;
+    field.appendChild(b);
+  }
 }
 
-/* Navigation state */
-function highlightNav(roomName){
-    const ids=["btn-engine","btn-room1","btn-room2","btn-room3"];
-    ids.forEach(id=>{
-        const el=document.getElementById(id);
-        if(!el)return;
-        el.classList.remove("active");
-    });
-    if(roomName==="engine") document.getElementById("btn-engine").classList.add("active");
-    if(roomName==="room1") document.getElementById("btn-room1").classList.add("active");
-    if(roomName==="room2") document.getElementById("btn-room2").classList.add("active");
-    if(roomName==="room3") document.getElementById("btn-room3").classList.add("active");
+/* room colors */
+const themes={
+  engine:{bg:'radial-gradient(circle at 30% 20%,#003300 0%,#006b3a 40%,#000 80%)',main:'rgba(0,255,128,.6)',alt:'rgba(0,128,64,.4)',speed:16},
+  room1:{bg:'radial-gradient(circle at 30% 20%,#2b003a 0%,#5e0099 40%,#000 80%)',main:'rgba(255,0,255,.6)',alt:'rgba(255,128,255,.4)',speed:20},
+  room2:{bg:'radial-gradient(circle at 30% 20%,#4a0024 0%,#cc0077 40%,#ff5500 70%,#000 90%)',main:'rgba(255,0,128,.6)',alt:'rgba(255,128,0,.4)',speed:10},
+  room3:{bg:'radial-gradient(circle at 30% 20%,#001133 0%,#2a0066 40%,#b300ff 70%,#000 90%)',main:'rgba(128,0,255,.6)',alt:'rgba(255,0,255,.4)',speed:18}
+};
+
+function go(room){
+  document.querySelectorAll('.room').forEach(r=>r.classList.remove('active'));
+  const active=document.getElementById(room);
+  if(active)active.classList.add('active');
+  const t=themes[room];
+  if(t){
+    document.body.style.background=t.bg;
+    spawnBubbles(t.main,t.alt,18,t.speed);
+  }
 }
 
-/* Theme per room */
-function setThemeFor(roomName){
-    const root=document.documentElement;
-    if(roomName==="engine"){
-        root.style.setProperty('--room-bg','radial-gradient(circle at 30% 20%, #003300 0%, #006b3a 40%, #000000 80%)');
-        root.style.setProperty('--bubble-main','rgba(0,255,128,0.6)');
-        root.style.setProperty('--bubble-alt','rgba(0,128,64,0.4)');
-    }
-    if(roomName==="room1"){
-        root.style.setProperty('--room-bg','radial-gradient(circle at 30% 20%, #2b003a 0%, #5e0099 40%, #000000 80%)');
-        root.style.setProperty('--bubble-main','rgba(255,0,255,0.6)');
-        root.style.setProperty('--bubble-alt','rgba(255,128,255,0.4)');
-    }
-    if(roomName==="room2"){
-        root.style.setProperty('--room-bg','radial-gradient(circle at 30% 20%, #4a0024 0%, #cc0077 40%, #ff5500 70%, #000000 90%)');
-        root.style.setProperty('--bubble-main','rgba(255,0,128,0.6)');
-        root.style.setProperty('--bubble-alt','rgba(255,128,0,0.4)');
-    }
-    if(roomName==="room3"){
-        root.style.setProperty('--room-bg','radial-gradient(circle at 30% 20%, #001133 0%, #2a0066 40%, #b300ff 70%, #000000 90%)');
-        root.style.setProperty('--bubble-main','rgba(128,0,255,0.6)');
-        root.style.setProperty('--bubble-alt','rgba(255,0,255,0.4)');
-    }
-}
-
-/* Switch visible section */
-function goRoom(roomName){
-    const rooms=["engine","room1","room2","room3"];
-    rooms.forEach(r=>{
-        const sec=document.getElementById(r);
-        if(sec) sec.classList.remove("active");
-    });
-    const active=document.getElementById(roomName);
-    if(active) active.classList.add("active");
-
-    setThemeFor(roomName);
-    highlightNav(roomName);
-
-    // scroll to top each jump (feels like moving decks)
-    window.scrollTo({top:0,left:0,behavior:"instant"});
-}
-
-/* boot */
-goRoom("engine");
+/* init */
+go('engine');
 </script>
 </body>
 </html>
