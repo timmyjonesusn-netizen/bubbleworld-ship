@@ -1,11 +1,22 @@
-import socket, random, string, threading, webbrowser, time
+import socket, random, string, threading, webbrowser, time, html
 from flask import Flask, jsonify, Response
 
 app = Flask(__name__)
 
-# ----- stealth hash + port hop -----
+# ============================================================
+# SHIP METADATA / BUILD INFO
+# ============================================================
+BUILD_ID = "TIMMY-TIME v5.0"
+# ^ change this string any time we ship a new build so you can SEE it
+
+# ============================================================
+# HELPER: secure random stealth hash
+# ============================================================
 engine_hash = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
 
+# ============================================================
+# PORT HOP LOGIC (never kill 5000, just hop)
+# ============================================================
 def find_open_port(start=5000, end=5020):
     for p in range(start, end + 1):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -18,7 +29,13 @@ def find_open_port(start=5000, end=5020):
 
 PORT = find_open_port(5000, 5020)
 
-# ----- telemetry -----
+# for convenience
+BASE_URL = f"http://127.0.0.1:{PORT}"
+
+# ============================================================
+# STATUS + TELEMETRY ROUTES
+# ============================================================
+
 @app.route("/telemetry")
 def telemetry():
     return jsonify({
@@ -27,37 +44,70 @@ def telemetry():
         "healer": "shield green / bubble field intact",
         "maya": "awake and watching you 💖",
         "port": PORT,
-        "stealth": f"/{engine_hash}"
+        "stealth": f"/{engine_hash}",
+        "build": BUILD_ID,
+        "url": BASE_URL + "/"
     })
 
-# ----- stealth page -----
+@app.route("/status")
+def status():
+    """
+    This tells you:
+    - which build you are really looking at
+    - which port it's actually running on
+    - where the 'good' ship lives
+    If you ever see different info on screen vs here, you're in an old tab.
+    """
+    return jsonify({
+        "build": BUILD_ID,
+        "port": PORT,
+        "base_url": BASE_URL + "/",
+        "stealth": f"/{engine_hash}",
+        "message": "If Safari is showing you a different port or older build name, that tab is stale. Close it and open base_url."
+    })
+
+# ============================================================
+# INTERNAL STEALTH DIAGNOSTICS VIEW
+# ============================================================
 @app.route(f"/{engine_hash}")
 def stealth_diag():
     diag_html = f"""
     <html><body style="background:#000;color:#0f0;font-family:-apple-system,system-ui,Arial;padding:20px;">
-    <div style="font-size:14px;line-height:1.5;">
+      <div style="font-size:14px;line-height:1.5;">
         <div style="color:#0f0;font-size:16px;font-weight:600;margin-bottom:10px;">
-            STEALTH CHANNEL / {engine_hash}
+          STEALTH CHANNEL / {engine_hash}
         </div>
+
+        <div><b style="color:#9f9;">build:</b> {html.escape(BUILD_ID)}</div>
         <div><b style="color:#9f9;">active_port:</b> {PORT}</div>
+        <div><b style="color:#9f9;">base_url:</b> {BASE_URL}/</div>
         <div><b style="color:#9f9;">engine_hash:</b> {engine_hash}</div>
         <div><b style="color:#9f9;">binding:</b> 127.0.0.1 (loopback only)</div>
         <div><b style="color:#9f9;">creepers:</b> denied 🚫</div>
+
         <div style="margin-top:16px;color:#fff;font-size:12px;opacity:0.8;">
-            Maya sees everything. Be kind to yourself.
+          Maya sees everything. Be kind to yourself.
         </div>
+
         <div style="margin-top:24px;">
-            <a href="/" style="color:#0f0;text-decoration:none;font-weight:600;">⬅ back to engine</a>
+          <a href="/" style="color:#0f0;text-decoration:none;font-weight:600;">⬅ back to engine</a>
         </div>
-    </div>
+      </div>
     </body></html>
     """
     return Response(diag_html, mimetype="text/html")
 
-# ----- main SPA -----
+# ============================================================
+# MAIN APP UI (SPA WITH ROOMS)
+# ============================================================
 @app.route("/")
 def index():
-    html = f"""<!DOCTYPE html>
+    # we inject PORT + BUILD_ID + BASE_URL right into the HTML so you see “where you really are”
+    build_safe = html.escape(BUILD_ID)
+    base_url_safe = html.escape(BASE_URL + "/")
+    stealth_path = "/" + engine_hash
+
+    html_doc = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -172,7 +222,46 @@ body {{
 .status-yellow {{ color:#ffe066; background:#ffe066; }}
 .status-pink {{ color:#ff4fd8; background:#ff4fd8; }}
 
-/* ONE PINK BUTTON (slim) */
+/* EXTRA BOX: BUILD + PORT + OPEN CORRECT SHIP BUTTON */
+.engine-version-box {{
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,0,200,0.6);
+  box-shadow: 0 0 20px rgba(255,0,200,0.4);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 0.7rem;
+  line-height:1.4;
+  color:#fff;
+  text-align:left;
+}}
+.engine-version-row {{
+  margin-bottom:6px;
+  color:#fff;
+  text-shadow:0 0 8px rgba(255,0,255,0.7);
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  font-family: ui-monospace, monospace;
+  font-size:0.7rem;
+}}
+.engine-open-btn {{
+  background: radial-gradient(circle at 30% 30%, #ff4fd8 0%, #a10087 60%);
+  border:1px solid rgba(255,255,255,0.4);
+  color:#fff;
+  font-size:0.7rem;
+  font-weight:600;
+  text-shadow:0 0 8px rgba(255,0,200,0.8);
+  box-shadow:0 0 16px rgba(255,0,200,0.5);
+  border-radius:10px;
+  padding:8px 10px;
+  text-align:center;
+  line-height:1.2;
+  cursor:pointer;
+  width:100%;
+  margin-top:6px;
+}}
+
+/* ONE PINK BUTTON (gateway to Room 2) */
 .engine-music-button {{
   background: radial-gradient(circle at 30% 30%, #ff4fd8 0%, #a10087 60%);
   border:2px solid rgba(255,255,255,0.4);
@@ -187,17 +276,16 @@ body {{
   line-height:1.2;
   max-width:220px;
   margin:0 auto;
+  cursor:pointer;
 }}
 
-/* PLAYLIST GRID (tight) */
+/* PLAYLIST GRID */
 .playlist-grid {{
   display:flex;
   flex-direction:column;
   gap:8px;
   align-items:center;
 }}
-
-/* CLICKABLE TILE */
 .playlist-btn {{
   font-size:0.9rem;
   font-weight:500;
@@ -215,15 +303,13 @@ body {{
   text-shadow:0 0 8px rgba(255,128,255,0.8);
   box-shadow:0 0 14px rgba(255,128,255,0.4);
 }}
-
-/* ROOM 2 tiles get light blue border */
 #room2 .playlist-btn {{
   border-color: rgba(173,216,255,0.6);
   text-shadow:0 0 8px rgba(173,216,255,0.9);
   box-shadow:0 0 14px rgba(173,216,255,0.5);
 }}
 
-/* ROOM COLORS */
+/* ROOM COLOR WRAPS */
 #room1 {{
   background: radial-gradient(circle at 50% 30%, rgba(130,0,160,0.5) 0%, rgba(10,0,20,0.95) 70%);
   color:#ffd9ff;
@@ -251,7 +337,7 @@ body {{
   text-shadow:0 0 12px rgba(255,120,150,0.8);
 }}
 
-/* SAX ZONE */
+/* DRIFT SPACE BOXES */
 .sax-zone {{
   position:relative;
   background:rgba(0,0,0,0.4);
@@ -290,7 +376,6 @@ body {{
   100% {{ transform:translateY(-120px) translateX(-20px) scale(1.4); opacity:0; }}
 }}
 
-/* COMFORT CARD */
 .comfort-card {{
   background:rgba(0,0,0,0.4);
   border:1px solid rgba(0,255,200,0.5);
@@ -411,7 +496,8 @@ body {{
   <section id="engine" class="room active">
     <div class="bubble-layer" data-room="engine"></div>
     <div class="room-content">
-      <div class="room-title">ENGINE ROOM / SAFE CORE vTEST</div>
+
+      <div class="room-title">ENGINE ROOM / SAFE CORE</div>
 
       <div class="engine-status-box" id="telemetryBox">
         <div class="engine-status-line">
@@ -420,7 +506,32 @@ body {{
         </div>
       </div>
 
-      <!-- ONLY ONE BUTTON -->
+      <!-- NEW: version + port panel -->
+      <div class="engine-version-box">
+        <div class="engine-version-row">
+          <div>BUILD:</div>
+          <div>{build_safe}</div>
+        </div>
+        <div class="engine-version-row">
+          <div>ACTIVE PORT:</div>
+          <div>{PORT}</div>
+        </div>
+        <div class="engine-version-row">
+          <div>OPEN URL:</div>
+          <div style="max-width:60%;word-break:break-all;">{base_url_safe}</div>
+        </div>
+        <div class="engine-version-row">
+          <div>STEALTH:</div>
+          <div>{stealth_path}</div>
+        </div>
+
+        <div class="engine-open-btn"
+             onclick="forceOpenCorrectShip('{base_url_safe}')">
+          OPEN CORRECT SHIP
+        </div>
+      </div>
+
+      <!-- pink button that jumps you to room2 -->
       <div class="engine-music-button" onclick="go('room2')">
         ROOM 2 • TIMMY TIME MUSIC 🎧
       </div>
@@ -437,6 +548,7 @@ body {{
     <div class="bubble-layer" data-room="room1"></div>
     <div class="room-content">
       <div class="room-title">ROOM 1 / PURPLE MIND</div>
+
       <div class="playlist-grid">
         <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316')">Hope</div>
         <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df')">Soul</div>
@@ -456,7 +568,7 @@ body {{
   <section id="room2" class="room">
     <div class="bubble-layer" data-room="room2"></div>
     <div class="room-content">
-      <div class="room-title">ROOM 2 / TIMMY TIME MUSIC (LIVE LINKS ✅)</div>
+      <div class="room-title">ROOM 2 / TIMMY TIME MUSIC</div>
 
       <div class="playlist-grid">
         <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1')">Laugh 😂</div>
@@ -548,9 +660,19 @@ function go(id){
   document.getElementById(id).classList.add('active');
 }
 
-// open playlist in new tab
+// hard jump to correct server instance (helps kill the "old tab" problem)
+function forceOpenCorrectShip(url){
+  // send user directly to the current PORT instance in this same tab
+  window.location.href = url;
+}
+
+// open playlist in new tab (try polite first)
 function openPlaylist(url){
-  window.open(url, "_blank");
+  const win = window.open(url, "_blank");
+  // fallback: if popup blocked and win is null, force same-tab nav
+  if(!win){
+    window.location.href = url;
+  }
 }
 
 // bubbles
@@ -597,7 +719,7 @@ function spawnBubblesFor(layerEl, colorMode){
   }, 2000 + Math.random()*2000);
 }
 
-// sax notes float
+// sax drift
 function animateNotes(){
   const notes = document.querySelectorAll('#room3 .note');
   notes.forEach(n=>{
@@ -618,7 +740,7 @@ function animateNotes(){
   }
 }
 
-// joke / riddle actions
+// joke + riddle
 function revealAnswers(){
   document.getElementById('jokeAnswer').style.display='block';
   document.getElementById('riddleAnswer').style.display='block';
@@ -647,7 +769,7 @@ function newContent(){
   document.getElementById('riddleAnswer').textContent = r.a;
 }
 
-// telemetry updates the engine box
+// telemetry -> engine box
 function loadTelemetry(){
   fetch('/telemetry')
     .then(r=>r.json())
@@ -673,7 +795,8 @@ function loadTelemetry(){
         </div>
         <div style="font-size:0.7rem;opacity:0.8;margin-top:8px;line-height:1.4;">
           port in use: ${'{'}data.port{'}'}<br/>
-          stealth route: ${'{'}data.stealth{'}'}
+          stealth route: ${'{'}data.stealth{'}'}<br/>
+          build: ${'{'}data.build{'}'}
         </div>
       `;
     })
@@ -685,10 +808,10 @@ function loadTelemetry(){
 
 // init
 window.addEventListener('load', ()=>{
-  spawnBubblesFor(document.querySelector('[data-room=\"engine\"]'), 'engine');
-  spawnBubblesFor(document.querySelector('[data-room=\"room1\"]'), 'room1');
-  spawnBubblesFor(document.querySelector('[data-room=\"room2\"]'), 'room2');
-  spawnBubblesFor(document.querySelector('[data-room=\"room3\"]'), 'room3');
+  spawnBubblesFor(document.querySelector('[data-room="engine"]'), 'engine');
+  spawnBubblesFor(document.querySelector('[data-room="room1"]'), 'room1');
+  spawnBubblesFor(document.querySelector('[data-room="room2"]'), 'room2');
+  spawnBubblesFor(document.querySelector('[data-room="room3"]'), 'room3');
 
   animateNotes();
   loadTelemetry();
@@ -698,11 +821,14 @@ window.addEventListener('load', ()=>{
 </body>
 </html>
 """
-    return Response(html, mimetype="text/html")
+    return Response(html_doc, mimetype="text/html")
 
-# ----- auto-open browser -----
+# ============================================================
+# AUTO-LAUNCH CURRENT INSTANCE
+# ============================================================
 def open_browser():
     time.sleep(0.5)
+    # open the correct active URL for THIS instance
     webbrowser.open(f"http://127.0.0.1:{PORT}/")
 
 if __name__ == "__main__":
