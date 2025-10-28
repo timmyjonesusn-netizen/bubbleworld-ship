@@ -1,12 +1,732 @@
-from flask import Flask, jsonify
+# ============================================================
+# Timmy Bubble Ship • Unified SPA Server
+# v4.0 merge
+#
+# LAWS:
+# - Bind ONLY to 127.0.0.1 (local loopback, no creepers)
+# - NEVER kill port 5000 (music lives there)
+# - We hop to a safe open port instead of killing 5000
+# - On run we auto-open the browser straight to "/"
+# - We generate a stealth hash route each boot
+# - We expose /telemetry JSON in your voice
+#
+# FRONTEND:
+# - Single Page App (SPA)
+# - 4 rooms (engine, room1, room2, room3) in one HTML
+# - JS go('roomX') swaps visible room, no page reload
+# - Bubble fields per room color
+# - Room3 sax + notes + joke/riddle w/ reveal + more
+# - "You are beautiful and loved 💖"
+# - "This ship was created on Timmy’s iPhone 17 Pro Max 2TB."
+#
+# ENGINE ROOM PANEL:
+# - We inject telemetry data into the status box dynamically.
+#
+# This file is the ONLY file you need to run.
+# Run: python app.py
+# ============================================================
+
+import socket, random, string, threading, webbrowser, time
+from flask import Flask, jsonify, Response
+
 app = Flask(__name__)
 
+# ─────────────────────────────────────────
+# Stealth hash route each boot
+# ─────────────────────────────────────────
+engine_hash = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+
+# ─────────────────────────────────────────
+# Port hopper that NEVER kills 5000
+# ─────────────────────────────────────────
+def find_open_port(start=5000, end=5020):
+    for p in range(start, end + 1):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.bind(("127.0.0.1", p))
+                return p
+            except OSError:
+                continue
+    return 5050
+
+PORT = find_open_port(5000, 5020)
+
+# ─────────────────────────────────────────
+# Telemetry API (your exact voice)
+# ─────────────────────────────────────────
 @app.route("/telemetry")
 def telemetry():
     return jsonify({
         "sniffer": "all clear on local ports",
-        "hopper": "port hop stable / cloak engaged",
+        "hopper": "port hop stable / music protected / cloak engaged",
         "healer": "shield green / bubble field intact",
-        "maya": "awake and watching you 💖"
+        "maya": "awake and watching you 💖",
+        "port": PORT,
+        "stealth": f"/{engine_hash}"
     })
 
+# ─────────────────────────────────────────
+# Stealth diagnostics view
+# ─────────────────────────────────────────
+@app.route(f"/{engine_hash}")
+def stealth_diag():
+    diag_html = f"""
+    <html><body style="background:#000;color:#0f0;font-family:-apple-system,system-ui,Arial;padding:20px;">
+    <div style="font-size:14px;line-height:1.5;">
+        <div style="color:#0f0;font-size:16px;font-weight:600;margin-bottom:10px;">
+            STEALTH CHANNEL / {engine_hash}
+        </div>
+        <div><b style="color:#9f9;">active_port:</b> {PORT}</div>
+        <div><b style="color:#9f9;">engine_hash:</b> {engine_hash}</div>
+        <div><b style="color:#9f9;">binding:</b> 127.0.0.1 (loopback only)</div>
+        <div><b style="color:#9f9;">creepers:</b> denied 🚫</div>
+        <div style="margin-top:16px;color:#fff;font-size:12px;opacity:0.8;">
+            Maya sees everything. Be kind to yourself.
+        </div>
+        <div style="margin-top:24px;">
+            <a href="/" style="color:#0f0;text-decoration:none;font-weight:600;">⬅ back to engine</a>
+        </div>
+    </div>
+    </body></html>
+    """
+    return Response(diag_html, mimetype="text/html")
+
+# ─────────────────────────────────────────
+# Root route (serves the whole SPA)
+# We inject PORT + engine_hash so front-end can show status.
+# ─────────────────────────────────────────
+@app.route("/")
+def index():
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Timmy’s Bubble Ship</title>
+<style>
+/* RESET */
+* {{
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+}}
+body {{
+  background: #000;
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}}
+
+/* GLOBAL LAYERS */
+#app {{
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}}
+.room {{
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 16px 72px; /* leave space for bottom nav */
+  font-size: 16px;
+  line-height: 1.4;
+}}
+.room.active {{
+  display: flex;
+}}
+
+/* BUBBLE FIELD CANVAS BG */
+.bubble-layer {{
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  filter: blur(0px);
+}}
+.bubble {{
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.4;
+  border: 2px solid rgba(255,255,255,0.4);
+  animation: floatUp linear infinite;
+}}
+@keyframes floatUp {{
+  0%   {{ transform: translateY(0) scale(1); opacity: 0.2; }}
+  50%  {{ opacity: 0.5; }}
+  100% {{ transform: translateY(-200vh) scale(1.2); opacity: 0; }}
+}}
+
+/* CONTENT WRAPPER ABOVE BUBBLES */
+.room-content {{
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}}
+
+/* TITLE / HEADER IN EACH ROOM */
+.room-title {{
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(255,255,255,0.6);
+  line-height: 1.2;
+}}
+
+/* ENGINE ROOM STYLE (green field) */
+#engine {{
+  background: radial-gradient(circle at 50% 30%, rgba(0,255,120,0.18) 0%, rgba(0,40,0,0.9) 70%);
+  color: #d8ffd8;
+}}
+#engine .room-title {{
+  color: #9affc9;
+  text-shadow: 0 0 12px rgba(0,255,140,0.8);
+}}
+.engine-status-box {{
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(0,255,128,0.5);
+  box-shadow: 0 0 20px rgba(0,255,128,0.4);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: left;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #afffdc;
+}}
+.engine-status-line {{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom:6px;
+}}
+.status-dot {{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  box-shadow:0 0 8px currentColor;
+}}
+.status-green {{ color:#00ff88; background:#00ff88; }}
+.status-yellow {{ color:#ffe066; background:#ffe066; }}
+.status-pink {{ color:#ff4fd8; background:#ff4fd8; }}
+
+.engine-music-button {{
+  background: radial-gradient(circle at 30% 30%, #ff4fd8 0%, #a10087 60%);
+  border:2px solid rgba(255,255,255,0.4);
+  color:#fff;
+  font-size:1rem;
+  font-weight:600;
+  text-shadow:0 0 8px rgba(255,0,200,0.8);
+  box-shadow:0 0 20px rgba(255,0,200,0.5);
+  border-radius:14px;
+  padding:14px 16px;
+  text-align:center;
+  line-height:1.2;
+}}
+
+/* ROOM 1 STYLE (purple mind w/ pink outline bubbles) */
+#room1 {{
+  background: radial-gradient(circle at 50% 30%, rgba(130,0,160,0.5) 0%, rgba(10,0,20,0.95) 70%);
+  color:#ffd9ff;
+}}
+#room1 .room-title{{
+  color:#ff89ff;
+  text-shadow:0 0 12px rgba(255,0,255,0.7);
+}}
+.playlist-grid {{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}}
+.playlist-btn {{
+  font-size:1rem;
+  font-weight:500;
+  line-height:1.3;
+  padding:14px 16px;
+  border-radius:12px;
+  border:2px solid rgba(255,128,255,0.7); /* pink outline */
+  background:rgba(0,0,0,0.35);
+  color:#fff;
+  text-shadow:0 0 8px rgba(255,128,255,0.8);
+  box-shadow:0 0 16px rgba(255,128,255,0.4);
+}}
+
+/* ROOM 2 STYLE (Timmy Time Music core) */
+#room2 {{
+  background: radial-gradient(circle at 50% 30%, rgba(255,0,150,0.4) 0%, rgba(30,0,30,0.95) 70%);
+  color:#ffe9ff;
+}}
+#room2 .room-title{{
+  color:#ff5fe0;
+  text-shadow:0 0 12px rgba(255,0,200,0.8);
+}}
+#room2 .playlist-btn{{
+  border:2px solid rgba(173,216,255,0.6); /* light blue line */
+  text-shadow:0 0 8px rgba(173,216,255,0.9);
+  box-shadow:0 0 16px rgba(173,216,255,0.5);
+}}
+
+/* ROOM 3 STYLE (Drift Space / burgundy middle / sax) */
+#room3 {{
+  background: radial-gradient(circle at 50% 50%, rgba(90,0,20,0.6) 0%, rgba(0,0,20,0.95) 70%);
+  color:#ffdede;
+}}
+#room3 .room-title {{
+  color:#ff8fb0;
+  text-shadow:0 0 12px rgba(255,120,150,0.8);
+}}
+.sax-zone{{
+  position:relative;
+  background:rgba(0,0,0,0.4);
+  border:1px solid rgba(0,255,200,0.4);
+  box-shadow:0 0 20px rgba(0,255,200,0.4);
+  border-radius:16px;
+  padding:16px;
+  text-align:center;
+  color:#afffea;
+  font-size:0.9rem;
+  line-height:1.4;
+  min-height:140px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-items:center;
+}}
+.sax-graphic {{
+  font-size:2.5rem;
+  line-height:1;
+  text-shadow:0 0 10px rgba(255,200,0,0.7),0 0 20px rgba(255,200,0,0.4);
+  margin-bottom:8px;
+}}
+.note {{
+  position:absolute;
+  font-size:1rem;
+  opacity:0.7;
+  animation:floatNotes linear infinite;
+  color:#fff;
+  text-shadow:0 0 8px rgba(0,255,255,0.8);
+}}
+@keyframes floatNotes {{
+  0%   {{ transform:translateY(0) translateX(0) scale(1); opacity:0.8; }}
+  100% {{ transform:translateY(-120px) translateX(-20px) scale(1.4); opacity:0; }}
+}}
+
+/* COMFORT CARD w/ joke + riddle */
+.comfort-card{{
+  background:rgba(0,0,0,0.4);
+  border:1px solid rgba(0,255,200,0.5);
+  box-shadow:0 0 20px rgba(0,255,200,0.4);
+  border-radius:14px;
+  padding:16px;
+  color:#dffff5;
+  font-size:0.9rem;
+  line-height:1.4;
+  text-align:left;
+}}
+.comfort-header{{
+  font-size:1rem;
+  font-weight:600;
+  margin-bottom:8px;
+  color:#ffbcd9;
+  text-shadow:0 0 8px rgba(255,120,200,0.8);
+}}
+.qa-line{{
+  margin-bottom:8px;
+}}
+.answer{{
+  color:#9affc9;
+  display:none;
+  font-weight:500;
+  text-shadow:0 0 8px rgba(0,255,200,0.8);
+}}
+.comfort-actions{{
+  display:flex;
+  gap:12px;
+}}
+.comfort-btn{{
+  flex:1;
+  text-align:center;
+  padding:12px;
+  border-radius:10px;
+  background:rgba(0,0,0,0.6);
+  border:1px solid rgba(0,255,200,0.5);
+  box-shadow:0 0 12px rgba(0,255,200,0.4);
+  font-size:0.9rem;
+  font-weight:500;
+  color:#9affc9;
+}}
+
+/* TIMMY TIME MUSIC PILL (global footer badge) */
+.music-pill{{
+  font-size:0.8rem;
+  font-weight:600;
+  text-align:center;
+  padding:10px 14px;
+  border-radius:999px;
+  background:radial-gradient(circle at 30% 30%, rgba(255,0,200,0.8) 0%, rgba(80,0,60,0.7) 70%);
+  border:2px solid rgba(255,255,255,0.4);
+  box-shadow:0 0 16px rgba(255,0,200,0.6),0 0 40px rgba(255,0,200,0.4);
+  color:#fff;
+  text-shadow:0 0 8px rgba(255,0,255,0.9);
+}}
+
+/* BOTTOM NAV BAR */
+.navbar{{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:64px;
+  background:rgba(0,0,0,0.6);
+  border-top:1px solid rgba(255,255,255,0.2);
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  z-index:5;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}}
+.navbtn{{
+  flex:1;
+  text-align:center;
+  font-size:0.7rem;
+  line-height:1.2;
+  color:#fff;
+  font-weight:500;
+  cursor:pointer;
+  padding:6px;
+}}
+.navbtn span{{
+  display:block;
+  font-size:1rem;
+  font-weight:600;
+  margin-bottom:4px;
+  text-shadow:0 0 8px rgba(255,255,255,0.6);
+}}
+
+/* SMALL PRINT / LOVE MESSAGE */
+.love-line{{
+  font-size:0.8rem;
+  line-height:1.4;
+  text-align:center;
+  color:#ffcfe9;
+  text-shadow:0 0 8px rgba(255,128,200,0.8);
+  font-weight:500;
+}}
+.created-line{{
+  color:#6affd8;
+  font-size:0.7rem;
+  text-align:center;
+  text-shadow:0 0 8px rgba(0,255,200,0.8);
+}}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ENGINE ROOM -->
+  <section id="engine" class="room active">
+    <div class="bubble-layer" data-room="engine"></div>
+    <div class="room-content">
+      <div class="room-title">ENGINE ROOM / SAFE CORE</div>
+
+      <div class="engine-status-box" id="telemetryBox">
+        <div class="engine-status-line">
+          <div class="status-dot status-green"></div>
+          <div>Loading ship status…</div>
+        </div>
+      </div>
+
+      <div class="engine-music-button" onclick="go('room2')">
+        ROOM 2 • TIMMY TIME MUSIC 🎧
+      </div>
+
+      <div class="love-line">You are beautiful and loved 💖</div>
+      <div class="created-line">This ship was created on Timmy’s iPhone 17 Pro Max 2TB.</div>
+
+      <div class="music-pill">TIMMY TIME MUSIC</div>
+    </div>
+  </section>
+
+  <!-- ROOM 1 -->
+  <section id="room1" class="room">
+    <div class="bubble-layer" data-room="room1"></div>
+    <div class="room-content">
+      <div class="room-title">ROOM 1 / PURPLE MIND</div>
+      <div class="playlist-grid">
+        <a class="playlist-btn" href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316" target="_blank">Hope</a>
+        <a class="playlist-btn" href="https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df" target="_blank">Soul</a>
+        <a class="playlist-btn" href="https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c" target="_blank">Beach</a>
+        <a class="playlist-btn" href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479" target="_blank">Rest</a>
+        <a class="playlist-btn" href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank">Jazz</a>
+      </div>
+
+      <div class="love-line">This room calms your mind, not your fire.</div>
+      <div class="created-line">Breathe in / shoulders down / you're safe.</div>
+
+      <div class="music-pill">TIMMY TIME MUSIC</div>
+    </div>
+  </section>
+
+  <!-- ROOM 2 -->
+  <section id="room2" class="room">
+    <div class="bubble-layer" data-room="room2"></div>
+    <div class="room-content">
+      <div class="room-title">ROOM 2 / TIMMY TIME MUSIC</div>
+
+      <div class="playlist-grid">
+        <a class="playlist-btn" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">Laugh 😂</a>
+        <a class="playlist-btn" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">Play 🎮</a>
+        <a class="playlist-btn" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">Fun 🎉</a>
+        <a class="playlist-btn" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">Motown 🎷</a>
+        <a class="playlist-btn" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">Feeling It 🔥</a>
+      </div>
+
+      <div class="love-line">Your pulse room. Your energy room.</div>
+      <div class="created-line">Heartbeat locked. Vibe protected.</div>
+
+      <div class="music-pill">TIMMY TIME MUSIC</div>
+    </div>
+  </section>
+
+  <!-- ROOM 3 -->
+  <section id="room3" class="room">
+    <div class="bubble-layer" data-room="room3"></div>
+    <div class="room-content">
+      <div class="room-title">ROOM 3 / DRIFT SPACE 🎷</div>
+
+      <div class="sax-zone">
+        <div class="sax-graphic">🎷</div>
+        <div style="font-size:0.8rem;color:#ffcfe9;text-align:center;margin-bottom:8px;">
+          Slow float mode. Notes and bubbles drift up.
+        </div>
+
+        <!-- floating notes -->
+        <div class="note">♪</div>
+        <div class="note">♩</div>
+        <div class="note">♫</div>
+        <div class="note">♬</div>
+      </div>
+
+      <div class="comfort-card">
+        <div class="comfort-header">Daily Light</div>
+
+        <div class="qa-line">
+          <strong>Joke:</strong>
+          <span class="qtext" id="jokeQ">Why did the bubble get promoted?</span>
+          <div class="answer" id="jokeAnswer">
+            Because it always rose to the top.
+          </div>
+        </div>
+
+        <div class="qa-line">
+          <strong>Riddle:</strong>
+          <span class="qtext" id="riddleQ">I make music without a mouth, and I drift without wings. What am I?</span>
+          <div class="answer" id="riddleAnswer">
+            A sax line floating through your Drift Space.
+          </div>
+        </div>
+
+        <div class="comfort-actions">
+          <div class="comfort-btn" onclick="revealAnswers()">Reveal Answer</div>
+          <div class="comfort-btn" onclick="newContent()">More?</div>
+        </div>
+      </div>
+
+      <div class="love-line">You are beautiful and loved 💖</div>
+      <div class="created-line">This ship was created on Timmy’s iPhone 17 Pro Max 2TB.</div>
+
+      <div class="music-pill">TIMMY TIME MUSIC</div>
+    </div>
+  </section>
+
+  <!-- bottom nav -->
+  <nav class="navbar">
+    <div class="navbtn" onclick="go('engine')">
+      <span>🛠</span>Engine
+    </div>
+    <div class="navbtn" onclick="go('room1')">
+      <span>💜</span>Room 1
+    </div>
+    <div class="navbtn" onclick="go('room2')">
+      <span>🎧</span>Room 2
+    </div>
+    <div class="navbtn" onclick="go('room3')">
+      <span>🌙</span>Room 3
+    </div>
+  </nav>
+
+</div>
+
+<script>
+// ----- NAV -----
+function go(id){{
+  document.querySelectorAll('.room').forEach(r=>r.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}}
+
+// ----- BUBBLES -----
+function spawnBubblesFor(layerEl, colorMode){{
+  function makeBubble(){{
+    const b = document.createElement('div');
+    b.className = 'bubble';
+
+    const size = 20 + Math.random()*80;
+    b.style.width = size+'px';
+    b.style.height = size+'px';
+
+    b.style.left = Math.random()*100+'%';
+    b.style.bottom = '-120px';
+
+    if(colorMode==='engine'){{
+      b.style.borderColor = 'rgba(0,255,140,0.6)';
+      b.style.boxShadow = '0 0 20px rgba(0,255,140,0.5)';
+      b.style.background = 'radial-gradient(circle at 30% 30%, rgba(0,255,140,0.2) 0%, rgba(0,0,0,0) 70%)';
+    }} else if(colorMode==='room1'){{
+      b.style.borderColor = 'rgba(255,128,255,0.8)';
+      b.style.boxShadow = '0 0 20px rgba(255,0,255,0.5)';
+      b.style.background = 'radial-gradient(circle at 30% 30%, rgba(255,0,255,0.15) 0%, rgba(0,0,0,0) 70%)';
+    }} else if(colorMode==='room2'){{
+      b.style.borderColor = 'rgba(173,216,255,0.7)';
+      b.style.boxShadow = '0 0 20px rgba(173,216,255,0.5)';
+      b.style.background = 'radial-gradient(circle at 30% 30%, rgba(255,0,200,0.15) 0%, rgba(0,0,0,0) 70%)';
+    }} else {{
+      b.style.borderColor = 'rgba(0,255,200,0.6)';
+      b.style.boxShadow = '0 0 24px rgba(255,0,0,0.4), 0 0 40px rgba(0,255,200,0.4)';
+      b.style.background = 'radial-gradient(circle at 30% 30%, rgba(180,0,40,0.3) 0%, rgba(0,0,0,0) 70%)';
+    }}
+
+    const dur = 10 + Math.random()*10;
+    b.style.animationDuration = dur+'s';
+
+    layerEl.appendChild(b);
+
+    setTimeout(()=>{{ b.remove(); }}, dur*1000 + 1000);
+  }}
+
+  setInterval(()=>{
+    const count = 1 + Math.floor(Math.random()*2);
+    for(let i=0;i<count;i++) makeBubble();
+  }, 2000 + Math.random()*2000);
+}}
+
+// ----- SAX NOTES -----
+function animateNotes(){{
+  const notes = document.querySelectorAll('#room3 .note');
+  notes.forEach(n=>{{
+    resetNote(n);
+    noteFloat(n);
+  }});
+  function resetNote(el){{
+    const startX = 50 + (Math.random()*20-10);
+    const startY = 60 + (Math.random()*10-5);
+    el.style.left = startX+'%';
+    el.style.bottom = startY+'px';
+    el.style.animationDuration = (2+Math.random()*2)+'s';
+  }}
+  function noteFloat(el){{
+    setInterval(()=>{{ resetNote(el); }}, 3000 + Math.random()*2000);
+  }}
+}}
+
+// ----- DRIFT SPACE: JOKE / RIDDLE -----
+function revealAnswers(){{
+  document.getElementById('jokeAnswer').style.display='block';
+  document.getElementById('riddleAnswer').style.display='block';
+}}
+function newContent(){{
+  document.getElementById('jokeAnswer').style.display='none';
+  document.getElementById('riddleAnswer').style.display='none';
+
+  const jokes = [
+    {{q:"Why did the bubble get promoted?", a:"Because it always rose to the top."}},
+    {{q:"Why did the saxophone take a break?", a:"It needed to decompress its brass."}},
+    {{q:"Why did the playlist blush?", a:"Because Room 2 kept staring at it."}}
+  ];
+  const riddles = [
+    {{q:"I float in your room but I’m not dust. I glow in your dark but I’m not fire. What am I?", a:"One of your comfort bubbles."}},
+    {{q:"I sing in curves, I rise in light, I drift with you deep in the night. What am I?", a:"The Drift Space sax line."}},
+    {{q:"I guard your peace without a sword. I hum instead of roar. What am I?", a:"Your ship."}}
+  ];
+
+  const j = jokes[Math.floor(Math.random()*jokes.length)];
+  const r = riddles[Math.floor(Math.random()*riddles.length)];
+
+  document.getElementById('jokeQ').textContent = j.q;
+  document.getElementById('jokeAnswer').textContent = j.a;
+  document.getElementById('riddleQ').textContent = r.q;
+  document.getElementById('riddleAnswer').textContent = r.a;
+}}
+
+// ----- TELEMETRY INJECTION INTO ENGINE ROOM -----
+function loadTelemetry(){{
+  fetch('/telemetry')
+    .then(r=>r.json())
+    .then(data=>{{
+      const box = document.getElementById('telemetryBox');
+      if(!box) return;
+      box.innerHTML = `
+        <div class="engine-status-line">
+          <div class="status-dot status-green"></div>
+          <div>Sniffer: ${'{'}data.sniffer{'}'}</div>
+        </div>
+        <div class="engine-status-line">
+          <div class="status-dot status-yellow"></div>
+          <div>Hopper: ${'{'}data.hopper{'}'}</div>
+        </div>
+        <div class="engine-status-line">
+          <div class="status-dot status-green"></div>
+          <div>Healer: ${'{'}data.healer{'}'}</div>
+        </div>
+        <div class="engine-status-line">
+          <div class="status-dot status-pink"></div>
+          <div>Maya: ${'{'}data.maya{'}'}</div>
+        </div>
+        <div style="font-size:0.7rem;opacity:0.8;margin-top:8px;line-height:1.4;">
+          port in use: ${'{'}data.port{'}'}<br/>
+          stealth route: ${'{'}data.stealth{'}'}
+        </div>
+      `;
+    }})
+    .catch(err=>{{
+      const box = document.getElementById('telemetryBox');
+      if(box) box.innerHTML = "<div>telemetry offline</div>";
+    }});
+}}
+
+// ----- INIT -----
+window.addEventListener('load', ()=>{
+  spawnBubblesFor(document.querySelector('[data-room="engine"]'), 'engine');
+  spawnBubblesFor(document.querySelector('[data-room="room1"]'), 'room1');
+  spawnBubblesFor(document.querySelector('[data-room="room2"]'), 'room2');
+  spawnBubblesFor(document.querySelector('[data-room="room3"]'), 'room3');
+
+  animateNotes();
+  loadTelemetry();
+});
+</script>
+
+</body>
+</html>
+"""
+    return Response(html, mimetype="text/html")
+
+# ─────────────────────────────────────────
+# Auto-open browser to "/"
+# ─────────────────────────────────────────
+def open_browser():
+    time.sleep(0.5)
+    webbrowser.open(f"http://127.0.0.1:{PORT}/")
+
+if __name__ == "__main__":
+    threading.Thread(target=open_browser, daemon=True).start()
+    app.run(host="127.0.0.1", port=PORT)
