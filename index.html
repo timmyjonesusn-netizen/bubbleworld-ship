@@ -28,11 +28,13 @@
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
-        padding: 16px 16px 72px;
-        overflow: hidden;
+        padding: 16px 16px 96px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
     }
 
-    /* TIMMY TIME MUSIC PILL (always visible in each room) */
+    /* TIMMY TIME MUSIC PILL (top right per room) */
     .music-pill {
         position: absolute;
         top: 12px;
@@ -46,6 +48,7 @@
         border-radius: 999px;
         box-shadow: 0 0 16px rgba(255,0,255,0.6), 0 0 32px rgba(255,0,255,0.3);
         text-shadow: 0 0 8px rgba(255,0,255,0.9);
+        z-index: 6;
     }
     .music-pill span {
         display: block;
@@ -63,11 +66,11 @@
         letter-spacing: 0.03em;
     }
 
-    /* ROOM TITLES / PANELS */
+    /* CORE PANEL (status / comfort text) */
     .panel-shell {
         position: relative;
         width: 90%;
-        max-width: 420px;
+        max-width: 460px;
         background: rgba(0,0,0,0.22);
         border: 1px solid rgba(255,255,255,0.18);
         border-radius: 16px;
@@ -79,6 +82,7 @@
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
         z-index: 5;
+        margin-top: 56px;
     }
     .panel-header {
         font-size: 18px;
@@ -89,29 +93,30 @@
         text-shadow: 0 0 8px rgba(255,255,255,0.6);
     }
     .panel-body {
-        font-size: 14px;
+        font-size: 15px;
         line-height: 1.4;
         color: rgba(255,255,255,0.9);
         text-align: center;
         white-space: pre-line;
     }
 
-    /* ENGINE ROOM DIAGNOSTICS BLOCK (counter lives here) */
+    /* ENGINE ROOM DIAGNOSTICS BLOCK (counter + lines) */
     .diag-block {
-        font-size: 13px;
+        font-size: 14px;
         line-height: 1.4;
         color: #caffc0;
         text-align: left;
-        margin-top: 12px;
+        margin-top: 16px;
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         white-space: pre-line;
         text-shadow:
             0 0 8px rgba(0,255,100,0.7),
             0 0 16px rgba(0,255,100,0.4);
     }
+
     .now-serving-line {
-        margin-top: 8px;
-        font-size: 15px;
+        margin-top: 12px;
+        font-size: 16px;
         font-weight: 600;
         color: #b6ff9a;
         text-shadow:
@@ -125,26 +130,153 @@
         50% { opacity: 0.55; }
     }
 
-    /* NAV BAR (bottom fixed) */
+    /* ENGINE ROOM BUTTON BANK (pink row of vibes) */
+    .vibe-bank-wrapper {
+        width: 90%;
+        max-width: 460px;
+        margin-top: 20px;
+        z-index: 5;
+    }
+    .vibe-bank-header {
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        text-align: center;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px rgba(255,0,200,0.8), 0 0 30px rgba(255,0,200,0.4);
+    }
+    .vibe-bank {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+    .vibe-btn {
+        flex: 1 1 calc(50% - 10px);
+        min-width: 130px;
+        background: radial-gradient(circle at 20% 20%, rgba(255,0,200,0.6) 0%, rgba(255,0,100,0.3) 40%, rgba(0,0,0,0) 70%);
+        border: 2px solid rgba(255,0,200,0.7);
+        border-radius: 999px;
+        padding: 10px 14px;
+        text-align: center;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.2;
+        text-decoration: none;
+        text-shadow:
+            0 0 8px rgba(255,0,200,1),
+            0 0 18px rgba(255,0,100,0.9),
+            0 0 36px rgba(255,0,100,0.5);
+        box-shadow:
+            0 0 12px rgba(255,0,200,0.7),
+            0 0 32px rgba(255,0,200,0.4),
+            0 0 64px rgba(255,0,200,0.2);
+        animation: vibePulse 3s infinite;
+    }
+    @keyframes vibePulse {
+        0%,100% { filter: brightness(1); }
+        50% { filter: brightness(1.25); }
+    }
+
+    /* PLAYLIST CARDS (Room1 / Room2 panels) */
+    .playlist-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        width: 90%;
+        max-width: 460px;
+        margin-top: 20px;
+        z-index: 5;
+    }
+    .playlist-card {
+        border: 1px solid rgba(255,0,255,0.4);
+        border-radius: 12px;
+        background: rgba(0,0,0,0.3);
+        padding: 16px;
+        text-align: center;
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 1.4;
+        color: #fff;
+        text-shadow: 0 0 8px rgba(255,0,255,0.7);
+        box-shadow:
+            0 0 10px rgba(255,0,255,0.5),
+            0 0 30px rgba(255,0,255,0.25),
+            0 0 60px rgba(255,0,255,0.15);
+    }
+    .playlist-card .name {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .playlist-card a {
+        color: #fff;
+        font-size: 14px;
+        text-decoration: none;
+        word-break: break-all;
+        opacity: 0.8;
+    }
+    .playlist-card a:active {
+        opacity: 1;
+    }
+
+    /* ROOM 3 sax text */
+    .sax-label {
+        font-size: 16px;
+        font-weight: 600;
+        color: rgba(255,200,200,0.9);
+        text-shadow:
+            0 0 8px rgba(255,0,0,0.6),
+            0 0 24px rgba(255,0,0,0.4);
+        margin-bottom: 4px;
+        text-align: center;
+    }
+    .soothe-line {
+        font-size: 14px;
+        line-height: 1.4;
+        color: rgba(255,220,220,0.8);
+        text-align: center;
+        white-space: pre-line;
+    }
+
+    /* ROOM 3 bottom comfort text */
+    .comfort-block {
+        margin-top: 20px;
+        font-size: 14px;
+        line-height: 1.4;
+        color: rgba(255,200,220,0.9);
+        text-shadow:
+            0 0 8px rgba(255,0,128,0.5),
+            0 0 20px rgba(255,0,128,0.2);
+        text-align: center;
+        white-space: pre-line;
+        z-index: 5;
+        width: 90%;
+        max-width: 460px;
+    }
+
+    /* NAV BAR */
     .nav-bar {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        height: 56px;
+        min-height: 56px;
         display: flex;
         justify-content: space-around;
-        align-items: center;
+        align-items: flex-start;
         background: rgba(0,0,0,0.5);
         border-top: 1px solid rgba(255,255,255,0.15);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
         z-index: 9999;
+        padding-top: 8px;
     }
     .nav-btn {
         flex: 1;
         text-align: center;
-        font-size: 11px;
+        font-size: 12px;
         color: rgba(255,255,255,0.8);
         font-weight: 600;
         line-height: 1.2;
@@ -153,16 +285,18 @@
     }
     .nav-btn span {
         display: block;
-        font-size: 9px;
+        font-size: 10px;
         font-weight: 400;
         opacity: 0.7;
     }
     .nav-btn.active {
         color: #fff;
-        text-shadow: 0 0 8px rgba(255,255,255,0.9);
+        text-shadow:
+            0 0 8px rgba(255,255,255,0.9),
+            0 0 24px rgba(255,255,255,0.6);
     }
 
-    /* BACKGROUNDS / BUBBLE CANVASES */
+    /* BUBBLE CANVASES */
     .bubble-layer {
         position: absolute;
         inset: 0;
@@ -177,96 +311,18 @@
         height: 100%;
     }
 
-    /* ENGINE ROOM BG - green radial */
+    /* ROOM BACKGROUND GRADIENTS */
     #engine-room {
         background: radial-gradient(circle at 50% 40%, rgba(0,255,100,0.25) 0%, rgba(0,40,0,0.9) 60%, rgba(0,0,0,1) 80%);
     }
-
-    /* ROOM 1 BG - purple mind */
     #room-1 {
         background: radial-gradient(circle at 50% 40%, rgba(170,0,255,0.28) 0%, rgba(30,0,40,0.9) 60%, rgba(0,0,0,1) 80%);
     }
-
-    /* ROOM 2 BG - warm magenta (no orange now, per request) */
     #room-2 {
         background: radial-gradient(circle at 50% 40%, rgba(255,0,170,0.28) 0%, rgba(40,0,40,0.9) 60%, rgba(0,0,0,1) 80%);
     }
-
-    /* ROOM 3 BG - Drift Space burgundy / crimson jazz */
     #room-3 {
         background: radial-gradient(circle at 50% 40%, rgba(90,0,0,0.6) 0%, rgba(10,0,0,0.9) 60%, rgba(0,0,0,1) 80%);
-    }
-
-    /* ROOM 3 SAX / NOTES STYLE */
-    .sax-label {
-        font-size: 16px;
-        font-weight: 600;
-        color: rgba(255,200,200,0.9);
-        text-shadow:
-            0 0 8px rgba(255,0,0,0.6),
-            0 0 24px rgba(255,0,0,0.4);
-        margin-bottom: 4px;
-        text-align: center;
-    }
-    .soothe-line {
-        font-size: 13px;
-        line-height: 1.4;
-        color: rgba(255,220,220,0.8);
-        text-align: center;
-        white-space: pre-line;
-    }
-
-    /* PLAYLIST BOXES (Room1 / Room2 vibe cards) */
-    .playlist-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 10px;
-        width: 100%;
-        max-width: 420px;
-        margin-top: 16px;
-    }
-    .playlist-card {
-        border: 1px solid rgba(255,0,255,0.4);
-        border-radius: 12px;
-        background: rgba(0,0,0,0.3);
-        padding: 12px;
-        text-align: center;
-        font-size: 14px;
-        font-weight: 500;
-        line-height: 1.4;
-        color: #fff;
-        text-shadow: 0 0 8px rgba(255,0,255,0.7);
-        box-shadow:
-            0 0 10px rgba(255,0,255,0.5),
-            0 0 30px rgba(255,0,255,0.25);
-    }
-    .playlist-card .name {
-        font-size: 15px;
-        font-weight: 600;
-        margin-bottom: 4px;
-    }
-    .playlist-card a {
-        color: #fff;
-        font-size: 13px;
-        text-decoration: none;
-        word-break: break-all;
-        opacity: 0.8;
-    }
-    .playlist-card a:active {
-        opacity: 1;
-    }
-
-    /* MESSAGE AT BOTTOM OF ROOM 3 */
-    .comfort-block {
-        margin-top: 16px;
-        font-size: 14px;
-        line-height: 1.4;
-        color: rgba(255,200,220,0.9);
-        text-shadow:
-            0 0 8px rgba(255,0,128,0.5),
-            0 0 20px rgba(255,0,128,0.2);
-        text-align: center;
-        white-space: pre-line;
     }
 </style>
 </head>
@@ -279,10 +335,13 @@
         <span class="main">LIVE LINK</span>
     </div>
 
-    <div class="panel-shell">
-        <div class="panel-header">ENGINE ROOM / CORE STATUS</div>
-        <div class="panel-body" style="color:#caffc0;text-shadow:0 0 8px rgba(0,255,100,0.7);">
-            Shields stable. Hopper synced. Sniffer clean.<br/>
+    <div class="panel-shell" style="color:#caffc0;text-shadow:0 0 8px rgba(0,255,100,0.7);">
+        <div class="panel-header" style="color:#fff;text-shadow:0 0 8px rgba(255,255,255,0.9);">
+            ENGINE ROOM / CORE STATUS
+        </div>
+        <div class="panel-body">
+            Shields stable. Hopper synced. Sniffer clean.
+
             Pulses nominal. You are safe in here.
         </div>
 
@@ -293,7 +352,21 @@ Healer: bubble regen active.
         </div>
 
         <div class="now-serving-line" id="nowServing">
-            <!-- will be filled by JS -->
+            <!-- JS fills this -->
+        </div>
+    </div>
+
+    <!-- Pink vibe button bank -->
+    <div class="vibe-bank-wrapper">
+        <div class="vibe-bank-header">
+            Timmy Time Music – Live
+        </div>
+        <div class="vibe-bank">
+            <a class="vibe-btn" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">Laugh</a>
+            <a class="vibe-btn" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">Play</a>
+            <a class="vibe-btn" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">Fun</a>
+            <a class="vibe-btn" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">Motown</a>
+            <a class="vibe-btn" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">Feeling it</a>
         </div>
     </div>
 
@@ -309,12 +382,13 @@ Healer: bubble regen active.
         <span class="main">PURPLE MIND</span>
     </div>
 
-    <div class="panel-shell">
+    <div class="panel-shell" style="color:#f0d6ff;text-shadow:0 0 8px rgba(200,0,255,0.6);">
         <div class="panel-header" style="color:#e6b3ff;text-shadow:0 0 8px rgba(200,0,255,0.9);">
             ROOM 1 / PURPLE MIND
         </div>
-        <div class="panel-body" style="color:#f0d6ff;text-shadow:0 0 8px rgba(200,0,255,0.6);">
-            Slow float. Healing calm.<br/>
+        <div class="panel-body">
+            Slow float. Healing calm.
+
             Breathe. Shoulders down.
         </div>
     </div>
@@ -354,11 +428,11 @@ Healer: bubble regen active.
         <span class="main">WARM CORE</span>
     </div>
 
-    <div class="panel-shell">
+    <div class="panel-shell" style="color:#ffd6f6;text-shadow:0 0 8px rgba(255,0,200,0.6);">
         <div class="panel-header" style="color:#ff99e6;text-shadow:0 0 8px rgba(255,0,200,0.9);">
             ROOM 2 / WARM CORE
         </div>
-        <div class="panel-body" style="color:#ffd6f6;text-shadow:0 0 8px rgba(255,0,200,0.6);">
+        <div class="panel-body">
             Playful. Warm. Safe. No rush, just pulse.
         </div>
     </div>
@@ -398,24 +472,25 @@ Healer: bubble regen active.
         <span class="main">DRIFT SPACE</span>
     </div>
 
-    <div class="panel-shell">
+    <div class="panel-shell" style="color:#ffe6e6;text-shadow:0 0 8px rgba(255,0,0,0.6);">
         <div class="panel-header" style="color:#ffd6d6;text-shadow:0 0 8px rgba(255,0,0,0.9);">
             ROOM 3 / DRIFT SPACE
         </div>
-        <div class="panel-body" style="color:#ffe6e6;text-shadow:0 0 8px rgba(255,0,0,0.6);">
+        <div class="panel-body">
             Slow sax. Thick air. No hurry.
+
+            🎷 Sax Channel
         </div>
 
-        <div class="sax-label">🎷 Sax Channel</div>
+        <div class="sax-label">Bubbles carry notes up through the burgundy.</div>
         <div class="soothe-line">
-            Bubbles carry notes up through the burgundy.<br/>
-            You are beautiful and loved 💖<br/>
+            You are beautiful and loved 💖
             This app was created on Timmy’s iPhone 17 Pro Max 2TB.
         </div>
     </div>
 
     <div class="comfort-block">
-        Joke + Riddle rotation coming here.<br/>
+        Joke + Riddle rotation coming here.
         “More?” button will live here in next build.
     </div>
 
@@ -438,15 +513,15 @@ Healer: bubble regen active.
    UTILITIES
 ========================================================= */
 function pad6(n) {
-    const mod = ((n - 1) % 999999) + 1; // wrap 1..999999
+    const mod = ((n - 1) % 999999) + 1; // wrap 1..999999 so we never show 1000000
     const s = String(mod);
     return s.padStart(6, "0");
 }
 
 /* =========================================================
-   NOW SERVING COUNTER (Engine Room)
-   - increments EVERY render of Engine Room
-   - never resets unless browser storage cleared
+   NOW SERVING COUNTER
+   - increments EVERY time Engine Room is shown
+   - never resets unless storage cleared
 ========================================================= */
 function incrementNowServing() {
     try {
@@ -461,7 +536,6 @@ function incrementNowServing() {
             el.textContent = "Now serving " + displayVal + " of 999,999";
         }
     } catch (err) {
-        // Fallback if storage blocked
         const el = document.getElementById("nowServing");
         if (el) {
             el.textContent = "Now serving 000001 of 999,999";
@@ -473,17 +547,13 @@ function incrementNowServing() {
    ROOM SWITCHING
 ========================================================= */
 function showRoom(id) {
-    // hide all
     document.querySelectorAll(".room").forEach(r => {
         r.style.display = "none";
     });
-    // show chosen
     const chosen = document.getElementById(id);
     if (chosen) {
         chosen.style.display = "flex";
     }
-
-    // update nav active state
     document.querySelectorAll(".nav-btn").forEach(btn => {
         if (btn.getAttribute("data-target") === id) {
             btn.classList.add("active");
@@ -492,12 +562,13 @@ function showRoom(id) {
         }
     });
 
-    // special: every time we VISIT Engine Room, increment
+    // each arrival to Engine bumps counter
     if (id === "engine-room") {
         incrementNowServing();
     }
 }
 
+/* tap handlers for nav */
 document.querySelectorAll(".nav-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         const tgt = btn.getAttribute("data-target");
@@ -506,15 +577,8 @@ document.querySelectorAll(".nav-btn").forEach(btn => {
 });
 
 /* =========================================================
-   BUBBLE SYSTEM
-   We run 3 engines:
-   - Engine Room: green diagnostics field
-   - Room 1 + Room 2: slow calm drift
-   - Room 3:
-       * background field (white/blue/red mix)
-       * sax bursts: bubble+note clusters
+   BUBBLE FIELD ENGINE
 ========================================================= */
-
 class BubbleField {
     constructor(canvas, opts) {
         this.canvas = canvas;
@@ -523,16 +587,17 @@ class BubbleField {
         this.opts = Object.assign({
             maxCount: 40,
             colorMode: "mono", // "mono", "mix"
-            baseHue: 120,      // engine uses greens ~120deg
+            baseHue: 120,
             alphaMin: 0.2,
             alphaMax: 0.4,
             minSpeed: 20,
             maxSpeed: 60,
             sideDrift: 0,
             lifeScale: 1.0,
-            palette: null // for mix
+            palette: null
         }, opts || {});
         this.lastSpawn = 0;
+        this.alive = true;
         this.resize();
         window.addEventListener("resize", () => this.resize());
         this.loop = this.loop.bind(this);
@@ -545,6 +610,7 @@ class BubbleField {
     }
 
     spawnBubble() {
+        if (!this.alive) return;
         if (this.bubbles.length >= this.opts.maxCount) return;
 
         const w = this.canvas.width;
@@ -556,10 +622,8 @@ class BubbleField {
         let rgba;
         if (this.opts.colorMode === "mono") {
             const a = this.opts.alphaMin + Math.random()*(this.opts.alphaMax - this.opts.alphaMin);
-            // green / purple / magenta etc via baseHue -> hsla
             rgba = `hsla(${this.opts.baseHue},100%,60%,${a})`;
         } else if (this.opts.colorMode === "mix" && Array.isArray(this.opts.palette)) {
-            // choose palette entry {color, alphaMin, alphaMax, radiusScale, speedScale, drift}
             const tone = this.opts.palette[Math.floor(Math.random()*this.opts.palette.length)];
             const aMin = tone.alphaMin ?? this.opts.alphaMin;
             const aMax = tone.alphaMax ?? this.opts.alphaMax;
@@ -567,10 +631,10 @@ class BubbleField {
             rgba = tone.color.replace("ALPHA", a.toFixed(3));
         }
 
-        // pick speed
+        // rise speed
         const spd = (this.opts.minSpeed + Math.random()*(this.opts.maxSpeed-this.opts.minSpeed));
 
-        // sideways drift
+        // sideways sway
         const drift = (typeof this.opts.sideDrift === "number")
             ? (Math.random()*2-1)*this.opts.sideDrift
             : 0;
@@ -579,10 +643,9 @@ class BubbleField {
             x,
             y: h + r,
             r,
-            vy: -spd / 60, // px per frame ~
+            vy: -spd / 60,
             vx: drift / 60,
-            color: rgba,
-            life: 0
+            color: rgba
         });
     }
 
@@ -595,17 +658,14 @@ class BubbleField {
 
         for (let i=this.bubbles.length-1; i>=0; i--) {
             const b = this.bubbles[i];
-            b.life += 1;
             b.x += b.vx;
             b.y += b.vy;
 
-            // draw bubble
             ctx.beginPath();
             ctx.fillStyle = b.color;
             ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
             ctx.fill();
 
-            // kill if off top
             if (b.y + b.r < 0) {
                 this.bubbles.splice(i,1);
             }
@@ -613,10 +673,12 @@ class BubbleField {
     }
 
     loop(ts) {
-        // spawn pacing
+        // keep alive even if mobile throttles frame 0
+        this.alive = true;
+
         if (!this.lastSpawn) this.lastSpawn = ts;
         const delta = ts - this.lastSpawn;
-        // try spawn each ~200ms so we climb toward maxCount softly
+        // spawn ~5/sec until we reach target density
         if (delta > 200) {
             this.spawnBubble();
             this.lastSpawn = ts;
@@ -628,11 +690,7 @@ class BubbleField {
 }
 
 /* =========================================================
-   ROOM 3 SAX BURSTS ENGINE
-   - Burst clusters every 3-5 seconds
-   - Each burst: 5-8 bubbles + 2-3 notes
-   - Rise ~8-12s, sway ±15°
-   - Transparency .25-.35
+   SAX BURST FIELD (Room 3 foreground)
 ========================================================= */
 class SaxBurstField {
     constructor(canvas) {
@@ -655,20 +713,32 @@ class SaxBurstField {
         return min + Math.random()*(max-min);
     }
 
+    pickSaxColor(){
+        const choices = [
+            "rgba(255,255,255,ALPHA)",
+            "rgba(180,200,255,ALPHA)",
+            "rgba(255,120,120,ALPHA)"
+        ];
+        const base = choices[Math.floor(Math.random()*choices.length)];
+        const alpha = 0.25 + Math.random()*0.1;
+        return base.replace("ALPHA", alpha.toFixed(3));
+    }
+
     burst() {
         const w = this.canvas.width;
         const h = this.canvas.height;
-        const baseX = w*0.5; // center-ish emission
+        const baseX = w*0.5;
         const baseY = h*0.8;
-        // bubbles
-        const bubbleCount = Math.floor(5+Math.random()*4); //5-8
+
+        // bubbles in burst
+        const bubbleCount = Math.floor(5+Math.random()*4); // 5-8
         for (let i=0;i<bubbleCount;i++){
             const alpha = 0.25 + Math.random()*0.1; //0.25-0.35
-            const speedDur = this.randMs(8000,12000); // ms to top-ish
+            const speedDur = this.randMs(8000,12000); // 8–12s
             const angleDeg = (Math.random()*30 - 15); // ±15°
             const angleRad = angleDeg * Math.PI/180;
             const vx = Math.sin(angleRad);
-            const vy = -Math.cos(angleRad); // mostly up
+            const vy = -Math.cos(angleRad);
             const r = 6+Math.random()*14;
             this.items.push({
                 kind:"bubble",
@@ -683,8 +753,9 @@ class SaxBurstField {
                 tint: this.pickSaxColor()
             });
         }
-        // notes
-        const noteCount = Math.floor(2+Math.random()*2); //2-3
+
+        // notes in burst
+        const noteCount = Math.floor(2+Math.random()*2); // 2-3
         const noteGlyphs = ["♪","♩","♫","♬"];
         for (let j=0;j<noteCount;j++){
             const alpha = 0.25 + Math.random()*0.1;
@@ -710,43 +781,28 @@ class SaxBurstField {
         }
     }
 
-    pickSaxColor(){
-        // whites, soft reds, soft blues, transparent glow
-        const choices = [
-            "rgba(255,255,255,ALPHA)",
-            "rgba(180,200,255,ALPHA)",
-            "rgba(255,120,120,ALPHA)"
-        ];
-        const base = choices[Math.floor(Math.random()*choices.length)];
-        const alpha = 0.25 + Math.random()*0.1;
-        return base.replace("ALPHA", alpha.toFixed(3));
-    }
-
     loop(ts){
         const ctx = this.ctx;
         const w = this.canvas.width;
         const h = this.canvas.height;
         ctx.clearRect(0,0,w,h);
 
-        // maybe burst
         if (ts >= this.nextBurstAt){
             this.burst();
-            this.nextBurstAt = ts + this.randMs(3000,5000);
+            this.nextBurstAt = ts + this.randMs(3000,5000); // new burst 3–5s
         }
 
-        // draw/update items
         for (let i=this.items.length-1;i>=0;i--){
             const it = this.items[i];
             const age = ts - it.born;
-            const t = age / it.lifeMs; // 0..1
+            const t = age / it.lifeMs;
             if (t>=1){
                 this.items.splice(i,1);
                 continue;
             }
-            // position
-            const speedPx = h * 0.8; // how far they can travel vertically
-            const px = it.x + it.vx * speedPx * t;
-            const py = it.y + it.vy * speedPx * t;
+            const travel = h * 0.8;
+            const px = it.x + it.vx * travel * t;
+            const py = it.y + it.vy * travel * t;
 
             if (it.kind==="bubble"){
                 ctx.beginPath();
@@ -767,59 +823,50 @@ class SaxBurstField {
 }
 
 /* =========================================================
-   INSTANTIATE FIELDS
+   INIT FIELDS
 ========================================================= */
 let engineField, room1Field, room2Field, room3Field, saxField;
 
 function initFields() {
-    // Engine Room bubbles
-    // - Count: ~25–35 active
-    // - Speed tiers fast/med/slow (2s / 6–8s / 12–15s rise)
-    // We'll simulate by mixing speeds via wide speed band
+    // Engine Room field
     const engCanvas = document.getElementById("engineCanvas");
     if (engCanvas) {
         engineField = new BubbleField(engCanvas, {
             maxCount: 30,
             colorMode: "mono",
-            baseHue: 120,          // green
+            baseHue: 120,  // green
             alphaMin: 0.3,
             alphaMax: 0.4,
-            minSpeed: 40,          // fast ones
-            maxSpeed: 140,         // slow rise = lower px/sec, BUT we invert speed above? Wait:
-                                   // note: vy = -spd/60, so higher spd => faster rise.
-                                   // We'll just accept this band for tiered motion visually.
+            minSpeed: 40,  // fast tier
+            maxSpeed: 140, // slow tier
             sideDrift: 5,
             lifeScale: 1.0
         });
     }
 
-    // Room 1 bubbles (Purple Mind)
-    // - Count 30–50
-    // - Rise 10–20s slow
-    // - Opacity .15–.25
+    // Room 1 (Purple Mind)
     const r1Canvas = document.getElementById("room1Canvas");
     if (r1Canvas) {
         room1Field = new BubbleField(r1Canvas, {
             maxCount: 45,
             colorMode: "mono",
-            baseHue: 285,          // purple-ish
+            baseHue: 285,  // purple
             alphaMin: 0.15,
             alphaMax: 0.25,
-            minSpeed: 20,          // slower band
+            minSpeed: 20,  // 10-20s drift band
             maxSpeed: 60,
             sideDrift: 4,
             lifeScale: 1.2
         });
     }
 
-    // Room 2 bubbles (Warm Core magenta)
-    // same calm drift as Room 1 but magenta hue
+    // Room 2 (Warm Core / magenta)
     const r2Canvas = document.getElementById("room2Canvas");
     if (r2Canvas) {
         room2Field = new BubbleField(r2Canvas, {
             maxCount: 45,
             colorMode: "mono",
-            baseHue: 315,          // magenta
+            baseHue: 315,  // magenta
             alphaMin: 0.15,
             alphaMax: 0.25,
             minSpeed: 20,
@@ -829,14 +876,7 @@ function initFields() {
         });
     }
 
-    // Room 3 background field:
-    // total active 40–60
-    // mix ratio: 60% white, 25% blue, 15% red
-    // lifespans:
-    //   white = 10–15s (faster rise)
-    //   blue = 20s
-    //   red  = 25s (barely moving)
-    // We'll approximate with palette entries that differ in alpha + speedScale/lifeScale
+    // Room 3 background (white/blue/red mix)
     const r3Canvas = document.getElementById("room3Canvas");
     if (r3Canvas) {
         room3Field = new BubbleField(r3Canvas, {
@@ -849,35 +889,47 @@ function initFields() {
             sideDrift: 3,
             lifeScale: 1.3,
             palette: [
-                // white ~60%
+                // white heavy
                 {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
                 {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
                 {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
                 {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
                 {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
                 {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                // blue ~25%
+                // blue
                 {color:"rgba(120,160,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
                 {color:"rgba(120,160,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
                 {color:"rgba(120,160,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                // red ~15%
+                // red anchors
                 {color:"rgba(255,70,70,ALPHA)", alphaMin:0.25, alphaMax:0.35},
                 {color:"rgba(255,70,70,ALPHA)", alphaMin:0.25, alphaMax:0.35}
             ]
         });
     }
 
-    // Room 3 sax foreground bursts (notes + clusters)
+    // Room 3 sax bursts (cluster + notes)
     const r3SaxCanvas = document.getElementById("room3SaxCanvas");
     if (r3SaxCanvas) {
         saxField = new SaxBurstField(r3SaxCanvas);
     }
 }
 
-initFields();
+/* =========================================================
+   ON LOAD
+========================================================= */
+window.addEventListener("load", () => {
+    initFields();
 
-/* boot into Engine Room and bump counter once */
-showRoom("engine-room");
+    // show Engine Room first and tick counter
+    showRoom("engine-room");
+
+    // safety kick in case mobile paused canvases at first paint
+    setTimeout(() => {
+        if (!engineField || !room1Field || !room2Field || !room3Field) {
+            initFields();
+        }
+    }, 800);
+});
 </script>
 </body>
 </html>
