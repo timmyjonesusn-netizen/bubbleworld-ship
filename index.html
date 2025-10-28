@@ -2,109 +2,673 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Bubble World v3.3.4 – Pop Field</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bubble World · Timmy Ship</title>
 <style>
-html,body{
-  margin:0;padding:0;width:100%;height:100%;overflow:hidden;
-  background:radial-gradient(circle at 30% 20%,#004400 0%,#00aa55 40%,#000 90%);
-  font-family:-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif;color:#fff;
-}
-body::before{content:'';position:fixed;inset:0;background:#000;z-index:-1;}
-.bubble-field{position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;z-index:0;pointer-events:none;}
-.bubble{position:absolute;border-radius:50%;filter:blur(18px);opacity:.7;animation:floatUp linear infinite;}
-@keyframes floatUp{0%{transform:translateY(100vh);}100%{transform:translateY(-20vh);}}
-.content{position:relative;z-index:1;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
-nav{position:fixed;top:10px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:5;}
-button.nav{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.3);border-radius:10px;color:#fff;font-weight:600;padding:10px 16px;}
-.bottom{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:5;}
-.bottom-pill{background:radial-gradient(circle at 0% 0%,#ff00ff 0%,#ff0080 30%,#ff5500 60%,transparent 80%);
-  padding:12px 20px;border-radius:999px;box-shadow:0 0 40px #ff0080;border:1px solid rgba(255,255,255,.4);
-  color:#fff;font-weight:600;}
-.room{display:none;animation:fadeRoom .5s ease both;}
-.room.active{display:block;}
-@keyframes fadeRoom{0%{opacity:0;}100%{opacity:1;}}
-h1{font-size:32px;margin-bottom:10px;}
-p{max-width:600px;margin:0 auto 10px;}
-a.play{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);
-  border-radius:8px;padding:8px 14px;color:#fff;text-decoration:none;margin:4px;}
+  :root {
+    --engine-bg-start: #003300;
+    --engine-bg-end: #001000;
+    --engine-glow: rgba(0,255,128,0.4);
+
+    --room1-bg-start: #2a0055;
+    --room1-bg-end: #000014;
+    --room1-glow: rgba(170,0,255,0.35);
+
+    --room2-bg-start: #4a003a;
+    --room2-bg-end: #000000;
+    --room2-glow: rgba(255,0,128,0.4);
+
+    --room3-bg-start: #000016;
+    --room3-bg-end: #000000;
+    --room3-glow: rgba(0,128,255,0.35);
+
+    --text-main: #ffffff;
+    --text-dim: #bbbbbb;
+
+    --pill-grad-left: #ff00a8;
+    --pill-grad-mid: #ff0077;
+    --pill-grad-hot: #ff4d00;
+    --pill-grad-dark: #000000;
+
+    --nav-bg: rgba(0,0,0,0.6);
+    --nav-border: rgba(255,255,255,0.4);
+    --nav-radius: 12px;
+
+    --bottom-bar-bg: #1a1a1a;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto, sans-serif;
+    background-color: #000;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ====== GLOBAL LAYOUT WRAPPERS ====== */
+
+  .room {
+    position: relative;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: calc(100vh - 80px); /* leave space for bottom bar */
+    padding: 120px 20px 160px;
+    display: none; /* JS will turn on one at a time */
+    overflow: hidden;
+    color: var(--text-main);
+  }
+
+  .room.active {
+    display: block;
+  }
+
+  /* radial glow background per room */
+  .engine-bg {
+    background: radial-gradient(circle at 50% 40%, var(--engine-bg-start) 0%, var(--engine-bg-end) 70%);
+  }
+  .room1-bg {
+    background: radial-gradient(circle at 50% 40%, var(--room1-bg-start) 0%, var(--room1-bg-end) 70%);
+  }
+  .room2-bg {
+    background: radial-gradient(circle at 50% 40%, var(--room2-bg-start) 0%, var(--room2-bg-end) 70%);
+  }
+  .room3-bg {
+    background: radial-gradient(circle at 50% 40%, var(--room3-bg-start) 0%, var(--room3-bg-end) 70%);
+  }
+
+  /* ====== FLOATING BUBBLES LAYER ====== */
+  .bubbles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(10px);
+  }
+
+  .bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: floatUp linear infinite;
+    mix-blend-mode: screen;
+  }
+
+  /* engine bubbles = greenish */
+  .bubbles.engine .bubble {
+    background: radial-gradient(circle at 30% 30%, rgba(0,255,128,0.45) 0%, rgba(0,0,0,0) 60%);
+    box-shadow: 0 0 30px 10px var(--engine-glow);
+  }
+
+  /* room1 bubbles = purple */
+  .bubbles.room1 .bubble {
+    background: radial-gradient(circle at 30% 30%, rgba(180,0,255,0.5) 0%, rgba(0,0,0,0) 60%);
+    box-shadow: 0 0 30px 10px var(--room1-glow);
+  }
+
+  /* room2 bubbles = magenta/pink */
+  .bubbles.room2 .bubble {
+    background: radial-gradient(circle at 30% 30%, rgba(255,0,170,0.5) 0%, rgba(0,0,0,0) 60%);
+    box-shadow: 0 0 30px 10px var(--room2-glow);
+  }
+
+  /* room3 bubbles = cosmic blue */
+  .bubbles.room3 .bubble {
+    background: radial-gradient(circle at 30% 30%, rgba(0,140,255,0.5) 0%, rgba(0,0,0,0) 60%);
+    box-shadow: 0 0 30px 10px var(--room3-glow);
+  }
+
+  @keyframes floatUp {
+    0%   { transform: translateY(0) scale(1);   opacity: 0.15; }
+    50%  { transform: translateY(-40px) scale(1.07); opacity: 0.4; }
+    100% { transform: translateY(-80px) scale(1); opacity: 0.15; }
+  }
+
+  /* ====== CONTENT WRAPPER ====== */
+  .content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .room-icon {
+    font-size: 48px;
+    line-height: 1;
+  }
+
+  .room-title {
+    font-size: clamp(2.2rem, 2.2rem + 1vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 20px auto 16px;
+    color: #fff;
+  }
+
+  .room-sub {
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: var(--text-dim);
+    font-weight: 500;
+    margin: 0 auto 32px;
+  }
+
+  /* little status blocks for Engine */
+  .status-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    margin: 24px 0 40px;
+  }
+
+  .status-chip {
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    font-weight: 500;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    min-width: 250px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,255,128,0.4);
+  }
+
+  .status-light {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+    background: radial-gradient(circle,#00ff88 0%,#006633 60%);
+    box-shadow:0 0 10px #00ff88,0 0 30px #00ff88;
+  }
+
+  /* playlists layout for Room 1 / Room 2 */
+  .playlist-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 360px;
+    margin: 0 auto 40px;
+  }
+
+  .playlist-item {
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0 0 25px rgba(255,0,200,0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .playlist-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #fff;
+  }
+  .playlist-desc {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-dim);
+  }
+
+  /* Drift Space message block */
+  .drift-affirm {
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #fff;
+    margin: 0 auto 32px;
+  }
+
+  /* ====== TIMMY TIME MUSIC PILL ====== */
+  .music-pill-wrap {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
+  .music-pill-glow {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    height: 120px;
+    border-radius: 999px;
+    filter: blur(40px);
+    opacity: 0.6;
+    background: radial-gradient(circle at 50% 50%, rgba(255,0,170,0.45) 0%, rgba(0,0,0,0) 70%);
+    pointer-events: none;
+  }
+  .music-pill {
+    position: relative;
+    display: inline-block;
+    background: linear-gradient(
+      90deg,
+      var(--pill-grad-left) 0%,
+      var(--pill-grad-mid) 30%,
+      var(--pill-grad-hot) 60%,
+      var(--pill-grad-dark) 100%
+    );
+    padding: 16px 20px;
+    border-radius: 1000px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #fff;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.4);
+    min-width: 300px;
+    text-align: center;
+    box-shadow:
+      0 0 20px rgba(255,0,170,0.7),
+      0 0 60px rgba(255,0,170,0.5),
+      0 0 120px rgba(255,0,0,0.4);
+  }
+
+  /* ====== TOP NAV ====== */
+  .top-nav-bar {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .top-btn {
+    background: var(--nav-bg);
+    border: 1px solid var(--nav-border);
+    border-radius: var(--nav-radius);
+    padding: 16px 20px;
+    min-width: 110px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  }
+
+  .top-btn.active {
+    box-shadow:
+      0 0 10px rgba(255,255,255,0.7),
+      0 0 40px rgba(255,0,200,0.5),
+      0 0 80px rgba(0,255,128,0.3);
+  }
+
+  /* ====== BOTTOM BAR ====== */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: var(--bottom-bar-bg);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    display: grid;
+    grid-template-columns: 60px 1fr 60px 60px;
+    align-items: center;
+    padding: 0 16px;
+    column-gap: 12px;
+    z-index: 9999;
+    color: #fff;
+  }
+
+  .bottom-icon-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.4);
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    line-height: 1;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  }
+
+  .home-col {
+    display: flex;
+    justify-content: center;
+  }
+
+  .notif-col {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .notif-bubble {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.5);
+    color: #fff;
+    min-width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 0 10px rgba(255,0,170,0.7),
+      0 0 30px rgba(255,0,170,0.4);
+  }
+
+  /* Slightly larger text on tiny phones */
+  @media (max-width:380px){
+    .room-title { font-size: 2rem; }
+    .room-sub { font-size: 1.1rem; }
+    .playlist-item { font-size: 1rem; }
+    .playlist-name { font-size: 1.05rem; }
+    .playlist-desc { font-size: 0.8rem; }
+    .music-pill { font-size: 1rem; min-width: 260px; }
+  }
 </style>
 </head>
 <body>
-<div class="bubble-field" id="bubbles"></div>
 
-<nav>
-  <button class="nav" onclick="go('engine')">Engine</button>
-  <button class="nav" onclick="go('room1')">Room 1</button>
-  <button class="nav" onclick="go('room2')">Room 2</button>
-  <button class="nav" onclick="go('room3')">Room 3</button>
-</nav>
-
-<div class="content">
-  <section id="engine" class="room active">
-    <h1>Welcome Aboard, Captain Timmy!</h1>
-    <p>Engine Room online — follow the glow to the Music Deck.</p>
-  </section>
-
-  <section id="room1" class="room">
-    <h1>💜 Room 1 — Purple Mind</h1>
-    <p>Healing playlists:</p>
-    <a class="play" href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316" target="_blank">Hope</a>
-    <a class="play" href="https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df" target="_blank">Soul</a>
-    <a class="play" href="https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c" target="_blank">Beach</a>
-    <a class="play" href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479" target="_blank">Rest</a>
-    <a class="play" href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank">Jazz</a>
-  </section>
-
-  <section id="room2" class="room">
-    <h1>🎧 Room 2 — Timmy Time Music</h1>
-    <p>Live vibe deck — choose your energy:</p>
-    <a class="play" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">Laugh</a>
-    <a class="play" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">Play</a>
-    <a class="play" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">Fun</a>
-    <a class="play" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">Motown</a>
-    <a class="play" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">Feeling It</a>
-  </section>
-
-  <section id="room3" class="room">
-    <h1>🌌 Room 3 — Drift Space</h1>
-    <p>You are beautiful and loved 💖</p>
-  </section>
+<!-- ╔════════════════╗ -->
+<!-- ║   TOP NAV BAR  ║ -->
+<!-- ╚════════════════╝ -->
+<div class="top-nav-bar">
+  <button class="top-btn" data-target="engine">Engine</button>
+  <button class="top-btn" data-target="room1">Room 1</button>
+  <button class="top-btn" data-target="room2">Room 2</button>
+  <button class="top-btn" data-target="room3">Room 3</button>
 </div>
 
-<div class="bottom">
-  <button class="bottom-pill" onclick="go('room2')">Timmy Time Music · Live</button>
+<!-- ╔════════════════╗ -->
+<!-- ║   ENGINE ROOM   ║ -->
+<!-- ╚════════════════╝ -->
+<section id="engine" class="room engine-bg active">
+  <div class="bubbles engine" aria-hidden="true"></div>
+
+  <div class="content">
+    <div class="room-icon">🛠️</div>
+    <div class="room-title">Engine Room</div>
+    <div class="room-sub">Systems online. Cloak stable. Shields holding.</div>
+
+    <div class="status-row">
+      <div class="status-chip">
+        <span class="status-light"></span>
+        Sniffer: all clear on local ports.
+      </div>
+      <div class="status-chip">
+        <span class="status-light"></span>
+        Port Hopper: active and stealthy.
+      </div>
+      <div class="status-chip">
+        <span class="status-light"></span>
+        Healer: bubble field stable.
+      </div>
+    </div>
+
+    <div class="music-pill-wrap">
+      <div class="music-pill-glow"></div>
+      <a class="music-pill" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank" rel="noopener">
+        Timmy Time Music · Live
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ╔════════════════╗ -->
+<!-- ║   ROOM 1       ║ -->
+<!-- ╚════════════════╝ -->
+<section id="room1" class="room room1-bg">
+  <div class="bubbles room1" aria-hidden="true"></div>
+
+  <div class="content">
+    <div class="room-icon">💜</div>
+    <div class="room-title">Room 1 — Purple Mind</div>
+    <div class="room-sub">Soft reset space. Breathe. Re-center.</div>
+
+    <div class="playlist-list">
+      <a class="playlist-item" href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316" target="_blank" rel="noopener">
+        <div class="playlist-name">Hope</div>
+        <div class="playlist-desc">Lift up / gentle light</div>
+      </a>
+      <a class="playlist-item" href="https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df" target="_blank" rel="noopener">
+        <div class="playlist-name">Soul</div>
+        <div class="playlist-desc">Heart warmth & groove</div>
+      </a>
+      <a class="playlist-item" href="https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c" target="_blank" rel="noopener">
+        <div class="playlist-name">Beach</div>
+        <div class="playlist-desc">Sun on skin, water sounds</div>
+      </a>
+      <a class="playlist-item" href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479" target="_blank" rel="noopener">
+        <div class="playlist-name">Rest</div>
+        <div class="playlist-desc">Close eyes, float slow</div>
+      </a>
+      <a class="playlist-item" href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank" rel="noopener">
+        <div class="playlist-name">Jazz</div>
+        <div class="playlist-desc">Late night corner booth</div>
+      </a>
+    </div>
+
+    <div class="music-pill-wrap">
+      <div class="music-pill-glow"></div>
+      <a class="music-pill" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank" rel="noopener">
+        Timmy Time Music · Live
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ╔════════════════╗ -->
+<!-- ║   ROOM 2       ║ -->
+<!-- ╚════════════════╝ -->
+<section id="room2" class="room room2-bg">
+  <div class="bubbles room2" aria-hidden="true"></div>
+
+  <div class="content">
+    <div class="room-icon">💗</div>
+    <div class="room-title">Room 2 — Warm Core</div>
+    <div class="room-sub">Energy up. Body awake. Fun mode on.</div>
+
+    <div class="playlist-list">
+      <a class="playlist-item" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank" rel="noopener">
+        <div class="playlist-name">Laugh</div>
+        <div class="playlist-desc">Silly brain, pressure release</div>
+      </a>
+      <a class="playlist-item" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank" rel="noopener">
+        <div class="playlist-name">Play</div>
+        <div class="playlist-desc">Bounce / joy / arcade colors</div>
+      </a>
+      <a class="playlist-item" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank" rel="noopener">
+        <div class="playlist-name">Fun</div>
+        <div class="playlist-desc">Upbeat, social, moving</div>
+      </a>
+      <a class="playlist-item" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank" rel="noopener">
+        <div class="playlist-name">Motown</div>
+        <div class="playlist-desc">Classic soul motion</div>
+      </a>
+      <a class="playlist-item" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank" rel="noopener">
+        <div class="playlist-name">Feeling It</div>
+        <div class="playlist-desc">Glow. Swagger. Magnet pull.</div>
+      </a>
+    </div>
+
+    <div class="music-pill-wrap">
+      <div class="music-pill-glow"></div>
+      <a class="music-pill" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank" rel="noopener">
+        Timmy Time Music · Live
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ╔════════════════╗ -->
+<!-- ║   ROOM 3       ║ -->
+<!-- ╚════════════════╝ -->
+<section id="room3" class="room room3-bg">
+  <div class="bubbles room3" aria-hidden="true"></div>
+
+  <div class="content">
+    <div class="room-icon">🌌</div>
+    <div class="room-title">Room 3 — Drift Space</div>
+    <div class="drift-affirm">You are beautiful and loved 💖</div>
+
+    <div class="room-sub" style="max-width:500px;">
+      This app was created on Timmy’s iPhone 17 Pro Max 2TB.
+      <br/>You are safe inside the bubble field.
+    </div>
+
+    <div class="music-pill-wrap">
+      <div class="music-pill-glow"></div>
+      <a class="music-pill" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank" rel="noopener">
+        Timmy Time Music · Live
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ╔════════════════╗ -->
+<!-- ║  BOTTOM BAR    ║ -->
+<!-- ╚════════════════╝ -->
+<div class="bottom-bar">
+  <div class="left-col">
+    <button class="bottom-icon-btn" id="prevBtn" aria-label="Previous Room">‹</button>
+  </div>
+
+  <div class="home-col">
+    <button class="bottom-icon-btn" id="homeBtn" aria-label="Engine Room">⌂</button>
+  </div>
+
+  <div class="right-col">
+    <button class="bottom-icon-btn" id="nextBtn" aria-label="Next Room">›</button>
+  </div>
+
+  <div class="notif-col">
+    <div class="notif-bubble" id="notifCount">54</div>
+  </div>
 </div>
 
 <script>
-const field=document.getElementById("bubbles");
-function spawnBubbles(main,alt,count=20,speed=12){
-  field.innerHTML='';
-  for(let i=0;i<count;i++){
-    const b=document.createElement('div');
-    b.className='bubble';
-    const size=Math.random()*120+40;
-    b.style.width=b.style.height=size+'px';
-    b.style.left=Math.random()*100+'%';
-    b.style.bottom=-Math.random()*200+'px';
-    b.style.animationDuration=(speed+Math.random()*6)+'s';
-    b.style.background=`radial-gradient(circle at 30% 30%,${main}0%,${alt}60%,transparent70%)`;
-    field.appendChild(b);
+/*
+  Bubble World Front Nav Logic
+  - Sections = engine, room1, room2, room3
+  - We just hide/show + update active state on nav buttons
+*/
+
+const rooms = ["engine", "room1", "room2", "room3"];
+let currentIndex = 0; // start in Engine
+
+const sections = {};
+rooms.forEach(r => { sections[r] = document.getElementById(r); });
+
+// top nav buttons
+const topBtns = Array.from(document.querySelectorAll(".top-btn"));
+topBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const target = btn.getAttribute("data-target");
+    goRoom(target);
+  });
+});
+
+// bottom arrows + home
+document.getElementById("prevBtn").addEventListener("click", () => {
+  const newIndex = (currentIndex - 1 + rooms.length) % rooms.length;
+  goRoom(rooms[newIndex]);
+});
+document.getElementById("nextBtn").addEventListener("click", () => {
+  const newIndex = (currentIndex + 1) % rooms.length;
+  goRoom(rooms[newIndex]);
+});
+document.getElementById("homeBtn").addEventListener("click", () => {
+  goRoom("engine");
+});
+
+function goRoom(id) {
+  // hide all
+  rooms.forEach(r => {
+    sections[r].classList.remove("active");
+  });
+
+  // show target
+  sections[id].classList.add("active");
+
+  // track index
+  currentIndex = rooms.indexOf(id);
+
+  // update nav highlight
+  topBtns.forEach(b => {
+    if (b.getAttribute("data-target") === id) {
+      b.classList.add("active");
+    } else {
+      b.classList.remove("active");
+    }
+  });
+
+  // optionally we could scroll to top so content sits nice
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+// ====== bubble spawner ======
+// lightweight random bubbles for each room section
+function spawnBubbles(sectionId, bubbleClass, count) {
+  const wrap = document.querySelector("#" + sectionId + " .bubbles");
+  if (!wrap) return;
+  for (let i = 0; i < count; i++) {
+    const b = document.createElement("div");
+    b.className = "bubble";
+    const size = 40 + Math.random()*120; // 40-160px
+    const left = Math.random()*100;      // vw%
+    const dur = 6 + Math.random()*6;     // 6-12s
+    const delay = (-1) * Math.random()*dur; // stagger
+
+    b.style.width = size + "px";
+    b.style.height = size + "px";
+    b.style.left = left + "vw";
+    b.style.bottom = (-40 - Math.random()*80) + "px";
+    b.style.animationDuration = dur + "s";
+    b.style.animationDelay = delay + "s";
+
+    wrap.appendChild(b);
   }
 }
-const themes={
-  engine:{bg:'radial-gradient(circle at 30% 20%,#004400 0%,#00aa55 40%,#000 90%)',main:'rgba(0,255,128,.8)',alt:'rgba(0,128,64,.5)',speed:14},
-  room1:{bg:'radial-gradient(circle at 30% 20%,#3a0066 0%,#9900ff 40%,#000 90%)',main:'rgba(255,0,255,.8)',alt:'rgba(255,128,255,.5)',speed:18},
-  room2:{bg:'radial-gradient(circle at 30% 20%,#660022 0%,#ff0077 40%,#ff5500 80%,#000 90%)',main:'rgba(255,0,128,.8)',alt:'rgba(255,128,0,.5)',speed:10},
-  room3:{bg:'radial-gradient(circle at 30% 20%,#001155 0%,#440099 40%,#9900ff 80%,#000 90%)',main:'rgba(128,0,255,.8)',alt:'rgba(255,0,255,.5)',speed:16}
-};
-function go(room){
-  document.querySelectorAll('.room').forEach(r=>r.classList.remove('active'));
-  const active=document.getElementById(room); if(active)active.classList.add('active');
-  const t=themes[room];
-  if(t){document.body.style.background=t.bg;spawnBubbles(t.main,t.alt,25,t.speed);}
-}
-go('engine');
+
+// per-room bubble groups
+spawnBubbles("engine", "engine", 10);
+spawnBubbles("room1", "room1", 10);
+spawnBubbles("room2", "room2", 10);
+spawnBubbles("room3", "room3", 10);
+
+// mark Engine as active on load
+goRoom("engine");
+
 </script>
 </body>
 </html>
