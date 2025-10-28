@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Timmy Time Ship</title>
+<title>Timmy Time Ship — Symphony Mode v3.5</title>
 <style>
     /* RESET / BASE */
     * {
@@ -24,16 +24,25 @@
 
     /* ---- GLOBAL LAYOUT ---- */
     .room {
-        display: none;
         position: relative;
         flex: 1;
         min-height: 100vh;
         padding: 2rem 1rem 6rem;
         text-align: center;
         overflow: hidden;
+
+        /* transition look */
+        opacity: 0;
+        transform: scale(0.98);
+        pointer-events: none;
+        transition:
+            opacity 0.8s ease,
+            transform 0.8s ease;
     }
     .room.active {
-        display: block;
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
     }
     .content-wrap {
         position: relative;
@@ -49,7 +58,17 @@
         overflow: hidden;
         pointer-events: none;
         z-index: 1;
+
+        /* ship breath pulse - subtle opacity wave */
+        animation: layerBreath 6s ease-in-out infinite;
     }
+
+    @keyframes layerBreath {
+        0%   { opacity: 0.9; }
+        50%  { opacity: 0.6; }
+        100% { opacity: 0.9; }
+    }
+
     .bubble {
         position: absolute;
         border-radius: 50%;
@@ -108,18 +127,28 @@
         font-size: 0.9rem;
         font-weight: 500;
         color: #fff;
+
         background: radial-gradient(circle at 20% 20%, #1aff1a 0%, #003300 60%);
         border: 1px solid rgba(0,255,0,0.5);
         box-shadow:
             0 0 8px rgba(0,255,0,0.7),
             0 0 32px rgba(0,255,0,0.4);
-        text-align: left;
+
+        /* heartbeat shimmer */
+        animation: pillBeat 4s ease-in-out infinite;
+    }
+
+    @keyframes pillBeat {
+        0%   { box-shadow:0 0 8px rgba(0,255,0,0.7),0 0 32px rgba(0,255,0,0.4); }
+        50%  { box-shadow:0 0 12px rgba(0,255,128,1),0 0 42px rgba(0,255,128,0.6); }
+        100% { box-shadow:0 0 8px rgba(0,255,0,0.7),0 0 32px rgba(0,255,0,0.4); }
     }
 
     /* ---- MUSIC NAV PILL (engine room link to room2) ---- */
     .music-pill-link {
         display: inline-block;
-        margin-top: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 0.5rem;
         padding: 0.75rem 1rem;
         border-radius: 999px;
         font-size: 0.95rem;
@@ -180,16 +209,18 @@
             0 0 24px rgba(255,255,0,0.6),
             0 0 48px rgba(255,0,0,0.4);
         margin-bottom: 0.5rem;
+        position: relative;
+        display: inline-block;
     }
 
-    /* floating musical notes layer */
+    /* floating musical notes layer anchored to sax horn */
     .note-layer {
         position: absolute;
-        left: 50%;
-        top: 0;
-        width: 200px;
-        height: 200px;
-        transform: translateX(-50%);
+        left: 55%;
+        top: -10px;
+        width: 120px;
+        height: 160px;
+        transform: translateX(-10%);
         pointer-events: none;
         z-index: 2;
     }
@@ -236,6 +267,7 @@
         margin-bottom: 0.75rem;
         color: rgba(255,255,255,0.9);
     }
+    /* riddle answer hidden by default */
     .riddle-a {
         display: none;
         color: #fff;
@@ -325,17 +357,16 @@
     #room3 {
         background: radial-gradient(circle at 50% 10%, rgba(128,0,0,0.4) 0%, #1a0000 60%, #000 90%);
     }
-
 </style>
 </head>
 <body>
 
 <!-- ENGINE ROOM -->
 <section class="room active" id="engine">
-    <div class="bubble-layer" id="bubbles-engine"><!-- engine has no colored outline bubbles by request (calm clean) --></div>
+    <!-- ENGINE HAS BUBBLES (green outline) -->
+    <div class="bubble-layer" id="bubbles-engine"></div>
 
     <div class="content-wrap">
-        <!-- Top buttons (optional small room nav pills) -->
         <div class="panel panel-tight" style="background:rgba(0,0,0,0.4); box-shadow:0 0 20px rgba(0,255,128,0.4),0 0 60px rgba(0,0,0,0.9) inset;">
             <div class="title-big" style="text-shadow:0 0 8px rgba(255,255,255,0.9),0 0 24px rgba(0,255,128,0.6);">
                 Engine Room
@@ -346,12 +377,10 @@
             <div class="status-pill">Port Hopper: active and stealthy.</div>
             <div class="status-pill">Healer: bubble field stable.</div>
 
-            <!-- Pink pill that takes you to Room 2 (music room) -->
-            <div style="margin-top:1rem;">
-                <button class="music-pill-link" onclick="go('room2')">
-                    Timmy Time Music – Live
-                </button>
-            </div>
+            <!-- Pink pill down low, invite to music room -->
+            <button class="music-pill-link" onclick="go('room2')">
+                Timmy Time Music – Live
+            </button>
         </div>
     </div>
 </section>
@@ -461,16 +490,17 @@
 
             <!-- SAX / NOTES -->
             <div class="sax-block">
-                <div class="sax-icon">🎷</div>
+                <div class="sax-icon">
+                    🎷
+                    <!-- Music notes floating layer: emits from sax horn -->
+                    <div class="note-layer" id="note-layer"></div>
+                </div>
                 <div class="soft-line" style="font-weight:600;">
                     Sax Channel<br/>
                     <span style="color:#ff8a9e;text-shadow:0 0 8px rgba(255,0,0,0.8),0 0 32px rgba(255,0,0,0.4);">
-                        Bubbles carry notes up through the burgundy.
+                        Notes drift right out of the horn.
                     </span>
                 </div>
-
-                <!-- Music notes floating layer -->
-                <div class="note-layer" id="note-layer"></div>
             </div>
 
             <div class="affirm-line">
@@ -489,7 +519,7 @@
             <div class="riddle-a" id="riddle-a"></div>
 
             <div class="joke-buttons" style="margin-top:1rem;">
-                <button class="mini-btn" onclick="revealAnswer()">Show answer</button>
+                <button class="mini-btn" onclick="revealAnswer()">Reveal riddle answer</button>
                 <button class="mini-btn" onclick="moreJokes()">More?</button>
             </div>
         </div>
@@ -520,15 +550,15 @@
 
 <script>
 /* ===========================================================
-   NAV / ROOM SWITCH
+   NAV / ROOM SWITCH with smooth active highlight
    =========================================================== */
 function go(roomId) {
-    // hide all rooms
+    // remove active from all
     document.querySelectorAll('.room').forEach(r => r.classList.remove('active'));
-    // show requested
+    // add active to chosen
     document.getElementById(roomId).classList.add('active');
 
-    // update active nav glow
+    // nav glow
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
     document.getElementById('nav-' + roomId).classList.add('active-nav');
 }
@@ -536,12 +566,12 @@ function go(roomId) {
 /* ===========================================================
    BUBBLE FIELDS
    Each room gets its own bubble style (outline color)
+   Engine: green outline (ship core)
    Room1: pink outline
    Room2: light blue outline
    Room3: green outline
-   Engine: no bubbles (calm)
    =========================================================== */
-function spawnBubbles(container, outlineColor, speedMin, speedMax) {
+function spawnBubbles(container, outlineColor, speedMin, speedMax, count=18) {
     const layer = document.getElementById(container);
     if (!layer) return;
 
@@ -552,13 +582,14 @@ function spawnBubbles(container, outlineColor, speedMin, speedMax) {
         const size = 20 + Math.random()*80; // px
         const left = Math.random()*100;      // vw%
         const dur = speedMin + Math.random()*(speedMax-speedMin); // seconds
-        const delay = -Math.random()*dur;    // so they are staggered
+        const delay = -Math.random()*dur;    // so they offset
 
         b.style.width = size + 'px';
         b.style.height = size + 'px';
         b.style.left = left + 'vw';
         b.style.bottom = '-100px';
-        b.style.filter = 'drop-shadow(0 0 8px ' + outlineColor + ') drop-shadow(0 0 24px ' + outlineColor + ')';
+        b.style.filter =
+            'drop-shadow(0 0 8px ' + outlineColor + ') drop-shadow(0 0 24px ' + outlineColor + ')';
         b.style.boxShadow =
             '0 0 12px 2px ' + outlineColor + ', 0 0 40px 8px ' + outlineColor;
 
@@ -568,26 +599,30 @@ function spawnBubbles(container, outlineColor, speedMin, speedMax) {
         layer.appendChild(b);
     }
 
-    // spawn a field of bubbles
-    for (let i=0; i<18; i++) {
+    // field
+    for (let i=0; i<count; i++) {
         makeOneBubble();
     }
-    // keep making slow trickle bubbles
+    // trickle
     setInterval(makeOneBubble, 4000);
 }
 
+// Engine: green outline, slightly slower float
+spawnBubbles('bubbles-engine', 'rgba(0,255,128,0.8)', 20, 30, 14);
+
 // Room 1: pink outline
-spawnBubbles('bubbles-room1', 'rgba(255,0,128,0.8)', 18, 28);
+spawnBubbles('bubbles-room1', 'rgba(255,0,128,0.8)', 18, 28, 18);
 
 // Room 2: light blue outline
-spawnBubbles('bubbles-room2', 'rgba(128,200,255,0.8)', 14, 22);
+spawnBubbles('bubbles-room2', 'rgba(128,200,255,0.8)', 14, 22, 18);
 
-// Room 3: green outline
-spawnBubbles('bubbles-room3', 'rgba(0,255,128,0.8)', 22, 32);
+// Room 3: green outline, extra slow / dreamy
+spawnBubbles('bubbles-room3', 'rgba(0,255,128,0.8)', 22, 32, 18);
 
 
 /* ===========================================================
    DRIFT SPACE: FLOATING MUSIC NOTES (Room 3 sax zone)
+   Notes emit directly from sax horn
    =========================================================== */
 const noteLayer = document.getElementById('note-layer');
 const NOTES = ['♪','♫','♩','♬'];
@@ -598,9 +633,10 @@ function spawnNote() {
     n.className = 'note';
     n.textContent = NOTES[Math.floor(Math.random()*NOTES.length)];
 
-    const x = 60 + Math.random()*80;   // px offset inside note-layer
+    // emit zone near the horn
+    const x = 10 + Math.random()*80;   // px offset inside layer
     const delay = Math.random()*3;     // seconds
-    const dur = 4 + Math.random()*3;   // total float time
+    const dur = 4 + Math.random()*3;   // total float
 
     n.style.left = x + 'px';
     n.style.bottom = '0px';
@@ -609,13 +645,13 @@ function spawnNote() {
 
     noteLayer.appendChild(n);
 
-    // Clean up after it's done floating
+    // cleanup after animation ends
     setTimeout(() => {
         if (n && n.parentNode) n.parentNode.removeChild(n);
     }, (dur+delay)*1000);
 }
 
-// steady trickle of notes rising
+// trickle notes
 setInterval(spawnNote, 1200);
 
 
@@ -623,7 +659,7 @@ setInterval(spawnNote, 1200);
    JOKE + RIDDLE ROTATION (Room 3)
    - Daily default
    - "More?" cycles locally
-   - "Show answer" reveals riddle answer
+   - "Reveal riddle answer" shows the answer
    =========================================================== */
 
 // Jokes
@@ -648,9 +684,8 @@ let jokeIndex = 0;
 let riddleIndex = 0;
 
 function seedDaily() {
-    // Basic daily seed from date; same joke/riddle for everyone each day
+    // daily seed so everyone sees same joke/riddle each calendar day
     const today = new Date().toISOString().slice(0,10); // yyyy-mm-dd
-    // simple hash
     let hash = 0;
     for (let i=0;i<today.length;i++){
         hash = (hash*31 + today.charCodeAt(i)) >>> 0;
