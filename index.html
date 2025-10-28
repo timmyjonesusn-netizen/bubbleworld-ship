@@ -43,13 +43,14 @@ body {
   display: flex;
 }
 
-/* BUBBLE FIELD CANVAS BG */
+/* BUBBLE FIELD BG */
 .bubble-layer {
   position: absolute;
   inset: 0;
   overflow: hidden;
   z-index: 0;
   filter: blur(0px);
+  pointer-events: none;
 }
 .bubble {
   position: absolute;
@@ -64,20 +65,22 @@ body {
   100% { transform: translateY(-200vh) scale(1.2); opacity: 0; }
 }
 
-/* CONTENT WRAPPER ABOVE BUBBLES */
+/* CONTENT BLOCK */
 .room-content {
   position: relative;
   z-index: 2;
   width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
   text-align: center;
 }
 
-/* TITLE / HEADER IN EACH ROOM */
+/* TITLES */
 .room-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   text-shadow: 0 0 10px rgba(255,255,255,0.6);
   line-height: 1.2;
@@ -97,7 +100,7 @@ body {
   border: 1px solid rgba(0,255,128,0.5);
   box-shadow: 0 0 20px rgba(0,255,128,0.4);
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px;
   text-align: left;
   font-size: 0.8rem;
   line-height: 1.4;
@@ -110,8 +113,8 @@ body {
   margin-bottom:6px;
 }
 .status-dot {
-  width:10px;
-  height:10px;
+  width:8px;
+  height:8px;
   border-radius:50%;
   box-shadow:0 0 8px currentColor;
 }
@@ -119,21 +122,59 @@ body {
 .status-yellow { color:#ffe066; background:#ffe066; }
 .status-pink { color:#ff4fd8; background:#ff4fd8; }
 
+/* SINGLE PINK BUTTON (slim) */
 .engine-music-button {
   background: radial-gradient(circle at 30% 30%, #ff4fd8 0%, #a10087 60%);
   border:2px solid rgba(255,255,255,0.4);
   color:#fff;
-  font-size:1rem;
+  font-size:0.9rem;
   font-weight:600;
   text-shadow:0 0 8px rgba(255,0,200,0.8);
   box-shadow:0 0 20px rgba(255,0,200,0.5);
-  border-radius:14px;
-  padding:14px 16px;
+  border-radius:12px;
+  padding:10px 12px;
   text-align:center;
   line-height:1.2;
+  max-width:220px;
+  margin:0 auto;
+  cursor:pointer;
 }
 
-/* ROOM 1 STYLE (purple mind w/ pink outline bubbles) */
+/* PLAYLIST GRID (tight) */
+.playlist-grid {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  align-items:center;
+}
+
+/* CLICKABLE TILE (all rooms default pink outline) */
+.playlist-btn {
+  font-size:0.9rem;
+  font-weight:500;
+  line-height:1.3;
+  padding:10px 12px;
+  border-radius:10px;
+  min-width:160px;
+  max-width:200px;
+  width:100%;
+  text-align:center;
+  background:rgba(0,0,0,0.4);
+  color:#fff;
+  cursor:pointer;
+  border:2px solid rgba(255,128,255,0.7);
+  text-shadow:0 0 8px rgba(255,128,255,0.8);
+  box-shadow:0 0 14px rgba(255,128,255,0.4);
+}
+
+/* ROOM 2 tiles get light blue look */
+#room2 .playlist-btn {
+  border-color: rgba(173,216,255,0.6);
+  text-shadow:0 0 8px rgba(173,216,255,0.9);
+  box-shadow:0 0 14px rgba(173,216,255,0.5);
+}
+
+/* ROOM 1 (purple mind) */
 #room1 {
   background: radial-gradient(circle at 50% 30%, rgba(130,0,160,0.5) 0%, rgba(10,0,20,0.95) 70%);
   color:#ffd9ff;
@@ -142,25 +183,8 @@ body {
   color:#ff89ff;
   text-shadow:0 0 12px rgba(255,0,255,0.7);
 }
-.playlist-grid {
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-.playlist-btn {
-  font-size:1rem;
-  font-weight:500;
-  line-height:1.3;
-  padding:14px 16px;
-  border-radius:12px;
-  border:2px solid rgba(255,128,255,0.7); /* pink outline */
-  background:rgba(0,0,0,0.35);
-  color:#fff;
-  text-shadow:0 0 8px rgba(255,128,255,0.8);
-  box-shadow:0 0 16px rgba(255,128,255,0.4);
-}
 
-/* ROOM 2 STYLE (Timmy Time Music core) */
+/* ROOM 2 (Timmy Time Music) */
 #room2 {
   background: radial-gradient(circle at 50% 30%, rgba(255,0,150,0.4) 0%, rgba(30,0,30,0.95) 70%);
   color:#ffe9ff;
@@ -169,13 +193,8 @@ body {
   color:#ff5fe0;
   text-shadow:0 0 12px rgba(255,0,200,0.8);
 }
-#room2 .playlist-btn{
-  border:2px solid rgba(173,216,255,0.6); /* light blue line */
-  text-shadow:0 0 8px rgba(173,216,255,0.9);
-  box-shadow:0 0 16px rgba(173,216,255,0.5);
-}
 
-/* ROOM 3 STYLE (Drift Space / burgundy middle / sax) */
+/* ROOM 3 (Drift Space) */
 #room3 {
   background: radial-gradient(circle at 50% 50%, rgba(90,0,20,0.6) 0%, rgba(0,0,20,0.95) 70%);
   color:#ffdede;
@@ -193,16 +212,18 @@ body {
   padding:16px;
   text-align:center;
   color:#afffea;
-  font-size:0.9rem;
+  font-size:0.8rem;
   line-height:1.4;
   min-height:140px;
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
   align-items:center;
+  max-width:280px;
+  margin:0 auto;
 }
 .sax-graphic {
-  font-size:2.5rem;
+  font-size:2rem;
   line-height:1;
   text-shadow:0 0 10px rgba(255,200,0,0.7),0 0 20px rgba(255,200,0,0.4);
   margin-bottom:8px;
@@ -220,7 +241,7 @@ body {
   100% { transform:translateY(-120px) translateX(-20px) scale(1.4); opacity:0; }
 }
 
-/* COMFORT CARD w/ joke + riddle */
+/* COMFORT CARD */
 .comfort-card{
   background:rgba(0,0,0,0.4);
   border:1px solid rgba(0,255,200,0.5);
@@ -228,12 +249,14 @@ body {
   border-radius:14px;
   padding:16px;
   color:#dffff5;
-  font-size:0.9rem;
+  font-size:0.8rem;
   line-height:1.4;
   text-align:left;
+  max-width:320px;
+  margin:0 auto;
 }
 .comfort-header{
-  font-size:1rem;
+  font-size:0.9rem;
   font-weight:600;
   margin-bottom:8px;
   color:#ffbcd9;
@@ -241,6 +264,7 @@ body {
 }
 .qa-line{
   margin-bottom:8px;
+  font-size:0.8rem;
 }
 .answer{
   color:#9affc9;
@@ -250,33 +274,36 @@ body {
 }
 .comfort-actions{
   display:flex;
-  gap:12px;
+  gap:8px;
+  font-size:0.8rem;
 }
 .comfort-btn{
   flex:1;
   text-align:center;
-  padding:12px;
+  padding:10px;
   border-radius:10px;
   background:rgba(0,0,0,0.6);
   border:1px solid rgba(0,255,200,0.5);
   box-shadow:0 0 12px rgba(0,255,200,0.4);
-  font-size:0.9rem;
+  font-size:0.8rem;
   font-weight:500;
   color:#9affc9;
 }
 
-/* TIMMY TIME MUSIC PILL (global footer badge) */
+/* BADGE */
 .music-pill{
-  font-size:0.8rem;
+  font-size:0.7rem;
   font-weight:600;
   text-align:center;
-  padding:10px 14px;
+  padding:8px 12px;
   border-radius:999px;
   background:radial-gradient(circle at 30% 30%, rgba(255,0,200,0.8) 0%, rgba(80,0,60,0.7) 70%);
   border:2px solid rgba(255,255,255,0.4);
   box-shadow:0 0 16px rgba(255,0,200,0.6),0 0 40px rgba(255,0,200,0.4);
   color:#fff;
   text-shadow:0 0 8px rgba(255,0,255,0.9);
+  max-width:200px;
+  margin:0 auto;
 }
 
 /* BOTTOM NAV BAR */
@@ -313,9 +340,9 @@ body {
   text-shadow:0 0 8px rgba(255,255,255,0.6);
 }
 
-/* SMALL PRINT / LOVE MESSAGE */
+/* TEXT LINES */
 .love-line{
-  font-size:0.8rem;
+  font-size:0.75rem;
   line-height:1.4;
   text-align:center;
   color:#ffcfe9;
@@ -324,7 +351,7 @@ body {
 }
 .created-line{
   color:#6affd8;
-  font-size:0.7rem;
+  font-size:0.65rem;
   text-align:center;
   text-shadow:0 0 8px rgba(0,255,200,0.8);
 }
@@ -340,21 +367,14 @@ body {
     <div class="room-content">
       <div class="room-title">ENGINE ROOM / SAFE CORE</div>
 
-      <div class="engine-status-box">
+      <div class="engine-status-box" id="telemetryBox">
         <div class="engine-status-line">
           <div class="status-dot status-green"></div>
-          <div>Path Monitor: nominal</div>
-        </div>
-        <div class="engine-status-line">
-          <div class="status-dot status-yellow"></div>
-          <div>Port Hopper: stable / music protected</div>
-        </div>
-        <div class="engine-status-line">
-          <div class="status-dot status-pink"></div>
-          <div>Maya Link: standing by</div>
+          <div>Loading ship status…</div>
         </div>
       </div>
 
+      <!-- ONE PINK BUTTON ONLY -->
       <div class="engine-music-button" onclick="go('room2')">
         ROOM 2 • TIMMY TIME MUSIC 🎧
       </div>
@@ -371,12 +391,13 @@ body {
     <div class="bubble-layer" data-room="room1"></div>
     <div class="room-content">
       <div class="room-title">ROOM 1 / PURPLE MIND</div>
+
       <div class="playlist-grid">
-        <div class="playlist-btn">Hope</div>
-        <div class="playlist-btn">Soul</div>
-        <div class="playlist-btn">Beach</div>
-        <div class="playlist-btn">Rest</div>
-        <div class="playlist-btn">Jazz</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316')">Hope</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df')">Soul</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c')">Beach</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479')">Rest</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be')">Jazz</div>
       </div>
 
       <div class="love-line">This room calms your mind, not your fire.</div>
@@ -393,11 +414,11 @@ body {
       <div class="room-title">ROOM 2 / TIMMY TIME MUSIC</div>
 
       <div class="playlist-grid">
-        <div class="playlist-btn">Laugh 😂</div>
-        <div class="playlist-btn">Play 🎮</div>
-        <div class="playlist-btn">Fun 🎉</div>
-        <div class="playlist-btn">Motown 🎷</div>
-        <div class="playlist-btn">Feeling It 🔥</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1')">Laugh 😂</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b')">Play 🎮</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f')">Fun 🎉</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840')">Motown 🎷</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c')">Feeling It 🔥</div>
       </div>
 
       <div class="love-line">Your pulse room. Your energy room.</div>
@@ -419,7 +440,6 @@ body {
           Slow float mode. Notes and bubbles drift up.
         </div>
 
-        <!-- floating notes (we position & animate in JS) -->
         <div class="note">♪</div>
         <div class="note">♩</div>
         <div class="note">♫</div>
@@ -431,7 +451,7 @@ body {
 
         <div class="qa-line">
           <strong>Joke:</strong>
-          Why did the bubble get promoted?
+          <span class="qtext" id="jokeQ">Why did the bubble get promoted?</span>
           <div class="answer" id="jokeAnswer">
             Because it always rose to the top.
           </div>
@@ -439,8 +459,7 @@ body {
 
         <div class="qa-line">
           <strong>Riddle:</strong>
-          I make music without a mouth, and I drift without wings.
-          What am I?
+          <span class="qtext" id="riddleQ">I make music without a mouth, and I drift without wings. What am I?</span>
           <div class="answer" id="riddleAnswer">
             A sax line floating through your Drift Space.
           </div>
@@ -478,34 +497,34 @@ body {
 </div>
 
 <script>
-/* simple room switcher */
+/* ROOM SWITCH */
 function go(id){
-  document.querySelectorAll('.room').forEach(r=>{
-    r.classList.remove('active');
-  });
+  document.querySelectorAll('.room').forEach(r=>r.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-/* bubble spawner per room */
+/* OPEN PLAYLIST
+   Tries new tab. If blocked (iPhone popup rules), fallback same tab. */
+function openPlaylist(url){
+  const win = window.open(url, "_blank");
+  if(!win){
+    window.location.href = url;
+  }
+}
+
+/* BUBBLE FIELD GENERATOR */
 function spawnBubblesFor(layerEl, colorMode){
-  // colorMode decides outline / fill style
-  // engine: greens
-  // room1: purples w/pink outline
-  // room2: magenta / light blue outline
-  // room3: burgundy / teal / red mix
   function makeBubble(){
     const b = document.createElement('div');
     b.className = 'bubble';
-    // random size
+
     const size = 20 + Math.random()*80;
     b.style.width = size+'px';
     b.style.height = size+'px';
 
-    // random start position
     b.style.left = Math.random()*100+'%';
     b.style.bottom = '-120px';
 
-    // different border/glow per room
     if(colorMode==='engine'){
       b.style.borderColor = 'rgba(0,255,140,0.6)';
       b.style.boxShadow = '0 0 20px rgba(0,255,140,0.5)';
@@ -519,31 +538,26 @@ function spawnBubblesFor(layerEl, colorMode){
       b.style.boxShadow = '0 0 20px rgba(173,216,255,0.5)';
       b.style.background = 'radial-gradient(circle at 30% 30%, rgba(255,0,200,0.15) 0%, rgba(0,0,0,0) 70%)';
     } else {
-      // room3
       b.style.borderColor = 'rgba(0,255,200,0.6)';
       b.style.boxShadow = '0 0 24px rgba(255,0,0,0.4), 0 0 40px rgba(0,255,200,0.4)';
       b.style.background = 'radial-gradient(circle at 30% 30%, rgba(180,0,40,0.3) 0%, rgba(0,0,0,0) 70%)';
     }
 
-    // animation duration / speed vibe
     const dur = 10 + Math.random()*10;
     b.style.animationDuration = dur+'s';
 
     layerEl.appendChild(b);
 
-    // cleanup later
     setTimeout(()=>{ b.remove(); }, dur*1000 + 1000);
   }
 
-  // spawn loop
   setInterval(()=>{
-    // burst of 1-2 bubbles at random pace
     const count = 1 + Math.floor(Math.random()*2);
     for(let i=0;i<count;i++) makeBubble();
   }, 2000 + Math.random()*2000);
 }
 
-/* sax note float animation in room3 */
+/* FLOATING NOTES IN ROOM 3 */
 function animateNotes(){
   const notes = document.querySelectorAll('#room3 .note');
   notes.forEach(n=>{
@@ -551,8 +565,8 @@ function animateNotes(){
     noteFloat(n);
   });
   function resetNote(el){
-    const startX = 50 + (Math.random()*20-10); // % near middle
-    const startY = 60 + (Math.random()*10-5);  // px above sax
+    const startX = 50 + (Math.random()*20-10); // %
+    const startY = 60 + (Math.random()*10-5);  // px
     el.style.left = startX+'%';
     el.style.bottom = startY+'px';
     el.style.animationDuration = (2+Math.random()*2)+'s';
@@ -564,57 +578,73 @@ function animateNotes(){
   }
 }
 
-/* Reveal/More logic for Drift Space card */
+/* JOKE / RIDDLE INTERACTION */
 function revealAnswers(){
   document.getElementById('jokeAnswer').style.display='block';
   document.getElementById('riddleAnswer').style.display='block';
 }
 function newContent(){
-  // rotate to new joke/riddle placeholder
   document.getElementById('jokeAnswer').style.display='none';
   document.getElementById('riddleAnswer').style.display='none';
 
-  // you can customize these later / daily seed
   const jokes = [
-    {q:"Why did the bubble get promoted?",
-     a:"Because it always rose to the top."},
-    {q:"Why did the saxophone take a break?",
-     a:"It needed to decompress its brass."},
-    {q:"Why did the playlist blush?",
-     a:"Because Room 2 kept staring at it."}
+    {q:"Why did the bubble get promoted?", a:"Because it always rose to the top."},
+    {q:"Why did the saxophone take a break?", a:"It needed to decompress its brass."},
+    {q:"Why did the playlist blush?", a:"Because Room 2 kept staring at it."}
   ];
   const riddles = [
-    {q:"I float in your room but I’m not dust. I glow in your dark but I’m not fire. What am I?",
-     a:"One of your comfort bubbles."},
-    {q:"I sing in curves, I rise in light, I drift with you deep in the night. What am I?",
-     a:"The Drift Space sax line."},
-    {q:"I guard your peace without a sword. I hum instead of roar. What am I?",
-     a:"Your ship."}
+    {q:"I float in your room but I’m not dust. I glow in your dark but I’m not fire. What am I?", a:"One of your comfort bubbles."},
+    {q:"I sing in curves, I rise in light, I drift with you deep in the night. What am I?", a:"The Drift Space sax line."},
+    {q:"I guard your peace without a sword. I hum instead of roar. What am I?", a:"Your ship."}
   ];
 
   const j = jokes[Math.floor(Math.random()*jokes.length)];
   const r = riddles[Math.floor(Math.random()*riddles.length)];
 
-  // update DOM
-  const qaLines = document.querySelectorAll('.comfort-card .qa-line');
-  // Joke line first
-  qaLines[0].childNodes[1].nodeValue = " " + j.q + " ";
+  document.getElementById('jokeQ').textContent = j.q;
   document.getElementById('jokeAnswer').textContent = j.a;
-  // Riddle line second
-  qaLines[1].childNodes[1].nodeValue = " " + r.q + " ";
+  document.getElementById('riddleQ').textContent = r.q;
   document.getElementById('riddleAnswer').textContent = r.a;
 }
 
-/* init */
+/* OPTIONAL: pull live telemetry into engine box (safe to skip if /telemetry not running) */
+function loadTelemetry(){
+  fetch('http://127.0.0.1:5000/telemetry')
+    .then(r=>r.json())
+    .then(data=>{
+      const box = document.getElementById('telemetryBox');
+      if(!box) return;
+      box.innerHTML = `
+        <div class="engine-status-line">
+          <div class="status-dot status-green"></div>
+          <div>Sniffer: ${data.sniffer}</div>
+        </div>
+        <div class="engine-status-line">
+          <div class="status-dot status-yellow"></div>
+          <div>Hopper: ${data.hopper}</div>
+        </div>
+        <div class="engine-status-line">
+          <div class="status-dot status-green"></div>
+          <div>Healer: ${data.healer}</div>
+        </div>
+        <div class="engine-status-line">
+          <div class="status-dot status-pink"></div>
+          <div>Maya: ${data.maya}</div>
+        </div>
+      `;
+    })
+    .catch(()=>{/* silent fail if Flask isn't up */});
+}
+
+/* INIT */
 window.addEventListener('load', ()=>{
-  // bubble layers
   spawnBubblesFor(document.querySelector('[data-room="engine"]'), 'engine');
   spawnBubblesFor(document.querySelector('[data-room="room1"]'), 'room1');
   spawnBubblesFor(document.querySelector('[data-room="room2"]'), 'room2');
   spawnBubblesFor(document.querySelector('[data-room="room3"]'), 'room3');
 
-  // sax notes drifting
   animateNotes();
+  loadTelemetry();
 });
 </script>
 
