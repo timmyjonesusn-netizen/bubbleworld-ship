@@ -1,11 +1,13 @@
 # ============================================================
 # Timmy Bubble Ship • Unified SPA Server
-# v4.1 (playlist tap fix)
+# v4.3
 #
-# Changes from v4.0:
-# - bubble-layer now pointer-events:none so bubbles never block taps
-# - playlist buttons use onclick + window.open() so iPhone will actually open Suno
-# - removed target="_blank" anchors and replaced with div buttons
+# This version =
+# - Single pink music button in Engine Room (slim)
+# - Narrow playlist tiles
+# - Playlists ARE LIVE LINKS again (open Suno)
+# - Room 1 & Room 2 tiles tap to open Suno in new tab
+# - We keep port hop law / stealth hash / telemetry
 # ============================================================
 
 import socket, random, string, threading, webbrowser, time
@@ -34,7 +36,7 @@ def find_open_port(start=5000, end=5020):
 PORT = find_open_port(5000, 5020)
 
 # ─────────────────────────────────────────
-# Telemetry API (your exact voice)
+# Telemetry API
 # ─────────────────────────────────────────
 @app.route("/telemetry")
 def telemetry():
@@ -74,8 +76,8 @@ def stealth_diag():
     return Response(diag_html, mimetype="text/html")
 
 # ─────────────────────────────────────────
-# Root route (serves the whole SPA)
-# v4.1 includes clickable playlist buttons and pointer-events fix
+# Root route (serves SPA)
+# v4.3 brings back music links with window.open()
 # ─────────────────────────────────────────
 @app.route("/")
 def index():
@@ -126,7 +128,7 @@ body {{
   overflow: hidden;
   z-index: 0;
   filter: blur(0px);
-  pointer-events:none; /* important: bubbles can't steal taps */
+  pointer-events:none;
 }}
 .bubble {{
   position: absolute;
@@ -144,17 +146,21 @@ body {{
   position: relative;
   z-index: 2;
   width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
   text-align: center;
 }}
 .room-title {{
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   text-shadow: 0 0 10px rgba(255,255,255,0.6);
   line-height: 1.2;
 }}
+
+/* ENGINE ROOM STYLE */
 #engine {{
   background: radial-gradient(circle at 50% 30%, rgba(0,255,120,0.18) 0%, rgba(0,40,0,0.9) 70%);
   color: #d8ffd8;
@@ -168,7 +174,7 @@ body {{
   border: 1px solid rgba(0,255,128,0.5);
   box-shadow: 0 0 20px rgba(0,255,128,0.4);
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px;
   text-align: left;
   font-size: 0.8rem;
   line-height: 1.4;
@@ -181,27 +187,66 @@ body {{
   margin-bottom:6px;
 }}
 .status-dot {{
-  width:10px;
-  height:10px;
+  width:8px;
+  height:8px;
   border-radius:50%;
   box-shadow:0 0 8px currentColor;
 }}
 .status-green {{ color:#00ff88; background:#00ff88; }}
 .status-yellow {{ color:#ffe066; background:#ffe066; }}
 .status-pink {{ color:#ff4fd8; background:#ff4fd8; }}
+
+/* SINGLE PINK MUSIC BUTTON (slim) */
 .engine-music-button {{
   background: radial-gradient(circle at 30% 30%, #ff4fd8 0%, #a10087 60%);
   border:2px solid rgba(255,255,255,0.4);
   color:#fff;
-  font-size:1rem;
+  font-size:0.9rem;
   font-weight:600;
   text-shadow:0 0 8px rgba(255,0,200,0.8);
   box-shadow:0 0 20px rgba(255,0,200,0.5);
-  border-radius:14px;
-  padding:14px 16px;
+  border-radius:12px;
+  padding:10px 12px;
   text-align:center;
   line-height:1.2;
+  max-width:200px;
+  margin:0 auto;
 }}
+
+/* PLAYLIST GRID (tight mode) */
+.playlist-grid {{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  align-items:center;
+}}
+
+/* SMALLER PLAYLIST TILE (CLICKABLE) */
+.playlist-btn {{
+  font-size:0.9rem;
+  font-weight:500;
+  line-height:1.3;
+  padding:10px 12px;
+  border-radius:10px;
+  min-width: 160px;
+  max-width: 200px;
+  width: 100%;
+  text-align:center;
+  background:rgba(0,0,0,0.4);
+  color:#fff;
+  box-shadow:0 0 14px rgba(255,128,255,0.4);
+  border:2px solid rgba(255,128,255,0.7); /* default pink outline */
+  text-shadow:0 0 8px rgba(255,128,255,0.8);
+  cursor:pointer;
+}}
+/* ROOM 2 border color override (light blue) */
+#room2 .playlist-btn {{
+  border-color: rgba(173,216,255,0.6);
+  text-shadow:0 0 8px rgba(173,216,255,0.9);
+  box-shadow:0 0 14px rgba(173,216,255,0.5);
+}}
+
+/* ROOM 1 LOOK */
 #room1 {{
   background: radial-gradient(circle at 50% 30%, rgba(130,0,160,0.5) 0%, rgba(10,0,20,0.95) 70%);
   color:#ffd9ff;
@@ -210,23 +255,8 @@ body {{
   color:#ff89ff;
   text-shadow:0 0 12px rgba(255,0,255,0.7);
 }}
-.playlist-grid {{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}}
-.playlist-btn {{
-  font-size:1rem;
-  font-weight:500;
-  line-height:1.3;
-  padding:14px 16px;
-  border-radius:12px;
-  border:2px solid rgba(255,128,255,0.7);
-  background:rgba(0,0,0,0.35);
-  color:#fff;
-  text-shadow:0 0 8px rgba(255,128,255,0.8);
-  box-shadow:0 0 16px rgba(255,128,255,0.4);
-}}
+
+/* ROOM 2 LOOK */
 #room2 {{
   background: radial-gradient(circle at 50% 30%, rgba(255,0,150,0.4) 0%, rgba(30,0,30,0.95) 70%);
   color:#ffe9ff;
@@ -235,11 +265,8 @@ body {{
   color:#ff5fe0;
   text-shadow:0 0 12px rgba(255,0,200,0.8);
 }}
-#room2 .playlist-btn{{
-  border:2px solid rgba(173,216,255,0.6);
-  text-shadow:0 0 8px rgba(173,216,255,0.9);
-  box-shadow:0 0 16px rgba(173,216,255,0.5);
-}}
+
+/* ROOM 3 LOOK */
 #room3 {{
   background: radial-gradient(circle at 50% 50%, rgba(90,0,20,0.6) 0%, rgba(0,0,20,0.95) 70%);
   color:#ffdede;
@@ -257,16 +284,18 @@ body {{
   padding:16px;
   text-align:center;
   color:#afffea;
-  font-size:0.9rem;
+  font-size:0.8rem;
   line-height:1.4;
   min-height:140px;
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
   align-items:center;
+  max-width:280px;
+  margin:0 auto;
 }}
 .sax-graphic {{
-  font-size:2.5rem;
+  font-size:2rem;
   line-height:1;
   text-shadow:0 0 10px rgba(255,200,0,0.7),0 0 20px rgba(255,200,0,0.4);
   margin-bottom:8px;
@@ -290,12 +319,14 @@ body {{
   border-radius:14px;
   padding:16px;
   color:#dffff5;
-  font-size:0.9rem;
+  font-size:0.8rem;
   line-height:1.4;
   text-align:left;
+  max-width:320px;
+  margin:0 auto;
 }}
 .comfort-header{{
-  font-size:1rem;
+  font-size:0.9rem;
   font-weight:600;
   margin-bottom:8px;
   color:#ffbcd9;
@@ -303,6 +334,7 @@ body {{
 }}
 .qa-line{{
   margin-bottom:8px;
+  font-size:0.8rem;
 }}
 .answer{{
   color:#9affc9;
@@ -312,31 +344,34 @@ body {{
 }}
 .comfort-actions{{
   display:flex;
-  gap:12px;
+  gap:8px;
+  font-size:0.8rem;
 }}
 .comfort-btn{{
   flex:1;
   text-align:center;
-  padding:12px;
+  padding:10px;
   border-radius:10px;
   background:rgba(0,0,0,0.6);
   border:1px solid rgba(0,255,200,0.5);
   box-shadow:0 0 12px rgba(0,255,200,0.4);
-  font-size:0.9rem;
+  font-size:0.8rem;
   font-weight:500;
   color:#9affc9;
 }}
 .music-pill{{
-  font-size:0.8rem;
+  font-size:0.7rem;
   font-weight:600;
   text-align:center;
-  padding:10px 14px;
+  padding:8px 12px;
   border-radius:999px;
   background:radial-gradient(circle at 30% 30%, rgba(255,0,200,0.8) 0%, rgba(80,0,60,0.7) 70%);
   border:2px solid rgba(255,255,255,0.4);
   box-shadow:0 0 16px rgba(255,0,200,0.6),0 0 40px rgba(255,0,200,0.4);
   color:#fff;
   text-shadow:0 0 8px rgba(255,0,255,0.9);
+  max-width:200px;
+  margin:0 auto;
 }}
 .navbar{{
   position:absolute;
@@ -371,7 +406,7 @@ body {{
   text-shadow:0 0 8px rgba(255,255,255,0.6);
 }}
 .love-line{{
-  font-size:0.8rem;
+  font-size:0.75rem;
   line-height:1.4;
   text-align:center;
   color:#ffcfe9;
@@ -380,7 +415,7 @@ body {{
 }}
 .created-line{{
   color:#6affd8;
-  font-size:0.7rem;
+  font-size:0.65rem;
   text-align:center;
   text-shadow:0 0 8px rgba(0,255,200,0.8);
 }}
@@ -403,6 +438,7 @@ body {{
         </div>
       </div>
 
+      <!-- Pink button just moves you to Room 2 (DJ booth) -->
       <div class="engine-music-button" onclick="go('room2')">
         ROOM 2 • TIMMY TIME MUSIC 🎧
       </div>
@@ -466,6 +502,7 @@ body {{
         <div style="font-size:0.8rem;color:#ffcfe9;text-align:center;margin-bottom:8px;">
           Slow float mode. Notes and bubbles drift up.
         </div>
+
         <div class="note">♪</div>
         <div class="note">♩</div>
         <div class="note">♫</div>
@@ -523,17 +560,18 @@ body {{
 </div>
 
 <script>
+// switch visible room
 function go(id){
   document.querySelectorAll('.room').forEach(r=>r.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// open Suno in a new tab/window with iPhone-friendly user gesture
+// open playlist in new tab (Suno)
 function openPlaylist(url){
   window.open(url, "_blank");
 }
 
-// ----- BUBBLES -----
+// bubbles
 function spawnBubblesFor(layerEl, colorMode){
   function makeBubble(){
     const b = document.createElement('div');
@@ -578,7 +616,7 @@ function spawnBubblesFor(layerEl, colorMode){
   }, 2000 + Math.random()*2000);
 }
 
-// ----- SAX NOTES -----
+// sax note float
 function animateNotes(){
   const notes = document.querySelectorAll('#room3 .note');
   notes.forEach(n=>{
@@ -599,7 +637,7 @@ function animateNotes(){
   }
 }
 
-// ----- DRIFT SPACE: JOKE / RIDDLE -----
+// joke / riddle
 function revealAnswers(){
   document.getElementById('jokeAnswer').style.display='block';
   document.getElementById('riddleAnswer').style.display='block';
@@ -628,7 +666,7 @@ function newContent(){
   document.getElementById('riddleAnswer').textContent = r.a;
 }
 
-// ----- TELEMETRY INJECTION INTO ENGINE ROOM -----
+// telemetry into engine
 function loadTelemetry(){
   fetch('/telemetry')
     .then(r=>r.json())
@@ -664,7 +702,7 @@ function loadTelemetry(){
     });
 }
 
-// ----- INIT -----
+// init
 window.addEventListener('load', ()=>{
   spawnBubblesFor(document.querySelector('[data-room="engine"]'), 'engine');
   spawnBubblesFor(document.querySelector('[data-room="room1"]'), 'room1');
