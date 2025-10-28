@@ -3,300 +3,46 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Timmy Time Mystery Ship</title>
+<title>Timmy Time Ship</title>
 <style>
-    /* RESET */
+    /* RESET / BASE */
     * {
         box-sizing: border-box;
         -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
         margin: 0;
         padding: 0;
     }
     body {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto, sans-serif;
         background: #000;
         color: #fff;
-        height: 100vh;
-        overflow: hidden;
-    }
-
-    /* GLOBAL LAYOUT */
-    .room {
-        position: absolute;
-        inset: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        padding: 16px 16px 96px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
     }
 
-    /* TIMMY TIME MUSIC PILL (top right per room) */
-    .music-pill {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        background: radial-gradient(circle at 30% 30%, rgba(255,0,255,0.4) 0%, rgba(255,128,255,0.15) 60%, rgba(0,0,0,0) 70%);
-        border: 2px solid rgba(255,0,255,0.6);
-        color: #fff;
-        font-size: 12px;
-        font-weight: 600;
-        padding: 8px 12px;
-        border-radius: 999px;
-        box-shadow: 0 0 16px rgba(255,0,255,0.6), 0 0 32px rgba(255,0,255,0.3);
-        text-shadow: 0 0 8px rgba(255,0,255,0.9);
-        z-index: 6;
-    }
-    .music-pill span {
-        display: block;
-        line-height: 1.2;
-        text-align: center;
-    }
-    .music-pill .label {
-        font-size: 10px;
-        opacity: 0.8;
-        font-weight: 500;
-    }
-    .music-pill .main {
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 0.03em;
-    }
-
-    /* CORE PANEL (status / comfort text) */
-    .panel-shell {
+    /* ---- GLOBAL LAYOUT ---- */
+    .room {
+        display: none;
         position: relative;
-        width: 90%;
-        max-width: 460px;
-        background: rgba(0,0,0,0.22);
-        border: 1px solid rgba(255,255,255,0.18);
-        border-radius: 16px;
-        padding: 16px;
-        color: #fff;
-        box-shadow:
-            0 0 20px rgba(0,0,0,0.9),
-            0 0 60px rgba(0,0,0,0.8);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        z-index: 5;
-        margin-top: 56px;
-    }
-    .panel-header {
-        font-size: 18px;
-        font-weight: 600;
-        line-height: 1.2;
-        margin-bottom: 8px;
-        text-align: center;
-        text-shadow: 0 0 8px rgba(255,255,255,0.6);
-    }
-    .panel-body {
-        font-size: 15px;
-        line-height: 1.4;
-        color: rgba(255,255,255,0.9);
-        text-align: center;
-        white-space: pre-line;
-    }
-
-    /* ENGINE ROOM DIAGNOSTICS BLOCK (counter + lines) */
-    .diag-block {
-        font-size: 14px;
-        line-height: 1.4;
-        color: #caffc0;
-        text-align: left;
-        margin-top: 16px;
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        white-space: pre-line;
-        text-shadow:
-            0 0 8px rgba(0,255,100,0.7),
-            0 0 16px rgba(0,255,100,0.4);
-    }
-
-    .now-serving-line {
-        margin-top: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        color: #b6ff9a;
-        text-shadow:
-            0 0 6px rgba(0,255,100,0.8),
-            0 0 18px rgba(0,255,100,0.5),
-            0 0 36px rgba(0,255,100,0.2);
-        animation: pulseServing 2.5s infinite;
-    }
-    @keyframes pulseServing {
-        0%,100% { opacity: 1; }
-        50% { opacity: 0.55; }
-    }
-
-    /* ENGINE ROOM BUTTON BANK (pink row of vibes) */
-    .vibe-bank-wrapper {
-        width: 90%;
-        max-width: 460px;
-        margin-top: 20px;
-        z-index: 5;
-    }
-    .vibe-bank-header {
-        font-size: 14px;
-        font-weight: 600;
-        color: #fff;
-        text-align: center;
-        margin-bottom: 10px;
-        text-shadow: 0 0 10px rgba(255,0,200,0.8), 0 0 30px rgba(255,0,200,0.4);
-    }
-    .vibe-bank {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-    }
-    .vibe-btn {
-        flex: 1 1 calc(50% - 10px);
-        min-width: 130px;
-        background: radial-gradient(circle at 20% 20%, rgba(255,0,200,0.6) 0%, rgba(255,0,100,0.3) 40%, rgba(0,0,0,0) 70%);
-        border: 2px solid rgba(255,0,200,0.7);
-        border-radius: 999px;
-        padding: 10px 14px;
-        text-align: center;
-        color: #fff;
-        font-size: 14px;
-        font-weight: 600;
-        line-height: 1.2;
-        text-decoration: none;
-        text-shadow:
-            0 0 8px rgba(255,0,200,1),
-            0 0 18px rgba(255,0,100,0.9),
-            0 0 36px rgba(255,0,100,0.5);
-        box-shadow:
-            0 0 12px rgba(255,0,200,0.7),
-            0 0 32px rgba(255,0,200,0.4),
-            0 0 64px rgba(255,0,200,0.2);
-        animation: vibePulse 3s infinite;
-    }
-    @keyframes vibePulse {
-        0%,100% { filter: brightness(1); }
-        50% { filter: brightness(1.25); }
-    }
-
-    /* PLAYLIST CARDS (Room1 / Room2 panels) */
-    .playlist-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 10px;
-        width: 90%;
-        max-width: 460px;
-        margin-top: 20px;
-        z-index: 5;
-    }
-    .playlist-card {
-        border: 1px solid rgba(255,0,255,0.4);
-        border-radius: 12px;
-        background: rgba(0,0,0,0.3);
-        padding: 16px;
-        text-align: center;
-        font-size: 15px;
-        font-weight: 500;
-        line-height: 1.4;
-        color: #fff;
-        text-shadow: 0 0 8px rgba(255,0,255,0.7);
-        box-shadow:
-            0 0 10px rgba(255,0,255,0.5),
-            0 0 30px rgba(255,0,255,0.25),
-            0 0 60px rgba(255,0,255,0.15);
-    }
-    .playlist-card .name {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 4px;
-    }
-    .playlist-card a {
-        color: #fff;
-        font-size: 14px;
-        text-decoration: none;
-        word-break: break-all;
-        opacity: 0.8;
-    }
-    .playlist-card a:active {
-        opacity: 1;
-    }
-
-    /* ROOM 3 sax text */
-    .sax-label {
-        font-size: 16px;
-        font-weight: 600;
-        color: rgba(255,200,200,0.9);
-        text-shadow:
-            0 0 8px rgba(255,0,0,0.6),
-            0 0 24px rgba(255,0,0,0.4);
-        margin-bottom: 4px;
-        text-align: center;
-    }
-    .soothe-line {
-        font-size: 14px;
-        line-height: 1.4;
-        color: rgba(255,220,220,0.8);
-        text-align: center;
-        white-space: pre-line;
-    }
-
-    /* ROOM 3 bottom comfort text */
-    .comfort-block {
-        margin-top: 20px;
-        font-size: 14px;
-        line-height: 1.4;
-        color: rgba(255,200,220,0.9);
-        text-shadow:
-            0 0 8px rgba(255,0,128,0.5),
-            0 0 20px rgba(255,0,128,0.2);
-        text-align: center;
-        white-space: pre-line;
-        z-index: 5;
-        width: 90%;
-        max-width: 460px;
-    }
-
-    /* NAV BAR */
-    .nav-bar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        min-height: 56px;
-        display: flex;
-        justify-content: space-around;
-        align-items: flex-start;
-        background: rgba(0,0,0,0.5);
-        border-top: 1px solid rgba(255,255,255,0.15);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        z-index: 9999;
-        padding-top: 8px;
-    }
-    .nav-btn {
         flex: 1;
+        min-height: 100vh;
+        padding: 2rem 1rem 6rem;
         text-align: center;
-        font-size: 12px;
-        color: rgba(255,255,255,0.8);
-        font-weight: 600;
-        line-height: 1.2;
-        cursor: pointer;
-        user-select: none;
+        overflow: hidden;
     }
-    .nav-btn span {
+    .room.active {
         display: block;
-        font-size: 10px;
-        font-weight: 400;
-        opacity: 0.7;
     }
-    .nav-btn.active {
-        color: #fff;
-        text-shadow:
-            0 0 8px rgba(255,255,255,0.9),
-            0 0 24px rgba(255,255,255,0.6);
+    .content-wrap {
+        position: relative;
+        max-width: 480px;
+        margin: 0 auto;
+        z-index: 3; /* Above bubbles */
     }
 
-    /* BUBBLE CANVASES */
+    /* bubble layer sits behind content */
     .bubble-layer {
         position: absolute;
         inset: 0;
@@ -304,632 +50,646 @@
         pointer-events: none;
         z-index: 1;
     }
-    canvas.bubble-canvas {
+    .bubble {
         position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), rgba(255,255,255,0.05) 70%, rgba(0,0,0,0) 80%);
+        opacity: 0.4;
+        animation: floatUp linear infinite;
+    }
+    @keyframes floatUp {
+        0%   { transform: translateY(0) scale(1); opacity:0.5; }
+        80%  { opacity:0.5; }
+        100% { transform: translateY(-120vh) scale(1.2); opacity:0; }
     }
 
-    /* ROOM BACKGROUND GRADIENTS */
-    #engine-room {
-        background: radial-gradient(circle at 50% 40%, rgba(0,255,100,0.25) 0%, rgba(0,40,0,0.9) 60%, rgba(0,0,0,1) 80%);
+    /* ---- PANELS, TEXT BLOCKS ---- */
+    .panel {
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 16px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        color: #fff;
+        box-shadow:
+            0 0 20px rgba(255,255,255,0.15),
+            0 20px 60px rgba(0,0,0,0.9) inset;
     }
-    #room-1 {
-        background: radial-gradient(circle at 50% 40%, rgba(170,0,255,0.28) 0%, rgba(30,0,40,0.9) 60%, rgba(0,0,0,1) 80%);
+    .panel-tight {
+        margin-bottom: 1rem;
     }
-    #room-2 {
-        background: radial-gradient(circle at 50% 40%, rgba(255,0,170,0.28) 0%, rgba(40,0,40,0.9) 60%, rgba(0,0,0,1) 80%);
+    .title-big {
+        font-weight: 700;
+        font-size: 1.5rem;
+        line-height: 1.3;
+        text-shadow: 0 0 8px rgba(255,255,255,0.9);
+        margin-bottom: 0.5rem;
     }
-    #room-3 {
-        background: radial-gradient(circle at 50% 40%, rgba(90,0,0,0.6) 0%, rgba(10,0,0,0.9) 60%, rgba(0,0,0,1) 80%);
+    .soft-line {
+        font-size: 1rem;
+        line-height: 1.4;
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 1rem;
     }
+    .affirm-line {
+        font-size: 1rem;
+        line-height: 1.4;
+        color: rgba(255,255,255,0.9);
+        margin-top: 1rem;
+    }
+
+    /* ---- ENGINE STATUS PILLS ---- */
+    .status-pill {
+        display: block;
+        width: fit-content;
+        margin: 0.4rem auto;
+        padding: 0.5rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #fff;
+        background: radial-gradient(circle at 20% 20%, #1aff1a 0%, #003300 60%);
+        border: 1px solid rgba(0,255,0,0.5);
+        box-shadow:
+            0 0 8px rgba(0,255,0,0.7),
+            0 0 32px rgba(0,255,0,0.4);
+        text-align: left;
+    }
+
+    /* ---- MUSIC NAV PILL (engine room link to room2) ---- */
+    .music-pill-link {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 999px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #fff;
+        background: radial-gradient(circle at 20% 20%, #ff2b70 0%, #7a0038 70%);
+        box-shadow:
+            0 0 8px rgba(255,0,128,0.8),
+            0 0 40px rgba(255,0,128,0.5),
+            0 0 80px rgba(255,0,128,0.3);
+        border: 1px solid rgba(255,255,255,0.2);
+        text-decoration: none;
+    }
+
+    /* ---- PLAYLIST CARDS ---- */
+    .playlist-card {
+        background: radial-gradient(circle at 20% 20%, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 60%);
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 16px;
+        box-shadow:
+            0 0 20px rgba(255,0,255,0.4),
+            0 0 60px rgba(0,0,0,0.9) inset;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+        color: #fff;
+    }
+    .playlist-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        text-shadow: 0 0 8px rgba(255,255,255,0.9);
+        margin-bottom: 0.25rem;
+    }
+    .playlist-desc {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.75);
+    }
+    .playlist-card a {
+        color: rgba(255,255,255,0.9);
+        text-decoration: underline;
+        word-break: break-word;
+        font-size: 0.9rem;
+    }
+
+    /* ---- DRIFT SPACE (ROOM 3) SPECIAL ---- */
+    .sax-block {
+        position: relative;
+        margin-bottom: 1rem;
+        text-align: center;
+        color: #fff;
+    }
+
+    /* Big sax icon */
+    .sax-icon {
+        font-size: 3rem;
+        line-height: 1;
+        text-shadow:
+            0 0 8px rgba(255,255,0,0.9),
+            0 0 24px rgba(255,255,0,0.6),
+            0 0 48px rgba(255,0,0,0.4);
+        margin-bottom: 0.5rem;
+    }
+
+    /* floating musical notes layer */
+    .note-layer {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        width: 200px;
+        height: 200px;
+        transform: translateX(-50%);
+        pointer-events: none;
+        z-index: 2;
+    }
+    .note {
+        position: absolute;
+        font-size: 1.2rem;
+        color: #fff;
+        text-shadow:
+            0 0 8px rgba(255,255,255,0.8),
+            0 0 24px rgba(255,0,128,0.5);
+        opacity: 0;
+        animation: floatNote 5s linear infinite;
+    }
+    @keyframes floatNote {
+        0%   { transform: translateY(0) translateX(0) scale(1);   opacity:0; }
+        10%  { opacity:1; }
+        70%  { opacity:1; }
+        100% { transform: translateY(-120px) translateX(-20px) scale(1.3); opacity:0; }
+    }
+
+    /* joke/riddle box */
+    .joke-block {
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 16px;
+        padding: 1rem 1.25rem;
+        color: #fff;
+        box-shadow:
+            0 0 20px rgba(255,0,255,0.2),
+            0 20px 60px rgba(0,0,0,0.9) inset;
+        margin-top: 2rem;
+    }
+    .joke-title {
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 8px rgba(255,255,255,0.9);
+    }
+    .joke-text,
+    .riddle-q,
+    .riddle-a {
+        font-size: 1rem;
+        line-height: 1.4;
+        margin-bottom: 0.75rem;
+        color: rgba(255,255,255,0.9);
+    }
+    .riddle-a {
+        display: none;
+        color: #fff;
+        text-shadow: 0 0 8px rgba(0,255,128,0.8);
+        font-weight: 600;
+    }
+
+    .joke-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+    }
+    .mini-btn {
+        background: radial-gradient(circle at 20% 20%, #ff2b70 0%, #7a0038 70%);
+        color: #fff;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.3);
+        padding: 0.5rem 0.9rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-shadow:
+            0 0 8px rgba(255,255,255,0.8),
+            0 0 24px rgba(255,0,128,0.4);
+    }
+
+    /* ---- BOTTOM NAV ---- */
+    .bottom-nav-wrap {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.9);
+        border-top: 1px solid rgba(255,255,255,0.2);
+        padding: 0.75rem 0.5rem 1rem;
+        z-index: 999;
+        box-shadow: 0 -20px 40px rgba(0,0,0,0.8);
+    }
+    .bottom-nav {
+        max-width: 480px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        text-align: center;
+        color: #fff;
+        font-size: 0.9rem;
+        line-height: 1.2;
+    }
+    .nav-item {
+        flex: 1;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .nav-label-top {
+        display: block;
+        font-weight: 700;
+    }
+    .nav-label-bottom {
+        display: block;
+        font-size: 0.8rem;
+        color: rgba(255,255,255,0.7);
+    }
+    .active-nav .nav-label-top {
+        text-shadow: 0 0 8px #fff, 0 0 24px #fff;
+    }
+
+    /* ---- ROOM BACKGROUNDS ---- */
+    /* Engine Room = deep green radial */
+    #engine {
+        background: radial-gradient(circle at 50% 10%, rgba(0,255,128,0.3) 0%, #001a00 60%, #000 90%);
+    }
+
+    /* Room 1 = purple mind */
+    #room1 {
+        background: radial-gradient(circle at 50% 10%, rgba(128,0,255,0.4) 0%, #1a002a 60%, #000 90%);
+    }
+
+    /* Room 2 = warm core / magenta */
+    #room2 {
+        background: radial-gradient(circle at 50% 10%, rgba(255,0,128,0.4) 0%, #2a001a 60%, #000 90%);
+    }
+
+    /* Room 3 = burgundy drift space */
+    #room3 {
+        background: radial-gradient(circle at 50% 10%, rgba(128,0,0,0.4) 0%, #1a0000 60%, #000 90%);
+    }
+
 </style>
 </head>
 <body>
 
-<!-- ========================= ENGINE ROOM ========================= -->
-<section class="room" id="engine-room" data-room="engine">
-    <div class="music-pill">
-        <span class="label">Timmy Time Music</span>
-        <span class="main">LIVE LINK</span>
-    </div>
+<!-- ENGINE ROOM -->
+<section class="room active" id="engine">
+    <div class="bubble-layer" id="bubbles-engine"><!-- engine has no colored outline bubbles by request (calm clean) --></div>
 
-    <div class="panel-shell" style="color:#caffc0;text-shadow:0 0 8px rgba(0,255,100,0.7);">
-        <div class="panel-header" style="color:#fff;text-shadow:0 0 8px rgba(255,255,255,0.9);">
-            ENGINE ROOM / CORE STATUS
-        </div>
-        <div class="panel-body">
-            Shields stable. Hopper synced. Sniffer clean.
+    <div class="content-wrap">
+        <!-- Top buttons (optional small room nav pills) -->
+        <div class="panel panel-tight" style="background:rgba(0,0,0,0.4); box-shadow:0 0 20px rgba(0,255,128,0.4),0 0 60px rgba(0,0,0,0.9) inset;">
+            <div class="title-big" style="text-shadow:0 0 8px rgba(255,255,255,0.9),0 0 24px rgba(0,255,128,0.6);">
+                Engine Room
+            </div>
+            <div class="soft-line">Systems online. Cloak stable. Shields holding.</div>
 
-            Pulses nominal. You are safe in here.
-        </div>
+            <div class="status-pill">Sniffer: all clear on local ports.</div>
+            <div class="status-pill">Port Hopper: active and stealthy.</div>
+            <div class="status-pill">Healer: bubble field stable.</div>
 
-        <div class="diag-block" id="diagLog">
-Sniffer: all clear on local ports.
-Hopper: cloak engaged.
-Healer: bubble regen active.
+            <!-- Pink pill that takes you to Room 2 (music room) -->
+            <div style="margin-top:1rem;">
+                <button class="music-pill-link" onclick="go('room2')">
+                    Timmy Time Music – Live
+                </button>
+            </div>
         </div>
-
-        <div class="now-serving-line" id="nowServing">
-            <!-- JS fills this -->
-        </div>
-    </div>
-
-    <!-- Pink vibe button bank -->
-    <div class="vibe-bank-wrapper">
-        <div class="vibe-bank-header">
-            Timmy Time Music – Live
-        </div>
-        <div class="vibe-bank">
-            <a class="vibe-btn" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">Laugh</a>
-            <a class="vibe-btn" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">Play</a>
-            <a class="vibe-btn" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">Fun</a>
-            <a class="vibe-btn" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">Motown</a>
-            <a class="vibe-btn" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">Feeling it</a>
-        </div>
-    </div>
-
-    <div class="bubble-layer">
-        <canvas class="bubble-canvas" id="engineCanvas"></canvas>
     </div>
 </section>
 
-<!-- ========================= ROOM 1 ========================= -->
-<section class="room" id="room-1" data-room="room1" style="display:none;">
-    <div class="music-pill">
-        <span class="label">Timmy Time Music</span>
-        <span class="main">PURPLE MIND</span>
-    </div>
+<!-- ROOM 1 -->
+<section class="room" id="room1">
+    <div class="bubble-layer" id="bubbles-room1"></div>
 
-    <div class="panel-shell" style="color:#f0d6ff;text-shadow:0 0 8px rgba(200,0,255,0.6);">
-        <div class="panel-header" style="color:#e6b3ff;text-shadow:0 0 8px rgba(200,0,255,0.9);">
-            ROOM 1 / PURPLE MIND
+    <div class="content-wrap">
+        <div class="panel">
+            <div class="title-big">ROOM 1 / MIND SPACE</div>
+            <div class="soft-line">
+                Slow float. Healing calm.<br/>
+                Breathe. Shoulders down.
+            </div>
         </div>
-        <div class="panel-body">
-            Slow float. Healing calm.
 
-            Breathe. Shoulders down.
+        <!-- Playlists -->
+        <div class="playlist-card">
+            <div class="playlist-name">Hope</div>
+            <div class="playlist-desc">Open playlist</div>
+            <a href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316" target="_blank">Hope link</a>
         </div>
-    </div>
 
-    <div class="playlist-grid">
         <div class="playlist-card">
-            <div class="name">Hope</div>
-            <a href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316" target="_blank">Open playlist</a>
+            <div class="playlist-name">Soul</div>
+            <div class="playlist-desc">Open playlist</div>
+            <a href="https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df" target="_blank">Soul link</a>
         </div>
-        <div class="playlist-card">
-            <div class="name">Soul</div>
-            <a href="https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df" target="_blank">Open playlist</a>
-        </div>
-        <div class="playlist-card">
-            <div class="name">Beach</div>
-            <a href="https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c" target="_blank">Open playlist</a>
-        </div>
-        <div class="playlist-card">
-            <div class="name">Rest</div>
-            <a href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479" target="_blank">Open playlist</a>
-        </div>
-        <div class="playlist-card">
-            <div class="name">Jazz</div>
-            <a href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank">Open playlist</a>
-        </div>
-    </div>
 
-    <div class="bubble-layer">
-        <canvas class="bubble-canvas" id="room1Canvas"></canvas>
+        <div class="playlist-card">
+            <div class="playlist-name">Beach</div>
+            <div class="playlist-desc">Open playlist</div>
+            <a href="https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c" target="_blank">Beach link</a>
+        </div>
+
+        <div class="playlist-card">
+            <div class="playlist-name">Rest</div>
+            <div class="playlist-desc">Open playlist</div>
+            <a href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479" target="_blank">Rest link</a>
+        </div>
+
+        <div class="playlist-card">
+            <div class="playlist-name">Jazz</div>
+            <div class="playlist-desc">Open playlist</div>
+            <a href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank">Jazz link</a>
+        </div>
     </div>
 </section>
 
-<!-- ========================= ROOM 2 ========================= -->
-<section class="room" id="room-2" data-room="room2" style="display:none;">
-    <div class="music-pill">
-        <span class="label">Timmy Time Music</span>
-        <span class="main">WARM CORE</span>
-    </div>
+<!-- ROOM 2 -->
+<section class="room" id="room2">
+    <div class="bubble-layer" id="bubbles-room2"></div>
 
-    <div class="panel-shell" style="color:#ffd6f6;text-shadow:0 0 8px rgba(255,0,200,0.6);">
-        <div class="panel-header" style="color:#ff99e6;text-shadow:0 0 8px rgba(255,0,200,0.9);">
-            ROOM 2 / WARM CORE
+    <div class="content-wrap">
+        <div class="panel">
+            <div class="title-big">ROOM 2 / WARM CORE</div>
+            <div class="soft-line">
+                Playful. Warm. Safe. No rush, just pulse.
+            </div>
         </div>
-        <div class="panel-body">
-            Playful. Warm. Safe. No rush, just pulse.
-        </div>
-    </div>
 
-    <div class="playlist-grid">
+        <!-- Playlists -->
         <div class="playlist-card">
-            <div class="name">Laugh</div>
-            <a href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">Open playlist</a>
+            <div class="playlist-name">Laugh</div>
+            <div class="playlist-desc">Open playlist</div>
+            <a href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">Laugh link</a>
         </div>
-        <div class="playlist-card">
-            <div class="name">Play</div>
-            <a href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">Open playlist</a>
-        </div>
-        <div class="playlist-card">
-            <div class="name">Fun</div>
-            <a href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">Open playlist</a>
-        </div>
-        <div class="playlist-card">
-            <div class="name">Motown</div>
-            <a href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">Open playlist</a>
-        </div>
-        <div class="playlist-card">
-            <div class="name">Feeling it</div>
-            <a href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">Open playlist</a>
-        </div>
-    </div>
 
-    <div class="bubble-layer">
-        <canvas class="bubble-canvas" id="room2Canvas"></canvas>
+        <div class="playlist-card">
+            <div class="playlist-name">Play</div>
+            <div class="playlist-desc">Open playlist</div>
+            <a href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">Play link</a>
+        </div>
+
+        <div class="playlist-card">
+            <div class="playlist-name">Fun</div>
+            <div class="playlist-desc">Open playlist</div>
+            <a href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">Fun link</a>
+        </div>
+
+        <div class="playlist-card">
+            <div class="playlist-name">Motown</div>
+            <div class="playlist-desc">Open playlist</div>
+            <a href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">Motown link</a>
+        </div>
+
+        <div class="playlist-card">
+            <div class="playlist-name">Feeling it</div>
+            <div class="playlist-desc">Open playlist</div>
+            <a href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">Feeling it link</a>
+        </div>
     </div>
 </section>
 
-<!-- ========================= ROOM 3 ========================= -->
-<section class="room" id="room-3" data-room="room3" style="display:none;">
-    <div class="music-pill">
-        <span class="label">Timmy Time Music</span>
-        <span class="main">DRIFT SPACE</span>
-    </div>
+<!-- ROOM 3 -->
+<section class="room" id="room3">
+    <div class="bubble-layer" id="bubbles-room3"></div>
 
-    <div class="panel-shell" style="color:#ffe6e6;text-shadow:0 0 8px rgba(255,0,0,0.6);">
-        <div class="panel-header" style="color:#ffd6d6;text-shadow:0 0 8px rgba(255,0,0,0.9);">
-            ROOM 3 / DRIFT SPACE
+    <div class="content-wrap">
+        <div class="panel">
+            <div class="title-big" style="text-shadow:0 0 10px rgba(255,0,0,0.8),0 0 30px rgba(255,0,0,0.5);">
+                ROOM 3 / DRIFT SPACE
+            </div>
+
+            <div class="soft-line">Slow sax. Thick air. No hurry.</div>
+
+            <!-- SAX / NOTES -->
+            <div class="sax-block">
+                <div class="sax-icon">🎷</div>
+                <div class="soft-line" style="font-weight:600;">
+                    Sax Channel<br/>
+                    <span style="color:#ff8a9e;text-shadow:0 0 8px rgba(255,0,0,0.8),0 0 32px rgba(255,0,0,0.4);">
+                        Bubbles carry notes up through the burgundy.
+                    </span>
+                </div>
+
+                <!-- Music notes floating layer -->
+                <div class="note-layer" id="note-layer"></div>
+            </div>
+
+            <div class="affirm-line">
+                You are beautiful and loved 💖<br/>
+                This app was created on Timmy’s iPhone 17 Pro Max 2TB.
+            </div>
         </div>
-        <div class="panel-body">
-            Slow sax. Thick air. No hurry.
 
-            🎷 Sax Channel
+        <!-- Joke / Riddle block -->
+        <div class="joke-block">
+            <div class="joke-title">Today’s Joke</div>
+            <div class="joke-text" id="joke-text"></div>
+
+            <div class="joke-title" style="margin-top:1rem;">Today’s Riddle</div>
+            <div class="riddle-q" id="riddle-q"></div>
+            <div class="riddle-a" id="riddle-a"></div>
+
+            <div class="joke-buttons" style="margin-top:1rem;">
+                <button class="mini-btn" onclick="revealAnswer()">Show answer</button>
+                <button class="mini-btn" onclick="moreJokes()">More?</button>
+            </div>
         </div>
-
-        <div class="sax-label">Bubbles carry notes up through the burgundy.</div>
-        <div class="soothe-line">
-            You are beautiful and loved 💖
-            This app was created on Timmy’s iPhone 17 Pro Max 2TB.
-        </div>
-    </div>
-
-    <div class="comfort-block">
-        Joke + Riddle rotation coming here.
-        “More?” button will live here in next build.
-    </div>
-
-    <div class="bubble-layer">
-        <canvas class="bubble-canvas" id="room3Canvas"></canvas>
-        <canvas class="bubble-canvas" id="room3SaxCanvas" style="pointer-events:none;"></canvas>
     </div>
 </section>
 
-<!-- ========================= NAVBAR ========================= -->
-<nav class="nav-bar">
-    <div class="nav-btn active" data-target="engine-room">Engine<br/><span>Core</span></div>
-    <div class="nav-btn" data-target="room-1">Room 1<br/><span>Mind</span></div>
-    <div class="nav-btn" data-target="room-2">Room 2<br/><span>Warm</span></div>
-    <div class="nav-btn" data-target="room-3">Room 3<br/><span>Drift</span></div>
-</nav>
+<!-- BOTTOM NAV -->
+<div class="bottom-nav-wrap">
+    <nav class="bottom-nav">
+        <a class="nav-item" id="nav-engine"    onclick="go('engine')">
+            <span class="nav-label-top">Engine</span>
+            <span class="nav-label-bottom">Core</span>
+        </a>
+        <a class="nav-item" id="nav-room1"     onclick="go('room1')">
+            <span class="nav-label-top">Room 1</span>
+            <span class="nav-label-bottom">Mind</span>
+        </a>
+        <a class="nav-item" id="nav-room2"     onclick="go('room2')">
+            <span class="nav-label-top">Room 2</span>
+            <span class="nav-label-bottom">Warm</span>
+        </a>
+        <a class="nav-item" id="nav-room3"     onclick="go('room3')">
+            <span class="nav-label-top">Room 3</span>
+            <span class="nav-label-bottom">Drift</span>
+        </a>
+    </nav>
+</div>
 
 <script>
-/* =========================================================
-   UTILITIES
-========================================================= */
-function pad6(n) {
-    const mod = ((n - 1) % 999999) + 1; // wrap 1..999999 so we never show 1000000
-    const s = String(mod);
-    return s.padStart(6, "0");
+/* ===========================================================
+   NAV / ROOM SWITCH
+   =========================================================== */
+function go(roomId) {
+    // hide all rooms
+    document.querySelectorAll('.room').forEach(r => r.classList.remove('active'));
+    // show requested
+    document.getElementById(roomId).classList.add('active');
+
+    // update active nav glow
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
+    document.getElementById('nav-' + roomId).classList.add('active-nav');
 }
 
-/* =========================================================
-   NOW SERVING COUNTER
-   - increments EVERY time Engine Room is shown
-   - never resets unless storage cleared
-========================================================= */
-function incrementNowServing() {
-    try {
-        let raw = localStorage.getItem("engineVisitCount");
-        let count = raw ? parseInt(raw,10) : 0;
-        if (isNaN(count)) count = 0;
-        count += 1;
-        localStorage.setItem("engineVisitCount", String(count));
-        const displayVal = pad6(count);
-        const el = document.getElementById("nowServing");
-        if (el) {
-            el.textContent = "Now serving " + displayVal + " of 999,999";
-        }
-    } catch (err) {
-        const el = document.getElementById("nowServing");
-        if (el) {
-            el.textContent = "Now serving 000001 of 999,999";
-        }
+/* ===========================================================
+   BUBBLE FIELDS
+   Each room gets its own bubble style (outline color)
+   Room1: pink outline
+   Room2: light blue outline
+   Room3: green outline
+   Engine: no bubbles (calm)
+   =========================================================== */
+function spawnBubbles(container, outlineColor, speedMin, speedMax) {
+    const layer = document.getElementById(container);
+    if (!layer) return;
+
+    function makeOneBubble() {
+        const b = document.createElement('div');
+        b.className = 'bubble';
+
+        const size = 20 + Math.random()*80; // px
+        const left = Math.random()*100;      // vw%
+        const dur = speedMin + Math.random()*(speedMax-speedMin); // seconds
+        const delay = -Math.random()*dur;    // so they are staggered
+
+        b.style.width = size + 'px';
+        b.style.height = size + 'px';
+        b.style.left = left + 'vw';
+        b.style.bottom = '-100px';
+        b.style.filter = 'drop-shadow(0 0 8px ' + outlineColor + ') drop-shadow(0 0 24px ' + outlineColor + ')';
+        b.style.boxShadow =
+            '0 0 12px 2px ' + outlineColor + ', 0 0 40px 8px ' + outlineColor;
+
+        b.style.animationDuration = dur + 's';
+        b.style.animationDelay = delay + 's';
+
+        layer.appendChild(b);
     }
+
+    // spawn a field of bubbles
+    for (let i=0; i<18; i++) {
+        makeOneBubble();
+    }
+    // keep making slow trickle bubbles
+    setInterval(makeOneBubble, 4000);
 }
 
-/* =========================================================
-   ROOM SWITCHING
-========================================================= */
-function showRoom(id) {
-    document.querySelectorAll(".room").forEach(r => {
-        r.style.display = "none";
-    });
-    const chosen = document.getElementById(id);
-    if (chosen) {
-        chosen.style.display = "flex";
-    }
-    document.querySelectorAll(".nav-btn").forEach(btn => {
-        if (btn.getAttribute("data-target") === id) {
-            btn.classList.add("active");
-        } else {
-            btn.classList.remove("active");
-        }
-    });
+// Room 1: pink outline
+spawnBubbles('bubbles-room1', 'rgba(255,0,128,0.8)', 18, 28);
 
-    // each arrival to Engine bumps counter
-    if (id === "engine-room") {
-        incrementNowServing();
-    }
-}
+// Room 2: light blue outline
+spawnBubbles('bubbles-room2', 'rgba(128,200,255,0.8)', 14, 22);
 
-/* tap handlers for nav */
-document.querySelectorAll(".nav-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        const tgt = btn.getAttribute("data-target");
-        showRoom(tgt);
-    });
-});
+// Room 3: green outline
+spawnBubbles('bubbles-room3', 'rgba(0,255,128,0.8)', 22, 32);
 
-/* =========================================================
-   BUBBLE FIELD ENGINE
-========================================================= */
-class BubbleField {
-    constructor(canvas, opts) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext("2d");
-        this.bubbles = [];
-        this.opts = Object.assign({
-            maxCount: 40,
-            colorMode: "mono", // "mono", "mix"
-            baseHue: 120,
-            alphaMin: 0.2,
-            alphaMax: 0.4,
-            minSpeed: 20,
-            maxSpeed: 60,
-            sideDrift: 0,
-            lifeScale: 1.0,
-            palette: null
-        }, opts || {});
-        this.lastSpawn = 0;
-        this.alive = true;
-        this.resize();
-        window.addEventListener("resize", () => this.resize());
-        this.loop = this.loop.bind(this);
-        requestAnimationFrame(this.loop);
-    }
 
-    resize() {
-        this.canvas.width = this.canvas.clientWidth;
-        this.canvas.height = this.canvas.clientHeight;
-    }
+/* ===========================================================
+   DRIFT SPACE: FLOATING MUSIC NOTES (Room 3 sax zone)
+   =========================================================== */
+const noteLayer = document.getElementById('note-layer');
+const NOTES = ['♪','♫','♩','♬'];
 
-    spawnBubble() {
-        if (!this.alive) return;
-        if (this.bubbles.length >= this.opts.maxCount) return;
+function spawnNote() {
+    if (!noteLayer) return;
+    const n = document.createElement('div');
+    n.className = 'note';
+    n.textContent = NOTES[Math.floor(Math.random()*NOTES.length)];
 
-        const w = this.canvas.width;
-        const h = this.canvas.height;
-        const x = Math.random() * w;
-        const r = (Math.random()*15+5) * this.opts.lifeScale;
+    const x = 60 + Math.random()*80;   // px offset inside note-layer
+    const delay = Math.random()*3;     // seconds
+    const dur = 4 + Math.random()*3;   // total float time
 
-        // pick color
-        let rgba;
-        if (this.opts.colorMode === "mono") {
-            const a = this.opts.alphaMin + Math.random()*(this.opts.alphaMax - this.opts.alphaMin);
-            rgba = `hsla(${this.opts.baseHue},100%,60%,${a})`;
-        } else if (this.opts.colorMode === "mix" && Array.isArray(this.opts.palette)) {
-            const tone = this.opts.palette[Math.floor(Math.random()*this.opts.palette.length)];
-            const aMin = tone.alphaMin ?? this.opts.alphaMin;
-            const aMax = tone.alphaMax ?? this.opts.alphaMax;
-            const a = aMin + Math.random()*(aMax - aMin);
-            rgba = tone.color.replace("ALPHA", a.toFixed(3));
-        }
+    n.style.left = x + 'px';
+    n.style.bottom = '0px';
+    n.style.animationDuration = dur + 's';
+    n.style.animationDelay = delay + 's';
 
-        // rise speed
-        const spd = (this.opts.minSpeed + Math.random()*(this.opts.maxSpeed-this.opts.minSpeed));
+    noteLayer.appendChild(n);
 
-        // sideways sway
-        const drift = (typeof this.opts.sideDrift === "number")
-            ? (Math.random()*2-1)*this.opts.sideDrift
-            : 0;
-
-        this.bubbles.push({
-            x,
-            y: h + r,
-            r,
-            vy: -spd / 60,
-            vx: drift / 60,
-            color: rgba
-        });
-    }
-
-    updateAndDraw() {
-        const ctx = this.ctx;
-        const w = this.canvas.width;
-        const h = this.canvas.height;
-
-        ctx.clearRect(0,0,w,h);
-
-        for (let i=this.bubbles.length-1; i>=0; i--) {
-            const b = this.bubbles[i];
-            b.x += b.vx;
-            b.y += b.vy;
-
-            ctx.beginPath();
-            ctx.fillStyle = b.color;
-            ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
-            ctx.fill();
-
-            if (b.y + b.r < 0) {
-                this.bubbles.splice(i,1);
-            }
-        }
-    }
-
-    loop(ts) {
-        // keep alive even if mobile throttles frame 0
-        this.alive = true;
-
-        if (!this.lastSpawn) this.lastSpawn = ts;
-        const delta = ts - this.lastSpawn;
-        // spawn ~5/sec until we reach target density
-        if (delta > 200) {
-            this.spawnBubble();
-            this.lastSpawn = ts;
-        }
-
-        this.updateAndDraw();
-        requestAnimationFrame(this.loop);
-    }
-}
-
-/* =========================================================
-   SAX BURST FIELD (Room 3 foreground)
-========================================================= */
-class SaxBurstField {
-    constructor(canvas) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext("2d");
-        this.items = [];
-        this.nextBurstAt = performance.now() + this.randMs(3000,5000);
-        this.resize();
-        window.addEventListener("resize", () => this.resize());
-        this.loop = this.loop.bind(this);
-        requestAnimationFrame(this.loop);
-    }
-
-    resize() {
-        this.canvas.width = this.canvas.clientWidth;
-        this.canvas.height = this.canvas.clientHeight;
-    }
-
-    randMs(min,max){
-        return min + Math.random()*(max-min);
-    }
-
-    pickSaxColor(){
-        const choices = [
-            "rgba(255,255,255,ALPHA)",
-            "rgba(180,200,255,ALPHA)",
-            "rgba(255,120,120,ALPHA)"
-        ];
-        const base = choices[Math.floor(Math.random()*choices.length)];
-        const alpha = 0.25 + Math.random()*0.1;
-        return base.replace("ALPHA", alpha.toFixed(3));
-    }
-
-    burst() {
-        const w = this.canvas.width;
-        const h = this.canvas.height;
-        const baseX = w*0.5;
-        const baseY = h*0.8;
-
-        // bubbles in burst
-        const bubbleCount = Math.floor(5+Math.random()*4); // 5-8
-        for (let i=0;i<bubbleCount;i++){
-            const alpha = 0.25 + Math.random()*0.1; //0.25-0.35
-            const speedDur = this.randMs(8000,12000); // 8–12s
-            const angleDeg = (Math.random()*30 - 15); // ±15°
-            const angleRad = angleDeg * Math.PI/180;
-            const vx = Math.sin(angleRad);
-            const vy = -Math.cos(angleRad);
-            const r = 6+Math.random()*14;
-            this.items.push({
-                kind:"bubble",
-                x: baseX + (Math.random()*40-20),
-                y: baseY + (Math.random()*40-20),
-                r,
-                alpha,
-                born: performance.now(),
-                lifeMs: speedDur,
-                vx,
-                vy,
-                tint: this.pickSaxColor()
-            });
-        }
-
-        // notes in burst
-        const noteCount = Math.floor(2+Math.random()*2); // 2-3
-        const noteGlyphs = ["♪","♩","♫","♬"];
-        for (let j=0;j<noteCount;j++){
-            const alpha = 0.25 + Math.random()*0.1;
-            const speedDur = this.randMs(8000,12000);
-            const angleDeg = (Math.random()*30 - 15);
-            const angleRad = angleDeg * Math.PI/180;
-            const vx = Math.sin(angleRad);
-            const vy = -Math.cos(angleRad);
-            const glyph = noteGlyphs[Math.floor(Math.random()*noteGlyphs.length)];
-            this.items.push({
-                kind:"note",
-                x: baseX + (Math.random()*40-20),
-                y: baseY + (Math.random()*40-20),
-                alpha,
-                born: performance.now(),
-                lifeMs: speedDur,
-                vx,
-                vy,
-                size: 18+Math.random()*10,
-                glyph,
-                tint: "rgba(255,200,200,ALPHA)".replace("ALPHA",alpha.toFixed(3))
-            });
-        }
-    }
-
-    loop(ts){
-        const ctx = this.ctx;
-        const w = this.canvas.width;
-        const h = this.canvas.height;
-        ctx.clearRect(0,0,w,h);
-
-        if (ts >= this.nextBurstAt){
-            this.burst();
-            this.nextBurstAt = ts + this.randMs(3000,5000); // new burst 3–5s
-        }
-
-        for (let i=this.items.length-1;i>=0;i--){
-            const it = this.items[i];
-            const age = ts - it.born;
-            const t = age / it.lifeMs;
-            if (t>=1){
-                this.items.splice(i,1);
-                continue;
-            }
-            const travel = h * 0.8;
-            const px = it.x + it.vx * travel * t;
-            const py = it.y + it.vy * travel * t;
-
-            if (it.kind==="bubble"){
-                ctx.beginPath();
-                ctx.fillStyle = it.tint;
-                ctx.arc(px,py,it.r,0,Math.PI*2);
-                ctx.fill();
-            } else {
-                ctx.font = it.size+"px system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
-                ctx.fillStyle = it.tint;
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(it.glyph, px, py);
-            }
-        }
-
-        requestAnimationFrame(this.loop);
-    }
-}
-
-/* =========================================================
-   INIT FIELDS
-========================================================= */
-let engineField, room1Field, room2Field, room3Field, saxField;
-
-function initFields() {
-    // Engine Room field
-    const engCanvas = document.getElementById("engineCanvas");
-    if (engCanvas) {
-        engineField = new BubbleField(engCanvas, {
-            maxCount: 30,
-            colorMode: "mono",
-            baseHue: 120,  // green
-            alphaMin: 0.3,
-            alphaMax: 0.4,
-            minSpeed: 40,  // fast tier
-            maxSpeed: 140, // slow tier
-            sideDrift: 5,
-            lifeScale: 1.0
-        });
-    }
-
-    // Room 1 (Purple Mind)
-    const r1Canvas = document.getElementById("room1Canvas");
-    if (r1Canvas) {
-        room1Field = new BubbleField(r1Canvas, {
-            maxCount: 45,
-            colorMode: "mono",
-            baseHue: 285,  // purple
-            alphaMin: 0.15,
-            alphaMax: 0.25,
-            minSpeed: 20,  // 10-20s drift band
-            maxSpeed: 60,
-            sideDrift: 4,
-            lifeScale: 1.2
-        });
-    }
-
-    // Room 2 (Warm Core / magenta)
-    const r2Canvas = document.getElementById("room2Canvas");
-    if (r2Canvas) {
-        room2Field = new BubbleField(r2Canvas, {
-            maxCount: 45,
-            colorMode: "mono",
-            baseHue: 315,  // magenta
-            alphaMin: 0.15,
-            alphaMax: 0.25,
-            minSpeed: 20,
-            maxSpeed: 60,
-            sideDrift: 4,
-            lifeScale: 1.2
-        });
-    }
-
-    // Room 3 background (white/blue/red mix)
-    const r3Canvas = document.getElementById("room3Canvas");
-    if (r3Canvas) {
-        room3Field = new BubbleField(r3Canvas, {
-            maxCount: 55,
-            colorMode: "mix",
-            alphaMin: 0.25,
-            alphaMax: 0.35,
-            minSpeed: 15,
-            maxSpeed: 50,
-            sideDrift: 3,
-            lifeScale: 1.3,
-            palette: [
-                // white heavy
-                {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                {color:"rgba(255,255,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                // blue
-                {color:"rgba(120,160,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                {color:"rgba(120,160,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                {color:"rgba(120,160,255,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                // red anchors
-                {color:"rgba(255,70,70,ALPHA)", alphaMin:0.25, alphaMax:0.35},
-                {color:"rgba(255,70,70,ALPHA)", alphaMin:0.25, alphaMax:0.35}
-            ]
-        });
-    }
-
-    // Room 3 sax bursts (cluster + notes)
-    const r3SaxCanvas = document.getElementById("room3SaxCanvas");
-    if (r3SaxCanvas) {
-        saxField = new SaxBurstField(r3SaxCanvas);
-    }
-}
-
-/* =========================================================
-   ON LOAD
-========================================================= */
-window.addEventListener("load", () => {
-    initFields();
-
-    // show Engine Room first and tick counter
-    showRoom("engine-room");
-
-    // safety kick in case mobile paused canvases at first paint
+    // Clean up after it's done floating
     setTimeout(() => {
-        if (!engineField || !room1Field || !room2Field || !room3Field) {
-            initFields();
-        }
-    }, 800);
-});
+        if (n && n.parentNode) n.parentNode.removeChild(n);
+    }, (dur+delay)*1000);
+}
+
+// steady trickle of notes rising
+setInterval(spawnNote, 1200);
+
+
+/* ===========================================================
+   JOKE + RIDDLE ROTATION (Room 3)
+   - Daily default
+   - "More?" cycles locally
+   - "Show answer" reveals riddle answer
+   =========================================================== */
+
+// Jokes
+const JOKES = [
+    "Why did the scarecrow get promoted? He was outstanding in his field.",
+    "I tried to catch some fog. I mist.",
+    "I asked the sax player for a favor. He said, ‘I’ll sax you later.’",
+    "Why don’t skeletons fight each other? They don’t have the guts.",
+    "I told my phone I needed a break… now we’re on airplane mode."
+];
+
+// Riddles [{q,a}]
+const RIDDLES = [
+    { q:"I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?", a:"An echo." },
+    { q:"What has keys but can’t open locks?", a:"A piano." },
+    { q:"You see me once in June, twice in November, and not at all in May. What am I?", a:"The letter 'e'." },
+    { q:"What can travel around the world while staying in the same corner?", a:"A stamp." },
+    { q:"The more you take, the more you leave behind. What are they?", a:"Footsteps." }
+];
+
+let jokeIndex = 0;
+let riddleIndex = 0;
+
+function seedDaily() {
+    // Basic daily seed from date; same joke/riddle for everyone each day
+    const today = new Date().toISOString().slice(0,10); // yyyy-mm-dd
+    // simple hash
+    let hash = 0;
+    for (let i=0;i<today.length;i++){
+        hash = (hash*31 + today.charCodeAt(i)) >>> 0;
+    }
+    jokeIndex = hash % JOKES.length;
+    riddleIndex = (hash >> 3) % RIDDLES.length;
+}
+
+function renderJokeRiddle() {
+    const jokeEl = document.getElementById('joke-text');
+    const rqEl = document.getElementById('riddle-q');
+    const raEl = document.getElementById('riddle-a');
+    if (!jokeEl || !rqEl || !raEl) return;
+
+    jokeEl.textContent = JOKES[jokeIndex];
+    rqEl.textContent = RIDDLES[riddleIndex].q;
+    raEl.textContent = RIDDLES[riddleIndex].a;
+    raEl.style.display = "none";
+}
+
+function revealAnswer() {
+    const raEl = document.getElementById('riddle-a');
+    if (raEl) {
+        raEl.style.display = "block";
+    }
+}
+
+function moreJokes() {
+    jokeIndex = (jokeIndex+1) % JOKES.length;
+    riddleIndex = (riddleIndex+1) % RIDDLES.length;
+    renderJokeRiddle();
+}
+
+// init jokes/riddles on load
+seedDaily();
+renderJokeRiddle();
+
+/* default landing is engine */
+go('engine');
 </script>
 </body>
 </html>
