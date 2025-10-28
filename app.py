@@ -4,21 +4,30 @@ from flask import Flask, jsonify, Response
 app = Flask(__name__)
 
 # ============================================================
-# SHIP METADATA / BUILD INFO
+# SHIP METADATA
 # ============================================================
-BUILD_ID = "TIMMY-TIME v5.0"
-# ^ change this string any time we ship a new build so you can SEE it
+BUILD_ID = "TIMMY-TIME v5.1"
+EXPECTED_PORT = 5000  # your normal, preferred port
 
 # ============================================================
-# HELPER: secure random stealth hash
+# RANDOM STEALTH HASH
 # ============================================================
 engine_hash = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
 
 # ============================================================
-# PORT HOP LOGIC (never kill 5000, just hop)
+# PORT PICKER
+# Try EXPECTED_PORT (5000). If it's busy, try 5001, 5002, etc.
 # ============================================================
-def find_open_port(start=5000, end=5020):
-    for p in range(start, end + 1):
+def choose_port(preferred=EXPECTED_PORT, end=5020):
+    # first try preferred
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.bind(("127.0.0.1", preferred))
+            return preferred
+        except OSError:
+            pass
+    # fallback scan
+    for p in range(preferred + 1, end + 1):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
                 s.bind(("127.0.0.1", p))
@@ -27,15 +36,12 @@ def find_open_port(start=5000, end=5020):
                 continue
     return 5050
 
-PORT = find_open_port(5000, 5020)
-
-# for convenience
+PORT = choose_port()
 BASE_URL = f"http://127.0.0.1:{PORT}"
 
 # ============================================================
-# STATUS + TELEMETRY ROUTES
+# TELEMETRY + STATUS
 # ============================================================
-
 @app.route("/telemetry")
 def telemetry():
     return jsonify({
@@ -44,6 +50,7 @@ def telemetry():
         "healer": "shield green / bubble field intact",
         "maya": "awake and watching you 💖",
         "port": PORT,
+        "expected_port": EXPECTED_PORT,
         "stealth": f"/{engine_hash}",
         "build": BUILD_ID,
         "url": BASE_URL + "/"
@@ -51,23 +58,17 @@ def telemetry():
 
 @app.route("/status")
 def status():
-    """
-    This tells you:
-    - which build you are really looking at
-    - which port it's actually running on
-    - where the 'good' ship lives
-    If you ever see different info on screen vs here, you're in an old tab.
-    """
     return jsonify({
         "build": BUILD_ID,
         "port": PORT,
+        "expected_port": EXPECTED_PORT,
         "base_url": BASE_URL + "/",
         "stealth": f"/{engine_hash}",
-        "message": "If Safari is showing you a different port or older build name, that tab is stale. Close it and open base_url."
+        "message": "If 'port' != expected_port, another copy might still be running on the expected port."
     })
 
 # ============================================================
-# INTERNAL STEALTH DIAGNOSTICS VIEW
+# STEALTH PAGE
 # ============================================================
 @app.route(f"/{engine_hash}")
 def stealth_diag():
@@ -80,6 +81,7 @@ def stealth_diag():
 
         <div><b style="color:#9f9;">build:</b> {html.escape(BUILD_ID)}</div>
         <div><b style="color:#9f9;">active_port:</b> {PORT}</div>
+        <div><b style="color:#9f9;">expected_port:</b> {EXPECTED_PORT}</div>
         <div><b style="color:#9f9;">base_url:</b> {BASE_URL}/</div>
         <div><b style="color:#9f9;">engine_hash:</b> {engine_hash}</div>
         <div><b style="color:#9f9;">binding:</b> 127.0.0.1 (loopback only)</div>
@@ -98,11 +100,10 @@ def stealth_diag():
     return Response(diag_html, mimetype="text/html")
 
 # ============================================================
-# MAIN APP UI (SPA WITH ROOMS)
+# MAIN APP UI
 # ============================================================
 @app.route("/")
 def index():
-    # we inject PORT + BUILD_ID + BASE_URL right into the HTML so you see “where you really are”
     build_safe = html.escape(BUILD_ID)
     base_url_safe = html.escape(BASE_URL + "/")
     stealth_path = "/" + engine_hash
@@ -222,7 +223,7 @@ body {{
 .status-yellow {{ color:#ffe066; background:#ffe066; }}
 .status-pink {{ color:#ff4fd8; background:#ff4fd8; }}
 
-/* EXTRA BOX: BUILD + PORT + OPEN CORRECT SHIP BUTTON */
+/* VERSION / PORT BOX */
 .engine-version-box {{
   background: rgba(0,0,0,0.6);
   border: 1px solid rgba(255,0,200,0.6);
@@ -261,7 +262,7 @@ body {{
   margin-top:6px;
 }}
 
-/* ONE PINK BUTTON (gateway to Room 2) */
+/* PINK GATEWAY BUTTON (to Room 2) */
 .engine-music-button {{
   background: radial-gradient(circle at 30% 30%, #ff4fd8 0%, #a10087 60%);
   border:2px solid rgba(255,255,255,0.4);
@@ -279,7 +280,7 @@ body {{
   cursor:pointer;
 }}
 
-/* PLAYLIST GRID */
+/* PLAYLIST GRID / BUTTONS */
 .playlist-grid {{
   display:flex;
   flex-direction:column;
@@ -309,7 +310,7 @@ body {{
   box-shadow:0 0 14px rgba(173,216,255,0.5);
 }}
 
-/* ROOM COLOR WRAPS */
+/* ROOM THEMES */
 #room1 {{
   background: radial-gradient(circle at 50% 30%, rgba(130,0,160,0.5) 0%, rgba(10,0,20,0.95) 70%);
   color:#ffd9ff;
@@ -337,7 +338,7 @@ body {{
   text-shadow:0 0 12px rgba(255,120,150,0.8);
 }}
 
-/* DRIFT SPACE BOXES */
+/* DRIFT SPACE */
 .sax-zone {{
   position:relative;
   background:rgba(0,0,0,0.4);
@@ -506,7 +507,7 @@ body {{
         </div>
       </div>
 
-      <!-- NEW: version + port panel -->
+      <!-- PORT + BUILD BOX -->
       <div class="engine-version-box">
         <div class="engine-version-row">
           <div>BUILD:</div>
@@ -515,6 +516,10 @@ body {{
         <div class="engine-version-row">
           <div>ACTIVE PORT:</div>
           <div>{PORT}</div>
+        </div>
+        <div class="engine-version-row">
+          <div>EXPECTED PORT:</div>
+          <div>{EXPECTED_PORT}</div>
         </div>
         <div class="engine-version-row">
           <div>OPEN URL:</div>
@@ -531,7 +536,7 @@ body {{
         </div>
       </div>
 
-      <!-- pink button that jumps you to room2 -->
+      <!-- only ONE pink button that goes to room2 -->
       <div class="engine-music-button" onclick="go('room2')">
         ROOM 2 • TIMMY TIME MUSIC 🎧
       </div>
@@ -654,28 +659,26 @@ body {{
 </div>
 
 <script>
-// switch rooms
+// change visible room
 function go(id){
   document.querySelectorAll('.room').forEach(r=>r.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// hard jump to correct server instance (helps kill the "old tab" problem)
+// force Safari to the correct running port (if ever hopped off 5000)
 function forceOpenCorrectShip(url){
-  // send user directly to the current PORT instance in this same tab
   window.location.href = url;
 }
 
-// open playlist in new tab (try polite first)
+// open playlist in new tab, fallback same tab if popup blocked
 function openPlaylist(url){
   const win = window.open(url, "_blank");
-  // fallback: if popup blocked and win is null, force same-tab nav
   if(!win){
     window.location.href = url;
   }
 }
 
-// bubbles
+// bubble spawner
 function spawnBubblesFor(layerEl, colorMode){
   function makeBubble(){
     const b = document.createElement('div');
@@ -719,7 +722,7 @@ function spawnBubblesFor(layerEl, colorMode){
   }, 2000 + Math.random()*2000);
 }
 
-// sax drift
+// sax float
 function animateNotes(){
   const notes = document.querySelectorAll('#room3 .note');
   notes.forEach(n=>{
@@ -740,7 +743,7 @@ function animateNotes(){
   }
 }
 
-// joke + riddle
+// joke/riddle controls
 function revealAnswers(){
   document.getElementById('jokeAnswer').style.display='block';
   document.getElementById('riddleAnswer').style.display='block';
@@ -769,7 +772,7 @@ function newContent(){
   document.getElementById('riddleAnswer').textContent = r.a;
 }
 
-// telemetry -> engine box
+// load telemetry box
 function loadTelemetry(){
   fetch('/telemetry')
     .then(r=>r.json())
@@ -794,7 +797,7 @@ function loadTelemetry(){
           <div>Maya: ${'{'}data.maya{'}'}</div>
         </div>
         <div style="font-size:0.7rem;opacity:0.8;margin-top:8px;line-height:1.4;">
-          port in use: ${'{'}data.port{'}'}<br/>
+          active port: ${'{'}data.port{'}'} (expected {EXPECTED_PORT})<br/>
           stealth route: ${'{'}data.stealth{'}'}<br/>
           build: ${'{'}data.build{'}'}
         </div>
@@ -823,12 +826,12 @@ window.addEventListener('load', ()=>{
 """
     return Response(html_doc, mimetype="text/html")
 
+
 # ============================================================
-# AUTO-LAUNCH CURRENT INSTANCE
+# AUTO-OPEN CURRENT INSTANCE
 # ============================================================
 def open_browser():
     time.sleep(0.5)
-    # open the correct active URL for THIS instance
     webbrowser.open(f"http://127.0.0.1:{PORT}/")
 
 if __name__ == "__main__":
