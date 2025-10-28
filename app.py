@@ -1,29 +1,11 @@
 # ============================================================
 # Timmy Bubble Ship • Unified SPA Server
-# v4.0 merge
+# v4.1 (playlist tap fix)
 #
-# LAWS:
-# - Bind ONLY to 127.0.0.1 (local loopback, no creepers)
-# - NEVER kill port 5000 (music lives there)
-# - We hop to a safe open port instead of killing 5000
-# - On run we auto-open the browser straight to "/"
-# - We generate a stealth hash route each boot
-# - We expose /telemetry JSON in your voice
-#
-# FRONTEND:
-# - Single Page App (SPA)
-# - 4 rooms (engine, room1, room2, room3) in one HTML
-# - JS go('roomX') swaps visible room, no page reload
-# - Bubble fields per room color
-# - Room3 sax + notes + joke/riddle w/ reveal + more
-# - "You are beautiful and loved 💖"
-# - "This ship was created on Timmy’s iPhone 17 Pro Max 2TB."
-#
-# ENGINE ROOM PANEL:
-# - We inject telemetry data into the status box dynamically.
-#
-# This file is the ONLY file you need to run.
-# Run: python app.py
+# Changes from v4.0:
+# - bubble-layer now pointer-events:none so bubbles never block taps
+# - playlist buttons use onclick + window.open() so iPhone will actually open Suno
+# - removed target="_blank" anchors and replaced with div buttons
 # ============================================================
 
 import socket, random, string, threading, webbrowser, time
@@ -93,7 +75,7 @@ def stealth_diag():
 
 # ─────────────────────────────────────────
 # Root route (serves the whole SPA)
-# We inject PORT + engine_hash so front-end can show status.
+# v4.1 includes clickable playlist buttons and pointer-events fix
 # ─────────────────────────────────────────
 @app.route("/")
 def index():
@@ -104,7 +86,6 @@ def index():
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Timmy’s Bubble Ship</title>
 <style>
-/* RESET */
 * {{
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
@@ -120,8 +101,6 @@ body {{
   width: 100vw;
   position: relative;
 }}
-
-/* GLOBAL LAYERS */
 #app {{
   position: relative;
   height: 100%;
@@ -134,21 +113,20 @@ body {{
   display: none;
   flex-direction: column;
   justify-content: space-between;
-  padding: 16px 16px 72px; /* leave space for bottom nav */
+  padding: 16px 16px 72px;
   font-size: 16px;
   line-height: 1.4;
 }}
 .room.active {{
   display: flex;
 }}
-
-/* BUBBLE FIELD CANVAS BG */
 .bubble-layer {{
   position: absolute;
   inset: 0;
   overflow: hidden;
   z-index: 0;
   filter: blur(0px);
+  pointer-events:none; /* important: bubbles can't steal taps */
 }}
 .bubble {{
   position: absolute;
@@ -162,8 +140,6 @@ body {{
   50%  {{ opacity: 0.5; }}
   100% {{ transform: translateY(-200vh) scale(1.2); opacity: 0; }}
 }}
-
-/* CONTENT WRAPPER ABOVE BUBBLES */
 .room-content {{
   position: relative;
   z-index: 2;
@@ -173,16 +149,12 @@ body {{
   gap: 16px;
   text-align: center;
 }}
-
-/* TITLE / HEADER IN EACH ROOM */
 .room-title {{
   font-size: 1.1rem;
   font-weight: 600;
   text-shadow: 0 0 10px rgba(255,255,255,0.6);
   line-height: 1.2;
 }}
-
-/* ENGINE ROOM STYLE (green field) */
 #engine {{
   background: radial-gradient(circle at 50% 30%, rgba(0,255,120,0.18) 0%, rgba(0,40,0,0.9) 70%);
   color: #d8ffd8;
@@ -217,7 +189,6 @@ body {{
 .status-green {{ color:#00ff88; background:#00ff88; }}
 .status-yellow {{ color:#ffe066; background:#ffe066; }}
 .status-pink {{ color:#ff4fd8; background:#ff4fd8; }}
-
 .engine-music-button {{
   background: radial-gradient(circle at 30% 30%, #ff4fd8 0%, #a10087 60%);
   border:2px solid rgba(255,255,255,0.4);
@@ -231,8 +202,6 @@ body {{
   text-align:center;
   line-height:1.2;
 }}
-
-/* ROOM 1 STYLE (purple mind w/ pink outline bubbles) */
 #room1 {{
   background: radial-gradient(circle at 50% 30%, rgba(130,0,160,0.5) 0%, rgba(10,0,20,0.95) 70%);
   color:#ffd9ff;
@@ -252,14 +221,12 @@ body {{
   line-height:1.3;
   padding:14px 16px;
   border-radius:12px;
-  border:2px solid rgba(255,128,255,0.7); /* pink outline */
+  border:2px solid rgba(255,128,255,0.7);
   background:rgba(0,0,0,0.35);
   color:#fff;
   text-shadow:0 0 8px rgba(255,128,255,0.8);
   box-shadow:0 0 16px rgba(255,128,255,0.4);
 }}
-
-/* ROOM 2 STYLE (Timmy Time Music core) */
 #room2 {{
   background: radial-gradient(circle at 50% 30%, rgba(255,0,150,0.4) 0%, rgba(30,0,30,0.95) 70%);
   color:#ffe9ff;
@@ -269,12 +236,10 @@ body {{
   text-shadow:0 0 12px rgba(255,0,200,0.8);
 }}
 #room2 .playlist-btn{{
-  border:2px solid rgba(173,216,255,0.6); /* light blue line */
+  border:2px solid rgba(173,216,255,0.6);
   text-shadow:0 0 8px rgba(173,216,255,0.9);
   box-shadow:0 0 16px rgba(173,216,255,0.5);
 }}
-
-/* ROOM 3 STYLE (Drift Space / burgundy middle / sax) */
 #room3 {{
   background: radial-gradient(circle at 50% 50%, rgba(90,0,20,0.6) 0%, rgba(0,0,20,0.95) 70%);
   color:#ffdede;
@@ -318,8 +283,6 @@ body {{
   0%   {{ transform:translateY(0) translateX(0) scale(1); opacity:0.8; }}
   100% {{ transform:translateY(-120px) translateX(-20px) scale(1.4); opacity:0; }}
 }}
-
-/* COMFORT CARD w/ joke + riddle */
 .comfort-card{{
   background:rgba(0,0,0,0.4);
   border:1px solid rgba(0,255,200,0.5);
@@ -363,8 +326,6 @@ body {{
   font-weight:500;
   color:#9affc9;
 }}
-
-/* TIMMY TIME MUSIC PILL (global footer badge) */
 .music-pill{{
   font-size:0.8rem;
   font-weight:600;
@@ -377,8 +338,6 @@ body {{
   color:#fff;
   text-shadow:0 0 8px rgba(255,0,255,0.9);
 }}
-
-/* BOTTOM NAV BAR */
 .navbar{{
   position:absolute;
   left:0;
@@ -411,8 +370,6 @@ body {{
   margin-bottom:4px;
   text-shadow:0 0 8px rgba(255,255,255,0.6);
 }}
-
-/* SMALL PRINT / LOVE MESSAGE */
 .love-line{{
   font-size:0.8rem;
   line-height:1.4;
@@ -463,11 +420,11 @@ body {{
     <div class="room-content">
       <div class="room-title">ROOM 1 / PURPLE MIND</div>
       <div class="playlist-grid">
-        <a class="playlist-btn" href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316" target="_blank">Hope</a>
-        <a class="playlist-btn" href="https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df" target="_blank">Soul</a>
-        <a class="playlist-btn" href="https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c" target="_blank">Beach</a>
-        <a class="playlist-btn" href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479" target="_blank">Rest</a>
-        <a class="playlist-btn" href="https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be" target="_blank">Jazz</a>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316')">Hope</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/457d7e00-938e-4bf0-bd59-f070729200df')">Soul</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/37b792b2-fca7-4d58-a094-bd467662ed9c')">Beach</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479')">Rest</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/d99adfd0-00ff-4641-bea0-c7e1071014be')">Jazz</div>
       </div>
 
       <div class="love-line">This room calms your mind, not your fire.</div>
@@ -484,11 +441,11 @@ body {{
       <div class="room-title">ROOM 2 / TIMMY TIME MUSIC</div>
 
       <div class="playlist-grid">
-        <a class="playlist-btn" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">Laugh 😂</a>
-        <a class="playlist-btn" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">Play 🎮</a>
-        <a class="playlist-btn" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">Fun 🎉</a>
-        <a class="playlist-btn" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">Motown 🎷</a>
-        <a class="playlist-btn" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">Feeling It 🔥</a>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1')">Laugh 😂</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b')">Play 🎮</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f')">Fun 🎉</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840')">Motown 🎷</div>
+        <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c')">Feeling It 🔥</div>
       </div>
 
       <div class="love-line">Your pulse room. Your energy room.</div>
@@ -509,8 +466,6 @@ body {{
         <div style="font-size:0.8rem;color:#ffcfe9;text-align:center;margin-bottom:8px;">
           Slow float mode. Notes and bubbles drift up.
         </div>
-
-        <!-- floating notes -->
         <div class="note">♪</div>
         <div class="note">♩</div>
         <div class="note">♫</div>
@@ -568,15 +523,19 @@ body {{
 </div>
 
 <script>
-// ----- NAV -----
-function go(id){{
+function go(id){
   document.querySelectorAll('.room').forEach(r=>r.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-}}
+}
+
+// open Suno in a new tab/window with iPhone-friendly user gesture
+function openPlaylist(url){
+  window.open(url, "_blank");
+}
 
 // ----- BUBBLES -----
-function spawnBubblesFor(layerEl, colorMode){{
-  function makeBubble(){{
+function spawnBubblesFor(layerEl, colorMode){
+  function makeBubble(){
     const b = document.createElement('div');
     b.className = 'bubble';
 
@@ -587,75 +546,77 @@ function spawnBubblesFor(layerEl, colorMode){{
     b.style.left = Math.random()*100+'%';
     b.style.bottom = '-120px';
 
-    if(colorMode==='engine'){{
+    if(colorMode==='engine'){
       b.style.borderColor = 'rgba(0,255,140,0.6)';
       b.style.boxShadow = '0 0 20px rgba(0,255,140,0.5)';
       b.style.background = 'radial-gradient(circle at 30% 30%, rgba(0,255,140,0.2) 0%, rgba(0,0,0,0) 70%)';
-    }} else if(colorMode==='room1'){{
+    } else if(colorMode==='room1'){
       b.style.borderColor = 'rgba(255,128,255,0.8)';
       b.style.boxShadow = '0 0 20px rgba(255,0,255,0.5)';
       b.style.background = 'radial-gradient(circle at 30% 30%, rgba(255,0,255,0.15) 0%, rgba(0,0,0,0) 70%)';
-    }} else if(colorMode==='room2'){{
+    } else if(colorMode==='room2'){
       b.style.borderColor = 'rgba(173,216,255,0.7)';
       b.style.boxShadow = '0 0 20px rgba(173,216,255,0.5)';
       b.style.background = 'radial-gradient(circle at 30% 30%, rgba(255,0,200,0.15) 0%, rgba(0,0,0,0) 70%)';
-    }} else {{
+    } else {
       b.style.borderColor = 'rgba(0,255,200,0.6)';
       b.style.boxShadow = '0 0 24px rgba(255,0,0,0.4), 0 0 40px rgba(0,255,200,0.4)';
       b.style.background = 'radial-gradient(circle at 30% 30%, rgba(180,0,40,0.3) 0%, rgba(0,0,0,0) 70%)';
-    }}
+    }
 
     const dur = 10 + Math.random()*10;
     b.style.animationDuration = dur+'s';
 
     layerEl.appendChild(b);
 
-    setTimeout(()=>{{ b.remove(); }}, dur*1000 + 1000);
-  }}
+    setTimeout(()=>{ b.remove(); }, dur*1000 + 1000);
+  }
 
   setInterval(()=>{
     const count = 1 + Math.floor(Math.random()*2);
     for(let i=0;i<count;i++) makeBubble();
   }, 2000 + Math.random()*2000);
-}}
+}
 
 // ----- SAX NOTES -----
-function animateNotes(){{
+function animateNotes(){
   const notes = document.querySelectorAll('#room3 .note');
-  notes.forEach(n=>{{
+  notes.forEach(n=>{
     resetNote(n);
     noteFloat(n);
-  }});
-  function resetNote(el){{
+  });
+  function resetNote(el){
     const startX = 50 + (Math.random()*20-10);
     const startY = 60 + (Math.random()*10-5);
     el.style.left = startX+'%';
     el.style.bottom = startY+'px';
     el.style.animationDuration = (2+Math.random()*2)+'s';
-  }}
-  function noteFloat(el){{
-    setInterval(()=>{{ resetNote(el); }}, 3000 + Math.random()*2000);
-  }}
-}}
+  }
+  function noteFloat(el){
+    setInterval(()=>{
+      resetNote(el);
+    }, 3000 + Math.random()*2000);
+  }
+}
 
 // ----- DRIFT SPACE: JOKE / RIDDLE -----
-function revealAnswers(){{
+function revealAnswers(){
   document.getElementById('jokeAnswer').style.display='block';
   document.getElementById('riddleAnswer').style.display='block';
-}}
-function newContent(){{
+}
+function newContent(){
   document.getElementById('jokeAnswer').style.display='none';
   document.getElementById('riddleAnswer').style.display='none';
 
   const jokes = [
-    {{q:"Why did the bubble get promoted?", a:"Because it always rose to the top."}},
-    {{q:"Why did the saxophone take a break?", a:"It needed to decompress its brass."}},
-    {{q:"Why did the playlist blush?", a:"Because Room 2 kept staring at it."}}
+    {q:"Why did the bubble get promoted?", a:"Because it always rose to the top."},
+    {q:"Why did the saxophone take a break?", a:"It needed to decompress its brass."},
+    {q:"Why did the playlist blush?", a:"Because Room 2 kept staring at it."}
   ];
   const riddles = [
-    {{q:"I float in your room but I’m not dust. I glow in your dark but I’m not fire. What am I?", a:"One of your comfort bubbles."}},
-    {{q:"I sing in curves, I rise in light, I drift with you deep in the night. What am I?", a:"The Drift Space sax line."}},
-    {{q:"I guard your peace without a sword. I hum instead of roar. What am I?", a:"Your ship."}}
+    {q:"I float in your room but I’m not dust. I glow in your dark but I’m not fire. What am I?", a:"One of your comfort bubbles."},
+    {q:"I sing in curves, I rise in light, I drift with you deep in the night. What am I?", a:"The Drift Space sax line."},
+    {q:"I guard your peace without a sword. I hum instead of roar. What am I?", a:"Your ship."}
   ];
 
   const j = jokes[Math.floor(Math.random()*jokes.length)];
@@ -665,13 +626,13 @@ function newContent(){{
   document.getElementById('jokeAnswer').textContent = j.a;
   document.getElementById('riddleQ').textContent = r.q;
   document.getElementById('riddleAnswer').textContent = r.a;
-}}
+}
 
 // ----- TELEMETRY INJECTION INTO ENGINE ROOM -----
-function loadTelemetry(){{
+function loadTelemetry(){
   fetch('/telemetry')
     .then(r=>r.json())
-    .then(data=>{{
+    .then(data=>{
       const box = document.getElementById('telemetryBox');
       if(!box) return;
       box.innerHTML = `
@@ -696,12 +657,12 @@ function loadTelemetry(){{
           stealth route: ${'{'}data.stealth{'}'}
         </div>
       `;
-    }})
-    .catch(err=>{{
+    })
+    .catch(err=>{
       const box = document.getElementById('telemetryBox');
       if(box) box.innerHTML = "<div>telemetry offline</div>";
-    }});
-}}
+    });
+}
 
 // ----- INIT -----
 window.addEventListener('load', ()=>{
