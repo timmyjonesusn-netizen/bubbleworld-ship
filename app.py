@@ -1,28 +1,11 @@
-# ============================================================
-# Timmy Bubble Ship • Unified SPA Server
-# v4.3
-#
-# This version =
-# - Single pink music button in Engine Room (slim)
-# - Narrow playlist tiles
-# - Playlists ARE LIVE LINKS again (open Suno)
-# - Room 1 & Room 2 tiles tap to open Suno in new tab
-# - We keep port hop law / stealth hash / telemetry
-# ============================================================
-
 import socket, random, string, threading, webbrowser, time
 from flask import Flask, jsonify, Response
 
 app = Flask(__name__)
 
-# ─────────────────────────────────────────
-# Stealth hash route each boot
-# ─────────────────────────────────────────
+# ----- stealth hash + port hop -----
 engine_hash = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
 
-# ─────────────────────────────────────────
-# Port hopper that NEVER kills 5000
-# ─────────────────────────────────────────
 def find_open_port(start=5000, end=5020):
     for p in range(start, end + 1):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -35,9 +18,7 @@ def find_open_port(start=5000, end=5020):
 
 PORT = find_open_port(5000, 5020)
 
-# ─────────────────────────────────────────
-# Telemetry API
-# ─────────────────────────────────────────
+# ----- telemetry -----
 @app.route("/telemetry")
 def telemetry():
     return jsonify({
@@ -49,9 +30,7 @@ def telemetry():
         "stealth": f"/{engine_hash}"
     })
 
-# ─────────────────────────────────────────
-# Stealth diagnostics view
-# ─────────────────────────────────────────
+# ----- stealth page -----
 @app.route(f"/{engine_hash}")
 def stealth_diag():
     diag_html = f"""
@@ -75,10 +54,7 @@ def stealth_diag():
     """
     return Response(diag_html, mimetype="text/html")
 
-# ─────────────────────────────────────────
-# Root route (serves SPA)
-# v4.3 brings back music links with window.open()
-# ─────────────────────────────────────────
+# ----- main SPA -----
 @app.route("/")
 def index():
     html = f"""<!DOCTYPE html>
@@ -154,13 +130,13 @@ body {{
   text-align: center;
 }}
 .room-title {{
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 600;
   text-shadow: 0 0 10px rgba(255,255,255,0.6);
   line-height: 1.2;
 }}
 
-/* ENGINE ROOM STYLE */
+/* ENGINE ROOM */
 #engine {{
   background: radial-gradient(circle at 50% 30%, rgba(0,255,120,0.18) 0%, rgba(0,40,0,0.9) 70%);
   color: #d8ffd8;
@@ -196,7 +172,7 @@ body {{
 .status-yellow {{ color:#ffe066; background:#ffe066; }}
 .status-pink {{ color:#ff4fd8; background:#ff4fd8; }}
 
-/* SINGLE PINK MUSIC BUTTON (slim) */
+/* ONE PINK BUTTON (slim) */
 .engine-music-button {{
   background: radial-gradient(circle at 30% 30%, #ff4fd8 0%, #a10087 60%);
   border:2px solid rgba(255,255,255,0.4);
@@ -209,11 +185,11 @@ body {{
   padding:10px 12px;
   text-align:center;
   line-height:1.2;
-  max-width:200px;
+  max-width:220px;
   margin:0 auto;
 }}
 
-/* PLAYLIST GRID (tight mode) */
+/* PLAYLIST GRID (tight) */
 .playlist-grid {{
   display:flex;
   flex-direction:column;
@@ -221,52 +197,51 @@ body {{
   align-items:center;
 }}
 
-/* SMALLER PLAYLIST TILE (CLICKABLE) */
+/* CLICKABLE TILE */
 .playlist-btn {{
   font-size:0.9rem;
   font-weight:500;
   line-height:1.3;
   padding:10px 12px;
   border-radius:10px;
-  min-width: 160px;
-  max-width: 200px;
-  width: 100%;
+  min-width:160px;
+  max-width:200px;
+  width:100%;
   text-align:center;
   background:rgba(0,0,0,0.4);
   color:#fff;
-  box-shadow:0 0 14px rgba(255,128,255,0.4);
-  border:2px solid rgba(255,128,255,0.7); /* default pink outline */
-  text-shadow:0 0 8px rgba(255,128,255,0.8);
   cursor:pointer;
+  border:2px solid rgba(255,128,255,0.7);
+  text-shadow:0 0 8px rgba(255,128,255,0.8);
+  box-shadow:0 0 14px rgba(255,128,255,0.4);
 }}
-/* ROOM 2 border color override (light blue) */
+
+/* ROOM 2 tiles get light blue border */
 #room2 .playlist-btn {{
   border-color: rgba(173,216,255,0.6);
   text-shadow:0 0 8px rgba(173,216,255,0.9);
   box-shadow:0 0 14px rgba(173,216,255,0.5);
 }}
 
-/* ROOM 1 LOOK */
+/* ROOM COLORS */
 #room1 {{
   background: radial-gradient(circle at 50% 30%, rgba(130,0,160,0.5) 0%, rgba(10,0,20,0.95) 70%);
   color:#ffd9ff;
 }}
-#room1 .room-title{{
+#room1 .room-title {{
   color:#ff89ff;
   text-shadow:0 0 12px rgba(255,0,255,0.7);
 }}
 
-/* ROOM 2 LOOK */
 #room2 {{
   background: radial-gradient(circle at 50% 30%, rgba(255,0,150,0.4) 0%, rgba(30,0,30,0.95) 70%);
   color:#ffe9ff;
 }}
-#room2 .room-title{{
+#room2 .room-title {{
   color:#ff5fe0;
   text-shadow:0 0 12px rgba(255,0,200,0.8);
 }}
 
-/* ROOM 3 LOOK */
 #room3 {{
   background: radial-gradient(circle at 50% 50%, rgba(90,0,20,0.6) 0%, rgba(0,0,20,0.95) 70%);
   color:#ffdede;
@@ -275,7 +250,9 @@ body {{
   color:#ff8fb0;
   text-shadow:0 0 12px rgba(255,120,150,0.8);
 }}
-.sax-zone{{
+
+/* SAX ZONE */
+.sax-zone {{
   position:relative;
   background:rgba(0,0,0,0.4);
   border:1px solid rgba(0,255,200,0.4);
@@ -312,7 +289,9 @@ body {{
   0%   {{ transform:translateY(0) translateX(0) scale(1); opacity:0.8; }}
   100% {{ transform:translateY(-120px) translateX(-20px) scale(1.4); opacity:0; }}
 }}
-.comfort-card{{
+
+/* COMFORT CARD */
+.comfort-card {{
   background:rgba(0,0,0,0.4);
   border:1px solid rgba(0,255,200,0.5);
   box-shadow:0 0 20px rgba(0,255,200,0.4);
@@ -325,29 +304,29 @@ body {{
   max-width:320px;
   margin:0 auto;
 }}
-.comfort-header{{
+.comfort-header {{
   font-size:0.9rem;
   font-weight:600;
   margin-bottom:8px;
   color:#ffbcd9;
   text-shadow:0 0 8px rgba(255,120,200,0.8);
 }}
-.qa-line{{
+.qa-line {{
   margin-bottom:8px;
   font-size:0.8rem;
 }}
-.answer{{
+.answer {{
   color:#9affc9;
   display:none;
   font-weight:500;
   text-shadow:0 0 8px rgba(0,255,200,0.8);
 }}
-.comfort-actions{{
+.comfort-actions {{
   display:flex;
   gap:8px;
   font-size:0.8rem;
 }}
-.comfort-btn{{
+.comfort-btn {{
   flex:1;
   text-align:center;
   padding:10px;
@@ -359,7 +338,8 @@ body {{
   font-weight:500;
   color:#9affc9;
 }}
-.music-pill{{
+
+.music-pill {{
   font-size:0.7rem;
   font-weight:600;
   text-align:center;
@@ -373,7 +353,8 @@ body {{
   max-width:200px;
   margin:0 auto;
 }}
-.navbar{{
+
+.navbar {{
   position:absolute;
   left:0;
   right:0;
@@ -388,7 +369,7 @@ body {{
   backdrop-filter:blur(8px);
   -webkit-backdrop-filter:blur(8px);
 }}
-.navbtn{{
+.navbtn {{
   flex:1;
   text-align:center;
   font-size:0.7rem;
@@ -398,14 +379,15 @@ body {{
   cursor:pointer;
   padding:6px;
 }}
-.navbtn span{{
+.navbtn span {{
   display:block;
   font-size:1rem;
   font-weight:600;
   margin-bottom:4px;
   text-shadow:0 0 8px rgba(255,255,255,0.6);
 }}
-.love-line{{
+
+.love-line {{
   font-size:0.75rem;
   line-height:1.4;
   text-align:center;
@@ -413,7 +395,7 @@ body {{
   text-shadow:0 0 8px rgba(255,128,200,0.8);
   font-weight:500;
 }}
-.created-line{{
+.created-line {{
   color:#6affd8;
   font-size:0.65rem;
   text-align:center;
@@ -429,7 +411,7 @@ body {{
   <section id="engine" class="room active">
     <div class="bubble-layer" data-room="engine"></div>
     <div class="room-content">
-      <div class="room-title">ENGINE ROOM / SAFE CORE</div>
+      <div class="room-title">ENGINE ROOM / SAFE CORE vTEST</div>
 
       <div class="engine-status-box" id="telemetryBox">
         <div class="engine-status-line">
@@ -438,7 +420,7 @@ body {{
         </div>
       </div>
 
-      <!-- Pink button just moves you to Room 2 (DJ booth) -->
+      <!-- ONLY ONE BUTTON -->
       <div class="engine-music-button" onclick="go('room2')">
         ROOM 2 • TIMMY TIME MUSIC 🎧
       </div>
@@ -474,7 +456,7 @@ body {{
   <section id="room2" class="room">
     <div class="bubble-layer" data-room="room2"></div>
     <div class="room-content">
-      <div class="room-title">ROOM 2 / TIMMY TIME MUSIC</div>
+      <div class="room-title">ROOM 2 / TIMMY TIME MUSIC (LIVE LINKS ✅)</div>
 
       <div class="playlist-grid">
         <div class="playlist-btn" onclick="openPlaylist('https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1')">Laugh 😂</div>
@@ -560,13 +542,13 @@ body {{
 </div>
 
 <script>
-// switch visible room
+// switch rooms
 function go(id){
   document.querySelectorAll('.room').forEach(r=>r.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// open playlist in new tab (Suno)
+// open playlist in new tab
 function openPlaylist(url){
   window.open(url, "_blank");
 }
@@ -606,7 +588,6 @@ function spawnBubblesFor(layerEl, colorMode){
     b.style.animationDuration = dur+'s';
 
     layerEl.appendChild(b);
-
     setTimeout(()=>{ b.remove(); }, dur*1000 + 1000);
   }
 
@@ -616,7 +597,7 @@ function spawnBubblesFor(layerEl, colorMode){
   }, 2000 + Math.random()*2000);
 }
 
-// sax note float
+// sax notes float
 function animateNotes(){
   const notes = document.querySelectorAll('#room3 .note');
   notes.forEach(n=>{
@@ -637,7 +618,7 @@ function animateNotes(){
   }
 }
 
-// joke / riddle
+// joke / riddle actions
 function revealAnswers(){
   document.getElementById('jokeAnswer').style.display='block';
   document.getElementById('riddleAnswer').style.display='block';
@@ -666,7 +647,7 @@ function newContent(){
   document.getElementById('riddleAnswer').textContent = r.a;
 }
 
-// telemetry into engine
+// telemetry updates the engine box
 function loadTelemetry(){
   fetch('/telemetry')
     .then(r=>r.json())
@@ -704,10 +685,10 @@ function loadTelemetry(){
 
 // init
 window.addEventListener('load', ()=>{
-  spawnBubblesFor(document.querySelector('[data-room="engine"]'), 'engine');
-  spawnBubblesFor(document.querySelector('[data-room="room1"]'), 'room1');
-  spawnBubblesFor(document.querySelector('[data-room="room2"]'), 'room2');
-  spawnBubblesFor(document.querySelector('[data-room="room3"]'), 'room3');
+  spawnBubblesFor(document.querySelector('[data-room=\"engine\"]'), 'engine');
+  spawnBubblesFor(document.querySelector('[data-room=\"room1\"]'), 'room1');
+  spawnBubblesFor(document.querySelector('[data-room=\"room2\"]'), 'room2');
+  spawnBubblesFor(document.querySelector('[data-room=\"room3\"]'), 'room3');
 
   animateNotes();
   loadTelemetry();
@@ -719,9 +700,7 @@ window.addEventListener('load', ()=>{
 """
     return Response(html, mimetype="text/html")
 
-# ─────────────────────────────────────────
-# Auto-open browser to "/"
-# ─────────────────────────────────────────
+# ----- auto-open browser -----
 def open_browser():
     time.sleep(0.5)
     webbrowser.open(f"http://127.0.0.1:{PORT}/")
