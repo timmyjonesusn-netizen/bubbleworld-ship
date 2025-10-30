@@ -1,95 +1,326 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Timmy Time • Magenta Stage</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Timmy Time · Stage · v1.0.6 Rock</title>
+<meta name="description" content="Timmy Time · Multi-room static mirror · Matrix • Neon bubbles • Performance+ Rock Mode">
+
+<!-- Speed: preconnect & DNS prefetch -->
+<link rel="preconnect" href="https://www.youtube.com">
+<link rel="preconnect" href="https://i.ytimg.com">
+<link rel="preconnect" href="https://www.google.com">
+<link rel="preconnect" href="https://suno.com">
+<link rel="dns-prefetch" href="//www.youtube.com">
+<link rel="dns-prefetch" href="//i.ytimg.com">
+<link rel="dns-prefetch" href="//www.google.com">
+<link rel="dns-prefetch" href="//suno.com">
+
 <style>
-body {
-  margin:0;overflow:hidden;
-  background:radial-gradient(circle at center,#0a0014,#000);
-  color:#fff;font-family:Arial,Helvetica,sans-serif;
-}
-h1,h2{margin:0;text-align:center}
-h1{font-size:3rem}
-h2{font-size:1.5rem;color:#f6d6ff}
-.arrow {
-  position:fixed;top:50%;transform:translateY(-50%);
-  font-size:3rem;color:white;padding:0.5rem 1rem;
-  background:rgba(255,0,255,0.25);border-radius:1rem;
-  cursor:pointer;z-index:10;user-select:none;
-}
-#left-arrow{left:1rem}
-#right-arrow{right:1rem}
-#video-box {
-  display:flex;justify-content:center;margin-top:2rem;
-}
-iframe {
-  width:90%;max-width:480px;height:270px;border:0;
-  border-radius:1rem;box-shadow:0 0 20px magenta;
-}
-#playlist {
-  margin:2rem;font-size:1.2rem;text-align:left;
-}
-a{color:#ffbfff}
-.bubble {
-  position:absolute;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,200,255,0.2),rgba(255,0,255,0.05));
-  animation:rise linear infinite;
-}
-@keyframes rise {
-  0%{transform:translateY(100vh) scale(0.8);opacity:0.4}
-  100%{transform:translateY(-10vh) scale(1.2);opacity:0.1}
-}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#000;color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial}
+  :root{
+    --accent:#ff40ff;                 /* per-room */
+    --glow-soft: 0 0 22px rgba(255,64,255,.5), 0 0 44px rgba(255,64,255,.28);
+    --grid-rgba: 0,255,120,0.26;      /* per-room tint target */
+    --bubble-rgb: 255,244,255;        /* per-room */
+    --shadow-on: 1;                    /* toggled by FPS governor */
+  }
+
+  /* Matrix background */
+  .grid{position:fixed;inset:0;pointer-events:none;contain:paint;
+    background:
+      radial-gradient(120vmin 120vmin at 10% 10%, rgba(255,255,255,.06), transparent 60%),
+      radial-gradient(100vmin 100vmin at 88% 20%, rgba(255,255,255,.06), transparent 60%),
+      radial-gradient(120vmin 120vmin at 28% 78%, rgba(255,255,255,.06), transparent 60%),
+      linear-gradient(0deg,#05000c,#000 50%,#020005)}
+  .grid::before{content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(transparent 31px, rgba(var(--grid-rgba)) 32px, transparent 33px),
+      linear-gradient(90deg,transparent 31px, rgba(var(--grid-rgba)) 32px, transparent 33px);
+    background-size:32px 32px;opacity:.9}
+
+  /* Bubbles (GPU-friendly) */
+  .bubbles{position:fixed;inset:0;pointer-events:none;overflow:hidden;contain:layout paint}
+  .bubble{
+    position:absolute;border-radius:50%;
+    width:12vmin;height:12vmin;
+    background:radial-gradient(circle at 30% 30%, rgba(var(--bubble-rgb),.18), rgba(var(--bubble-rgb),.06) 60%, rgba(var(--bubble-rgb),0) 70%);
+    border:.45vmin solid rgba(255,182,255,.16);
+    filter: drop-shadow(0 0 .6vmin rgba(255,255,255,calc(var(--shadow-on)*.22)));
+    will-change: transform;
+    animation: rise linear infinite;
+    opacity:.85;
+  }
+  @keyframes rise{
+    from{transform:translate3d(var(--x),110vh,0) scale(var(--s))}
+    to  {transform:translate3d(calc(var(--x) + var(--drift)), -15vh,0) scale(var(--s))}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .bubble{animation:none;opacity:.25}
+  }
+
+  /* Layout */
+  .wrap{position:relative;min-height:100%;display:flex;flex-direction:column;gap:2rem;
+    padding:10vh 6vw 22vh}
+  .brand{display:flex;align-items:center;gap:1rem}
+  .logo{font-weight:900;letter-spacing:.4rem;line-height:.9;text-shadow:var(--glow-soft);user-select:none}
+  .logo .row{display:block;font-size:clamp(2rem,5vw,3rem)}
+  .logo .row:first-child{color:#ff7cff}.logo .row:last-child{color:#ffb3ff}
+  .ver{margin-left:auto;padding:.45rem .75rem;border:1px solid rgba(255,255,255,.22);
+    border-radius:1rem;font-size:.95rem;color:#ffc8ff;background:rgba(0,0,0,.35);
+    backdrop-filter:blur(6px);box-shadow:0 0 24px color-mix(in oklab, var(--accent) 40%, #000 60%)}
+
+  h1{font-size:clamp(2.6rem,7vw,5rem);margin:0;color:#fff4ff;text-shadow:var(--glow-soft)}
+  .subtitle{font-size:clamp(1.2rem,2.8vw,1.6rem);opacity:.95}
+  .bullets{font-size:clamp(1.05rem,2.6vw,1.5rem);opacity:.92}
+
+  .stage{margin-top:1rem;display:grid;gap:1rem}
+  .video-shell{
+    position:relative;width:100%;max-width:1100px;margin-inline:auto;aspect-ratio:16/9;
+    border-radius:1rem;border:2px solid color-mix(in oklab, var(--accent) 70%, #000 30%);
+    box-shadow:inset 0 0 18px color-mix(in oklab, var(--accent) 45%, #000 55%);
+    overflow:hidden;background:#070109;contain:content}
+  .video-shell iframe{width:100%;height:100%;border:0;display:block;contain:strict}
+
+  .joke{max-width:1100px;margin:.5rem auto 0;font-size:clamp(1.15rem,2.6vw,1.6rem);
+    color:#ffd6ff;text-shadow:0 0 8px color-mix(in oklab, var(--accent) 35%, #000 65%)}
+
+  .addlink{max-width:1100px;margin:.5rem auto 0;display:flex;gap:.5rem;align-items:center}
+  .addlink input{flex:1;padding:.8rem 1rem;font-size:1rem;border-radius:.8rem;
+    border:1px solid rgba(255,255,255,.22);background:rgba(15,0,22,.6);color:#fff;outline:none}
+  .addlink button{padding:.85rem 1rem;font-weight:700;border-radius:.8rem;border:1px solid rgba(255,255,255,.22);
+    background:linear-gradient(90deg,color-mix(in oklab, var(--accent) 90%, #fff 10%), #ffa0ff);
+    color:#1a001f;cursor:pointer;box-shadow:0 0 24px color-mix(in oklab, var(--accent) 30%, #000 70%)}
+
+  .suno{max-width:1100px;margin:1.5rem auto 0}
+  .suno h2{font-size:clamp(1.6rem,3.5vw,2.1rem);margin:0 0 .5rem;color:#ffd6ff;text-shadow:var(--glow-soft)}
+  .suno ul{margin:0;padding-left:1.1rem}.suno li{margin:.35rem 0}.suno a{color:#ffc2ff;text-decoration:underline}
+
+  .nav-arrows{position:fixed;inset:auto 0 25vh 0;display:flex;justify-content:space-between;padding:0 4vw;pointer-events:none}
+  .arrow{pointer-events:auto;width:84px;height:84px;border-radius:20px;display:grid;place-items:center;
+    border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.35);backdrop-filter:blur(6px);
+    box-shadow:0 0 24px color-mix(in oklab, var(--accent) 35%, #000 65%)}
+  .arrow svg{width:44px;height:44px;fill:#fff;opacity:.95}
+
+  .footer{max-width:1100px;margin:2rem auto 0;opacity:.9;font-size:clamp(1rem,2.2vw,1.15rem)}
+  a,button{-webkit-tap-highlight-color:transparent}
 </style>
 </head>
 <body>
-<h1>TIMMY TIME</h1>
-<h2>Magenta Stage • Reels Lab E</h2>
-<div id="video-box">
-  <iframe id="ytplayer" src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-  allowfullscreen></iframe>
-</div>
-<p style="text-align:center;font-size:1.3rem;margin-top:1rem;">
-“Creators welcome. Copyright-free vibes, neon-powered.”
-</p>
+  <div class="grid"></div>
+  <div class="bubbles" id="bubbles"></div>
 
-<div id="playlist">
-  <strong>Suno Playlists</strong>
-  <ul>
-    <li><a href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">Vibe 1 — Laugh</a></li>
-    <li><a href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">Vibe 2 — Play</a></li>
-    <li><a href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">Vibe 3 — Fun</a></li>
-    <li><a href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">Vibe 4 — Motown</a></li>
-    <li><a href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">Vibe 5 — Feeling it</a></li>
-  </ul>
-</div>
+  <div class="wrap" id="wrap">
+    <div class="brand">
+      <div class="logo" aria-label="TIMMY TIME"><span class="row">TIMMY</span><span class="row">TIME</span></div>
+      <div class="ver">Static Mirror · <strong id="ver">v1.0.6</strong></div>
+    </div>
 
-<div id="left-arrow" class="arrow">&#8592;</div>
-<div id="right-arrow" class="arrow">&#8594;</div>
+    <div>
+      <h1 id="title">Stage</h1>
+      <div class="subtitle" id="subtitle"></div>
+      <div class="bullets" id="bullets"></div>
+    </div>
+
+    <section class="stage" aria-label="Video Stage">
+      <div class="video-shell" id="videoShell">
+        <!-- Lazy by default; eager if &instant=1 -->
+        <iframe id="ytFrame" title="YouTube video player" loading="lazy" fetchpriority="low"
+          referrerpolicy="origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+      <div class="joke" id="jokeLine">“Creators welcome. Copyright-free vibes, neon-powered.”</div>
+
+      <div class="addlink" aria-label="Add YouTube Link">
+        <input id="ytInput" type="url" inputmode="url" placeholder="Paste YouTube link (watch / shorts / youtu.be) and tap +"
+               autocomplete="off" spellcheck="false">
+        <button id="addBtn" title="Embed">+</button>
+      </div>
+    </section>
+
+    <section class="suno" id="sunoBlock" style="display:none">
+      <h2>Suno Playlists</h2>
+      <ul id="sunoList"></ul>
+      <div class="note">Static preview. For saved links & port-hop, run <code>python app.py</code> locally.</div>
+    </section>
+
+    <div class="footer" id="footNote"></div>
+  </div>
+
+  <!-- Fail-safe arrows (query navigation, no .html files required) -->
+  <div class="nav-arrows">
+    <a class="arrow" id="prevBtn" href="#" title="Prev">
+      <svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </a>
+    <a class="arrow" id="nextBtn" href="#" title="Next">
+      <svg viewBox="0 0 24 24"><path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6z"/></svg>
+    </a>
+  </div>
 
 <script>
-// -------- Neon Bubble Generator --------
-for (let i=0;i<30;i++){
-  const b=document.createElement("div");
-  const size=Math.random()*80+20;
-  b.className="bubble";
-  b.style.width=b.style.height=size+"px";
-  b.style.left=Math.random()*100+"vw";
-  b.style.animationDuration=10+Math.random()*20+"s";
-  document.body.appendChild(b);
-}
+/* ---------- Room config (tints + copy) ---------- */
+const ROOMS = {
+  1:{ n:"Magenta Stage", sub:"Reels Lab E", bullets:"Rock Mode • Matrix • Neon bubbles",
+      joke:"“Creators welcome. Copyright-free vibes, neon-powered.”",
+      accent:"#ff40ff", grid:"0,255,120,0.26", bubble:"255,244,255", suno:false,
+      yt:"dQw4w9WgXcQ" },
+  2:{ n:"Purple Play", sub:"Suno Room A", bullets:"Creator-friendly playlists • Bright shell",
+      joke:"“Laugh first, edit later.”",
+      accent:"#b86bff", grid:"120,90,255,0.26", bubble:"235,220,255", suno:[
+        ["Vibe 1 — Laugh","https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1"],
+        ["Vibe 2 — Play","https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b"],
+        ["Vibe 3 — Fun","https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f"],
+        ["Vibe 4 — Motown","https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840"],
+        ["Vibe 5 — Feeling it","https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c"]
+      ],
+      yt:"dQw4w9WgXcQ" },
+  3:{ n:"Warm Core", sub:"Suno Room B", bullets:"Cozy glow • Feel-good sets",
+      joke:"“Good vibes only, batteries included.”",
+      accent:"#ff8fbf", grid:"255,120,200,0.24", bubble:"255,225,240",
+      suno:[
+        ["Set A","https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479"],
+        ["Set B","https://suno.com/playlist/d04a7c63-52b7-4695-b47f-64f3a3dae677"],
+        ["Set C","https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316"],
+        ["Set D","https://suno.com/playlist/3a82341f-95df-4b1b-91a2-4d5e6531ae08"],
+        ["Set E","https://suno.com/playlist/d3ed7e46-ea14-477f-a9cf-051bdfc0c9c3"]
+      ],
+      yt:"dQw4w9WgXcQ" },
+  4:{ n:"Drift Space", sub:"Jokes & Riddles", bullets:"Daily punchlines • Clip-ready",
+      joke:"“Reality called; we sent it to voicemail.”",
+      accent:"#4de1ff", grid:"80,220,255,0.26", bubble:"215,245,255", suno:false, yt:"dQw4w9WgXcQ" },
+  5:{ n:"Terrific Timmy", sub:"Reels Lab A", bullets:"Bold edits • Big energy",
+      joke:"“Cut fast. Laugh faster.”", accent:"#ffb84d", grid:"255,200,120,0.24", bubble:"255,240,210", suno:false, yt:"dQw4w9WgXcQ" },
+  6:{ n:"Timmy Bubbles", sub:"Reels Lab B", bullets:"Floating hype • Bright hooks",
+      joke:"“If it pops, it plays.”", accent:"#7affc7", grid:"120,255,210,0.24", bubble:"220,255,245", suno:false, yt:"dQw4w9WgXcQ" },
+  7:{ n:"Tornado Timmy", sub:"Reels Lab C", bullets:"Spin up the views",
+      joke:"“We only chase storms and trends.”", accent:"#ff6b6b", grid:"255,120,120,0.24", bubble:"255,225,225", suno:false, yt:"dQw4w9WgXcQ" },
+  8:{ n:"Center Stage", sub:"Marketing Shell", bullets:"Center video • Neon frame",
+      joke:"“Frame it. Fame it.”", accent:"#ff66cc", grid:"255,120,220,0.24", bubble:"255,225,245", suno:false, yt:"dQw4w9WgXcQ" },
+  9:{ n:"Love Notes", sub:"Pink Quotes", bullets:"Two hearts • One beat",
+      joke:"“More neon, less noise.”", accent:"#ff5ea2", grid:"255,120,180,0.24", bubble:"255,220,235", suno:false, yt:"dQw4w9WgXcQ" }
+};
 
-// -------- Room Navigator (Fail-Safe Mode) --------
-let room=parseInt(new URLSearchParams(window.location.search).get('room'))||1;
-function goRoom(dir){
-  let next=room+dir;
-  if(next>9) next=1;
-  if(next<1) next=9;
-  window.location.href=`./?room=${next}&v=1.0.5`;
+const qs = new URLSearchParams(location.search);
+let room = Math.max(1, Math.min(9, parseInt(qs.get('room')||'1',10)));
+const INSTANT = qs.get('instant')==='1';
+
+/* Paint room */
+function paint(){
+  const R = ROOMS[room];
+  document.title = `Timmy Time · ${R.n} · v1.0.6`;
+  document.documentElement.style.setProperty('--accent', R.accent);
+  document.documentElement.style.setProperty('--grid-rgba', R.grid);
+  document.documentElement.style.setProperty('--bubble-rgb', R.bubble);
+  document.getElementById('title').textContent = R.n;
+  document.getElementById('subtitle').textContent = `· ${R.sub}`;
+  document.getElementById('bullets').textContent = R.bullets;
+  document.getElementById('jokeLine').textContent = R.joke;
+
+  // Suno playlists
+  const block = document.getElementById('sunoBlock');
+  const list = document.getElementById('sunoList'); list.innerHTML='';
+  if (R.suno){
+    block.style.display=''; R.suno.forEach(([t,u])=>{
+      const li=document.createElement('li'); const a=document.createElement('a');
+      a.href=u; a.target='_blank'; a.rel='noopener'; a.textContent=t;
+      li.appendChild(a); list.appendChild(li);
+    });
+  } else block.style.display='none';
+
+  // YouTube iframe (lazy; eager with &instant=1)
+  const f = document.getElementById('ytFrame');
+  const src = `https://www.youtube.com/embed/${R.yt}`;
+  if (INSTANT) { f.loading="eager"; f.fetchPriority="high"; f.src = src; }
+  else {
+    const io = new IntersectionObserver((entries)=>{
+      if(entries.some(e=>e.isIntersecting)){ f.src = src; io.disconnect(); }
+    }, {rootMargin:"200px"});
+    io.observe(f);
+  }
+
+  // Prefetch next room URL for snappier hops
+  const next = room===9?1:room+1;
+  const link = document.createElement('link');
+  link.rel = 'prefetch'; link.href = `./?room=${next}&v=1.0.6`;
+  document.head.appendChild(link);
 }
-document.getElementById('left-arrow').onclick=()=>goRoom(-1);
-document.getElementById('right-arrow').onclick=()=>goRoom(1);
+paint();
+
+/* Arrows (fail-safe, query-only) */
+function hop(delta){ let n = room + delta; if(n<1) n=9; if(n>9) n=1; location.href=`./?room=${n}&v=1.0.6`; }
+document.getElementById('prevBtn').onclick = (e)=>{e.preventDefault(); hop(-1);};
+document.getElementById('nextBtn').onclick = (e)=>{e.preventDefault(); hop(1);};
+
+/* Bubbles with adaptive FPS governor */
+(function bubbles(){
+  const root = document.getElementById('bubbles');
+  const small = innerWidth < 420;
+  let count = small ? 14 : 22;
+
+  function spawn(n){
+    for(let i=0;i<n;i++){
+      const b=document.createElement('div'); b.className='bubble';
+      const size = 8 + Math.random()*18;
+      const startX = Math.random()*100;
+      const drift = (Math.random()*18-9) + 'vw';
+      const delay = (-Math.random()*18)+'s';
+      const dur = (18 + Math.random()*26) + 's';
+      b.style.width=size+'vmin'; b.style.height=size+'vmin';
+      b.style.setProperty('--x', startX+'vw');
+      b.style.setProperty('--drift', drift);
+      b.style.setProperty('--s', (0.7 + Math.random()*0.6).toFixed(2));
+      b.style.animationDuration=dur; b.style.animationDelay=delay;
+      root.appendChild(b);
+    }
+  }
+  spawn(count);
+
+  // FPS check: if <45fps over a short window, trim bubbles & shadows
+  let frames=0, start;
+  function tick(ts){
+    if(!start) start = ts;
+    frames++;
+    if(ts - start >= 1500){
+      const fps = frames / ((ts-start)/1000);
+      if(fps < 45){
+        // remove ~1/3 bubbles and disable heavy shadows
+        const toRemove = Math.floor(root.children.length/3);
+        for(let i=0;i<toRemove;i++){ const c=root.children[root.children.length-1]; if(c) c.remove(); }
+        document.documentElement.style.setProperty('--shadow-on', '0');
+      }
+      return; // stop sampling
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+/* Paste-to-embed */
+function toEmbed(url){
+  if(!url) return null;
+  url = url.trim();
+  let m;
+  if (m = url.match(/^https?:\/\/youtu\.be\/([a-zA-Z0-9_-]{6,})/)) return 'https://www.youtube.com/embed/'+m[1];
+  if (m = url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/)) return 'https://www.youtube.com/embed/'+m[1];
+  if (m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,})/)) return 'https://www.youtube.com/embed/'+m[1];
+  return null;
+}
+document.getElementById('addBtn').addEventListener('click', ()=>{
+  const val = document.getElementById('ytInput').value;
+  const embed = toEmbed(val);
+  const f = document.getElementById('ytFrame');
+  if(embed){ f.src = embed; document.getElementById('jokeLine').textContent='Loaded. Lights up—roll camera.'; document.getElementById('ytInput').value=''; }
+  else { document.getElementById('jokeLine').textContent="Hmm… that doesn't look like a YouTube link."; }
+});
+document.getElementById('ytInput').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('addBtn').click(); });
+
+/* Service worker (for offline speed & caching) */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
 </script>
 </body>
 </html>
