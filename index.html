@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>TimmyTime • Bubble World Ship — Pretty Pack v1.2</title>
+<title>TimmyTime • Bubble World Ship — Pretty Pack v1.3</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <base href="/bubbleworld-ship/">
 
@@ -52,6 +52,7 @@
     width:min(1100px,92vw); margin:0 auto 1rem; aspect-ratio:16/9; border-radius:var(--radius);
     overflow:hidden; background:#000; outline:1px solid var(--accent-28);
     box-shadow: 0 10px 40px rgba(0,0,0,.5), 0 0 24px var(--accent-10);
+    position:relative;
   }
   .stage iframe{ width:100%; height:100%; border:0; display:block; }
 
@@ -137,11 +138,25 @@
   .room-gold    { --accent:#ffd166; --accent-60:rgba(255,209,102,.60); --accent-28:rgba(255,209,102,.28); --accent-18:rgba(255,209,102,.18); --accent-10:rgba(255,209,102,.10); }
   .room-lime    { --accent:#86ff82; --accent-60:rgba(134,255,130,.60); --accent-28:rgba(134,255,130,.28); --accent-18:rgba(134,255,130,.18); --accent-10:rgba(134,255,130,.10); }
   .room-rose    { --accent:#ff7aa2; --accent-60:rgba(255,122,162,.60); --accent-28:rgba(255,122,162,.28); --accent-18:rgba(255,122,162,.18); --accent-10:rgba(255,122,162,.10); }
-  .room-orange  { --accent:#ff9b4a; --accent-60:rgba(255,155,74,.60);  --accent-28:rgba(255,155,74,.28);  --accent-18:rgba(255,155,74,.18); --accent-10:rgba(255,155,74,.10); }
+  .room-orange  { --accent:#ff9b4a; --accent-60:rgba(255,155,74,.60);  --accent-28:rgba(255,155,74,.28);  --accent-18:rgba(255,155,74,.18);  --accent-10:rgba(255,155,74,.10); }
   .room-blue    { --accent:#6ab8ff; --accent-60:rgba(106,184,255,.60); --accent-28:rgba(106,184,255,.28); --accent-18:rgba(106,184,255,.18); --accent-10:rgba(106,184,255,.10); }
 
   @media (prefers-reduced-motion: reduce){
-    #matrix,#bubbles{ display:none; }
+    #matrix,#bubbles,#hammerfx{ display:none; }
+  }
+
+  /* ====== ENGINE ROOM SPECIALS ====== */
+  .hammer-wrap{
+    position:absolute; inset:0; display:grid; place-items:center;
+  }
+  .hammer-spot{
+    width: 36vmin; height: 20vmin; border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,.85) 0%, rgba(0,0,0,0) 70%);
+    position:absolute; bottom: 10%; left: 50%; transform: translateX(-50%);
+    pointer-events:none;
+  }
+  .hammer-svg{
+    width:min(38vmin, 70%); height:auto; filter: drop-shadow(0 8px 28px rgba(0,0,0,.65));
   }
 </style>
 </head>
@@ -150,6 +165,7 @@
 <!-- FX layers -->
 <canvas id="matrix" class="fx-layer"></canvas>
 <canvas id="bubbles" class="fx-layer"></canvas>
+<canvas id="hammerfx" class="fx-layer"></canvas> <!-- lightning for Engine Room only -->
 <div class="halo" id="halo"></div>
 
 <!-- Arrows -->
@@ -157,44 +173,48 @@
 <a class="arrow right" href="#next" aria-label="Next room">▶</a>
 
 <main>
-  <!-- Default: Room 4 (Magenta) -->
-  <section data-room="room4" class="room-magenta on">
-    <h1 class="title">Magenta Room</h1>
-    <p class="subtitle">Electric glow • Center-stage marketing</p>
-    <div class="brand">TimmyTime • Pink Neon Pulse</div>
-    <div class="stage" data-video="dQw4w9WgXcQ"></div>
-    <div class="joke">“If the bubbles are vibing, we’re already on page 2 of awesome.”</div>
+  <!-- ===== Engine Room is now DEFAULT (Room 1) ===== -->
+  <section data-room="room1" class="room-engine on">
+    <h1 class="title">Engine Room</h1>
+    <p class="subtitle">Green Matrix • Thor’s Hammer • Lightning</p>
+    <div class="brand">Elevator Online • Green Core Warm</div>
 
-    <div class="plus-wrap">
-      <button class="plus-btn" data-linker="#linker-room4"><span class="dot">＋</span> Add Link</button>
-    </div>
-    <div class="sheet" id="linker-room4">
-      <div class="sheet-inner">
-        <label for="input-room4">Paste a YouTube link (watch / shorts / youtu.be) or an ID:</label>
-        <input id="input-room4" type="url" inputmode="url" placeholder="https://youtu.be/VIDEO or https://youtube.com/watch?v=VIDEO">
-        <div class="actions">
-          <button class="btn primary" data-apply="room4">Set Video</button>
-          <button class="btn" data-reset="room4">Reset to Default</button>
-          <span class="hint">Saves to this room only (local)</span>
-        </div>
+    <!-- Hammer Stage (centered) -->
+    <div class="stage" data-video="aqz-KE-bpKQ" id="engine-stage">
+      <div class="hammer-wrap">
+        <div class="hammer-spot"></div>
+        <!-- Simple, clean SVG Mjölnir (no external assets) -->
+        <svg class="hammer-svg" viewBox="0 0 220 220" aria-hidden="true">
+          <!-- Head -->
+          <rect x="40" y="40" width="140" height="70" rx="12" ry="12" fill="#c9ced1"/>
+          <rect x="55" y="55" width="110" height="40" rx="8" ry="8" fill="#e7ebee"/>
+          <!-- Neck -->
+          <rect x="98" y="110" width="24" height="18" rx="6" ry="6" fill="#b5b9bc"/>
+          <!-- Handle -->
+          <rect x="90" y="128" width="40" height="64" rx="10" ry="10" fill="#6a4b3a"/>
+          <!-- Grip rings -->
+          <g fill="#865c45">
+            <rect x="90" y="138" width="40" height="6" rx="3"/>
+            <rect x="90" y="154" width="40" height="6" rx="3"/>
+            <rect x="90" y="170" width="40" height="6" rx="3"/>
+          </g>
+          <!-- Pommel -->
+          <circle cx="110" cy="196" r="10" fill="#4b3429"/>
+          <!-- Glint -->
+          <rect x="50" y="48" width="18" height="6" rx="3" fill="white" opacity=".65"/>
+        </svg>
       </div>
     </div>
-  </section>
 
-  <!-- 1 -->
-  <section data-room="room1" class="room-engine">
-    <h1 class="title">Engine Room</h1>
-    <p class="subtitle">Matrix + Hammer strikes (FX slot)</p>
-    <div class="brand">Elevator Online • Green Core Warm</div>
-    <div class="stage" data-video="aqz-KE-bpKQ"></div>
     <div class="joke">“If it sparks, it works.”</div>
 
+    <!-- Add Link for Engine Room video -->
     <div class="plus-wrap">
       <button class="plus-btn" data-linker="#linker-room1"><span class="dot">＋</span> Add Link</button>
     </div>
     <div class="sheet" id="linker-room1">
       <div class="sheet-inner">
-        <label for="input-room1">Paste a YouTube link or ID:</label>
+        <label for="input-room1">Paste a YouTube link or ID (Engine Room video):</label>
         <input id="input-room1" type="url" inputmode="url" placeholder="https://youtu.be/VIDEO or ID">
         <div class="actions">
           <button class="btn primary" data-apply="room1">Set Video</button>
@@ -205,7 +225,7 @@
     </div>
   </section>
 
-  <!-- 2 — Suno Room A (5 links) -->
+  <!-- 2 — Purple Play (Suno A) -->
   <section data-room="room2" class="room-purple">
     <h1 class="title">Purple Play</h1>
     <p class="subtitle">Suno Room A • 5 links</p>
@@ -236,7 +256,7 @@
     </div>
   </section>
 
-  <!-- 3 — Suno Room B (your 5 links) -->
+  <!-- 3 — Warm Core (Suno B) -->
   <section data-room="room3" class="room-cyan">
     <h1 class="title">Warm Core</h1>
     <p class="subtitle">Suno Room B • 5 links</p>
@@ -262,6 +282,30 @@
           <button class="btn primary" data-apply="room3">Set Video</button>
           <button class="btn" data-reset="room3">Reset to Default</button>
           <span class="hint">Room 3 only (local)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 — Magenta -->
+  <section data-room="room4" class="room-magenta">
+    <h1 class="title">Magenta Room</h1>
+    <p class="subtitle">Electric glow • Center-stage marketing</p>
+    <div class="brand">TimmyTime • Pink Neon Pulse</div>
+    <div class="stage" data-video="dQw4w9WgXcQ"></div>
+    <div class="joke">“If the bubbles are vibing, we’re already on page 2 of awesome.”</div>
+
+    <div class="plus-wrap">
+      <button class="plus-btn" data-linker="#linker-room4"><span class="dot">＋</span> Add Link</button>
+    </div>
+    <div class="sheet" id="linker-room4">
+      <div class="sheet-inner">
+        <label for="input-room4">Paste a YouTube link (watch / shorts / youtu.be) or an ID:</label>
+        <input id="input-room4" type="url" inputmode="url" placeholder="https://youtu.be/VIDEO or https://youtube.com/watch?v=VIDEO">
+        <div class="actions">
+          <button class="btn primary" data-apply="room4">Set Video</button>
+          <button class="btn" data-reset="room4">Reset to Default</button>
+          <span class="hint">Room 4 only (local)</span>
         </div>
       </div>
     </div>
@@ -395,38 +439,24 @@
    SPA Router + Video Mount
    ========================= */
 const ROOMS = ["room1","room2","room3","room4","room5","room6","room7","room8","room9"];
-const DEFAULT_ROOM = "room4";
+const DEFAULT_ROOM = "room1"; // ENGINE ROOM LANDS FIRST
 
-/* YouTube ID parser: supports watch, shorts, youtu.be, embed, or raw ID */
+/* YouTube ID parser */
 function ytIdFrom(input){
   if (!input) return "";
   let s = (""+input).trim();
-  // If it's already a plain 11-char ID (basic check)
   if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
-
   try{
     const u = new URL(s);
     const host = u.hostname.replace(/^www\./,"");
-    if (host === "youtu.be"){
-      return u.pathname.split("/").filter(Boolean)[0] || "";
-    }
-    if (host === "youtube.com" || host === "m.youtube.com" || host === "music.youtube.com"){
-      // watch?v=ID
+    if (host === "youtu.be"){ return u.pathname.split("/").filter(Boolean)[0] || ""; }
+    if (host.includes("youtube.com")){
       const v = u.searchParams.get("v");
       if (v) return v;
-      // shorts/ID
-      if (u.pathname.startsWith("/shorts/")){
-        return u.pathname.split("/")[2] || "";
-      }
-      // embed/ID
-      if (u.pathname.startsWith("/embed/")){
-        return u.pathname.split("/")[2] || "";
-      }
+      if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2] || "";
+      if (u.pathname.startsWith("/embed/"))  return u.pathname.split("/")[2] || "";
     }
-  }catch(e){
-    // not a URL, ignore
-  }
-  // Fallback: strip params like ?t=30s
+  }catch(e){}
   s = s.split(/[?&]/)[0];
   if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
   return "";
@@ -438,7 +468,7 @@ function saveVideo(room, vid){ try{ localStorage.setItem(keyFor(room), vid); }ca
 function loadVideo(room){ try{ return localStorage.getItem(keyFor(room)) || ""; }catch(e){ return ""; } }
 function clearVideo(room){ try{ localStorage.removeItem(keyFor(room)); }catch(e){} }
 
-/* Build an iframe in the .stage for each room from data-video or stored override */
+/* Build an iframe from data-video or stored override */
 function mountVideoFor(roomId){
   const section = document.querySelector(`[data-room="${roomId}"]`);
   if (!section) return;
@@ -463,8 +493,12 @@ function showRoom(id){
   document.body.className = "";
   el.classList.forEach(c=>{ if (c.startsWith("room-")) document.body.classList.add(c); });
 
-  // Mount/refresh video for current room every time (so override shows immediately)
+  // Videos
   mountVideoFor(room);
+
+  // Lightning canvas only when Engine Room is visible
+  const hammerfx = document.getElementById("hammerfx");
+  hammerfx.style.display = (room === "room1") ? "block" : "none";
 }
 
 function currentIndex(){
@@ -525,7 +559,7 @@ addEventListener("resize", bResize, {passive:true});
 drawBubbles();
 
 /* =========================
-   Matrix drizzle — visible
+   Matrix drizzle — room-tinted
    ========================= */
 const mc = document.getElementById("matrix");
 const mctx = mc.getContext("2d");
@@ -541,10 +575,8 @@ function matrixTint(){
   return cs.getPropertyValue("--accent-18").trim() || "rgba(0,255,120,.18)";
 }
 function matrixLoop(){
-  // fade canvas slightly
   mctx.fillStyle = "rgba(0,0,0,0.04)";
   mctx.fillRect(0,0,mc.width,mc.height);
-  // draw visible columns
   const tint = matrixTint();
   for (let k=0;k<6;k++){
     const x = Math.random()*mc.width;
@@ -556,6 +588,61 @@ function matrixLoop(){
   requestAnimationFrame(matrixLoop);
 }
 matrixLoop();
+
+/* =========================
+   Engine Room Lightning (Mjölnir)
+   ========================= */
+const hfx = document.getElementById("hammerfx");
+const hctx = hfx.getContext("2d");
+function hResize(){
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  hfx.width = Math.floor(innerWidth * dpr);
+  hfx.height = Math.floor(innerHeight * dpr);
+  hfx.style.width = "100%"; hfx.style.height = "100%";
+}
+hResize(); addEventListener("resize", hResize, {passive:true});
+
+function bolt(x1,y1,x2,y2,seg=10,spread=28){
+  const pts = [{x:x1,y:y1}];
+  for(let i=1;i<seg;i++){
+    const t = i/seg;
+    const x = x1 + (x2-x1)*t + (Math.random()*2-1)*spread*(1-Math.abs(.5-t)*2);
+    const y = y1 + (y2-y1)*t + (Math.random()*2-1)*spread;
+    pts.push({x,y});
+  }
+  pts.push({x:x2,y:y2});
+  hctx.beginPath();
+  hctx.moveTo(pts[0].x, pts[0].y);
+  for(const p of pts.slice(1)) hctx.lineTo(p.x,p.y);
+  hctx.stroke();
+}
+
+let lastStrike = 0;
+function lightningLoop(ts){
+  const now = performance.now();
+  hctx.clearRect(0,0,hfx.width,hfx.height);
+
+  // Strike occasionally when Engine Room is active
+  const engineVisible = document.querySelector('[data-room="room1"]').classList.contains('on');
+  if (engineVisible && (now - lastStrike) > (1500 + Math.random()*2500)){
+    lastStrike = now;
+
+    const cx = hfx.width/2, cy = hfx.height*0.38;
+    hctx.lineWidth = 2 * Math.min(devicePixelRatio||1,2);
+    hctx.shadowBlur = 24;
+    hctx.shadowColor = "rgba(180,255,255,.9)";
+    hctx.strokeStyle = "rgba(210,255,255,.95)";
+    // Primary bolt from top toward center of stage/hammer
+    bolt(cx, 0, cx + (Math.random()*120-60), cy + (Math.random()*40-20), 14, 34);
+    // Small branches
+    hctx.lineWidth = 1.2 * Math.min(devicePixelRatio||1,2);
+    bolt(cx, hfx.height*0.12, cx-120, cy-30, 8, 24);
+    bolt(cx, hfx.height*0.16, cx+140, cy-10, 8, 24);
+  }
+
+  requestAnimationFrame(lightningLoop);
+}
+lightningLoop();
 
 /* =========================
    Add Link UI (per-room)
