@@ -1,21 +1,56 @@
-body {
-  background: radial-gradient(circle at 50% 30%, rgba(255,0,128,0.25), transparent 70%),
-              radial-gradient(circle at 20% 80%, rgba(255,140,0,0.18), transparent 70%),
-              radial-gradient(circle at 80% 70%, rgba(138,43,226,0.35), transparent 80%),
-              #000014;
-  color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
-  overflow: hidden;
-}
-.bubble {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,0,170,.5), transparent 70%);
-  box-shadow: 0 0 20px rgba(255,0,170,.6), 0 0 60px rgba(255,140,0,.4);
-  animation: drift linear infinite;
-}
-@keyframes drift {
-  0% {transform: translateY(0);opacity:0;}
-  10%{opacity:.8;}
-  100%{transform: translateY(-120vh);opacity:0;}
+/* Timmy Time Lab v1.0.4 — neon bubbles + matrix + big text */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+body{color:#fff}
+.top{position:fixed;left:0;right:0;top:0;padding:14px 18px;display:flex;gap:16px;align-items:center;z-index:5;background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,.0))}
+.brand{font-weight:800;letter-spacing:.16em;font-size:1.25rem;color:#ff9dfc;text-shadow:0 0 12px #ff6bf5}
+.room-title{font-weight:800;font-size:1.5rem}
+.room-title .sub{opacity:.8;font-weight:500;font-size:1rem}
+
+main{padding-top:76px;min-height:100%;position:relative}
+.stage{max-width:860px;margin:6vh auto 16vh;padding:16px}
+.marketing{font-size:1.25rem;opacity:.95;margin-bottom:10px}
+.video-box{position:relative;aspect-ratio:16/9;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center}
+.video-box .yt{width:100%;height:100%;border:0}
+.placeholder{padding:18px;text-align:center;color:#ddd}
+
+.suno-wrap{margin-top:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:12px;border-radius:8px}
+.suno-wrap .suno-title{font-weight:800;margin-bottom:6px}
+.suno-wrap ul{margin:0;padding-left:18px}
+.suno-wrap a{color:#aaf}
+
+.add-link{display:flex;gap:8px;align-items:center;margin:12px 0}
+.add-link input{flex:1;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.35);color:#fff;font-size:1rem}
+.add-link button{padding:10px 14px;border-radius:8px;border:0;background:#ff6bf5;color:#000;font-weight:800}
+.add-link .stealth{opacity:.6;font-size:.85rem}
+
+.joke{margin-top:12px;font-size:1.1rem;color:#ffe;opacity:.95;text-shadow:0 0 8px rgba(255,255,255,.25)}
+
+.arrows{position:fixed;left:0;right:0;bottom:10vh;display:flex;justify-content:space-between;pointer-events:auto;z-index:6;padding:0 3vw}
+.arrows a{font-size:3rem;text-decoration:none;color:#fff8;padding:.2em .4em;border:2px solid #fff3;border-radius:18px;backdrop-filter:blur(3px)}
+.arrows a:hover{color:#fff;border-color:#fff8}
+
+#bubble-canvas{position:fixed;inset:0;z-index:0}
+.matrix{position:fixed;inset:0;z-index:1;background-image: repeating-linear-gradient(0deg, rgba(0,255,120,.2) 0, rgba(0,255,120,.2) 1px, transparent 1px, transparent 24px), repeating-linear-gradient(90deg, rgba(0,255,120,.2) 0, rgba(0,255,120,.2) 1px, transparent 1px, transparent 24px);opacity:.25;mix-blend-mode:screen;pointer-events:none}
+
+.hammer-wrap{display:grid;place-items:center;margin:8vh 0}
+.hammer{font-size:24vmin;filter:drop-shadow(0 0 18px rgba(255,128,255,.5))}
+.lightning{position:absolute;width:2px;height:26vmin;background:linear-gradient(180deg,#fff,transparent);animation:flash 2.6s infinite ease-in-out;mix-blend-mode:screen}
+@keyframes flash{0%,92%{opacity:0;transform:translateY(-60vh)} 96%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(20vh)}}
+
+/* THEMES (title / bubble tint) */
+.theme-engine .brand{color:#ffb6ff}
+.theme-purple .brand{color:#d7a4ff}
+.theme-warm .brand{color:#ffd7a4}
+.theme-aqua .brand{color:#a4ffef}
+.theme-gold .brand{color:#ffe38a}
+.theme-crimson .brand{color:#ffa4b2}
+.theme-blue .brand{color:#a4c7ff}
+.theme-magenta .brand{color:#ff9dfc}
+.theme-emerald .brand{color:#a4ffc4}
+
+/* Big readable text */
+@media (min-width: 320px){
+  .room-title{font-size:2.1rem}
+  .marketing{font-size:1.3rem}
 }
