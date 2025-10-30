@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Timmy Time · Stage · v1.0.6 Rock</title>
-<meta name="description" content="Timmy Time · Multi-room static mirror · Matrix • Neon bubbles • Performance+ Rock Mode">
+<title>Timmy Time · Stage · v1.0.7 Alive</title>
+<meta name="description" content="Timmy Time · Multi-room static mirror · Matrix • Neon bubbles • Alive Mode (Sniffer/Jumper/Healer)">
 
-<!-- Speed: preconnect & DNS prefetch -->
+<!-- Speed helpers -->
 <link rel="preconnect" href="https://www.youtube.com">
 <link rel="preconnect" href="https://i.ytimg.com">
 <link rel="preconnect" href="https://www.google.com">
@@ -22,10 +22,9 @@
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial}
   :root{
     --accent:#ff40ff;                 /* per-room */
-    --glow-soft: 0 0 22px rgba(255,64,255,.5), 0 0 44px rgba(255,64,255,.28);
     --grid-rgba: 0,255,120,0.26;      /* per-room tint target */
     --bubble-rgb: 255,244,255;        /* per-room */
-    --shadow-on: 1;                    /* toggled by FPS governor */
+    --shadow-on: 1;                   /* FPS governor toggles heavy shadow */
   }
 
   /* Matrix background */
@@ -40,6 +39,10 @@
       linear-gradient(transparent 31px, rgba(var(--grid-rgba)) 32px, transparent 33px),
       linear-gradient(90deg,transparent 31px, rgba(var(--grid-rgba)) 32px, transparent 33px);
     background-size:32px 32px;opacity:.9}
+
+  /* Enter/exit transitions */
+  .fade-layer{position:fixed;inset:0;pointer-events:none;background:rgba(0,0,0,0);backdrop-filter:blur(0px);transition:background .24s ease, backdrop-filter .24s ease}
+  .fade-layer.on{background:rgba(0,0,0,.25);backdrop-filter:blur(4px)}
 
   /* Bubbles (GPU-friendly) */
   .bubbles{position:fixed;inset:0;pointer-events:none;overflow:hidden;contain:layout paint}
@@ -65,14 +68,16 @@
   .wrap{position:relative;min-height:100%;display:flex;flex-direction:column;gap:2rem;
     padding:10vh 6vw 22vh}
   .brand{display:flex;align-items:center;gap:1rem}
-  .logo{font-weight:900;letter-spacing:.4rem;line-height:.9;text-shadow:var(--glow-soft);user-select:none}
+  .logo{font-weight:900;letter-spacing:.4rem;line-height:.9;user-select:none;
+    text-shadow:0 0 22px color-mix(in oklab, var(--accent) 60%, #000 40%), 0 0 44px color-mix(in oklab, var(--accent) 30%, #000 70%)}
   .logo .row{display:block;font-size:clamp(2rem,5vw,3rem)}
   .logo .row:first-child{color:#ff7cff}.logo .row:last-child{color:#ffb3ff}
   .ver{margin-left:auto;padding:.45rem .75rem;border:1px solid rgba(255,255,255,.22);
     border-radius:1rem;font-size:.95rem;color:#ffc8ff;background:rgba(0,0,0,.35);
     backdrop-filter:blur(6px);box-shadow:0 0 24px color-mix(in oklab, var(--accent) 40%, #000 60%)}
 
-  h1{font-size:clamp(2.6rem,7vw,5rem);margin:0;color:#fff4ff;text-shadow:var(--glow-soft)}
+  h1{font-size:clamp(2.6rem,7vw,5rem);margin:0;color:#fff4ff;
+    text-shadow:0 0 22px color-mix(in oklab, var(--accent) 60%, #000 40%)}
   .subtitle{font-size:clamp(1.2rem,2.8vw,1.6rem);opacity:.95}
   .bullets{font-size:clamp(1.05rem,2.6vw,1.5rem);opacity:.92}
 
@@ -95,7 +100,8 @@
     color:#1a001f;cursor:pointer;box-shadow:0 0 24px color-mix(in oklab, var(--accent) 30%, #000 70%)}
 
   .suno{max-width:1100px;margin:1.5rem auto 0}
-  .suno h2{font-size:clamp(1.6rem,3.5vw,2.1rem);margin:0 0 .5rem;color:#ffd6ff;text-shadow:var(--glow-soft)}
+  .suno h2{font-size:clamp(1.6rem,3.5vw,2.1rem);margin:0 0 .5rem;color:#ffd6ff;
+    text-shadow:0 0 20px color-mix(in oklab, var(--accent) 40%, #000 60%)}
   .suno ul{margin:0;padding-left:1.1rem}.suno li{margin:.35rem 0}.suno a{color:#ffc2ff;text-decoration:underline}
 
   .nav-arrows{position:fixed;inset:auto 0 25vh 0;display:flex;justify-content:space-between;padding:0 4vw;pointer-events:none}
@@ -111,11 +117,12 @@
 <body>
   <div class="grid"></div>
   <div class="bubbles" id="bubbles"></div>
+  <div class="fade-layer" id="fade"></div>
 
   <div class="wrap" id="wrap">
     <div class="brand">
       <div class="logo" aria-label="TIMMY TIME"><span class="row">TIMMY</span><span class="row">TIME</span></div>
-      <div class="ver">Static Mirror · <strong id="ver">v1.0.6</strong></div>
+      <div class="ver">Alive Mode · <strong id="ver">v1.0.7</strong></div>
     </div>
 
     <div>
@@ -126,7 +133,6 @@
 
     <section class="stage" aria-label="Video Stage">
       <div class="video-shell" id="videoShell">
-        <!-- Lazy by default; eager if &instant=1 -->
         <iframe id="ytFrame" title="YouTube video player" loading="lazy" fetchpriority="low"
           referrerpolicy="origin"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -144,7 +150,7 @@
     <section class="suno" id="sunoBlock" style="display:none">
       <h2>Suno Playlists</h2>
       <ul id="sunoList"></ul>
-      <div class="note">Static preview. For saved links & port-hop, run <code>python app.py</code> locally.</div>
+      <div class="note">Static mirror. For saved lists & port-hop, run <code>python app.py</code> locally.</div>
     </section>
 
     <div class="footer" id="footNote"></div>
@@ -163,7 +169,7 @@
 <script>
 /* ---------- Room config (tints + copy) ---------- */
 const ROOMS = {
-  1:{ n:"Magenta Stage", sub:"Reels Lab E", bullets:"Rock Mode • Matrix • Neon bubbles",
+  1:{ n:"Magenta Stage", sub:"Reels Lab E", bullets:"Alive Mode • Matrix • Neon bubbles",
       joke:"“Creators welcome. Copyright-free vibes, neon-powered.”",
       accent:"#ff40ff", grid:"0,255,120,0.26", bubble:"255,244,255", suno:false,
       yt:"dQw4w9WgXcQ" },
@@ -175,8 +181,7 @@ const ROOMS = {
         ["Vibe 3 — Fun","https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f"],
         ["Vibe 4 — Motown","https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840"],
         ["Vibe 5 — Feeling it","https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c"]
-      ],
-      yt:"dQw4w9WgXcQ" },
+      ], yt:"dQw4w9WgXcQ" },
   3:{ n:"Warm Core", sub:"Suno Room B", bullets:"Cozy glow • Feel-good sets",
       joke:"“Good vibes only, batteries included.”",
       accent:"#ff8fbf", grid:"255,120,200,0.24", bubble:"255,225,240",
@@ -186,8 +191,7 @@ const ROOMS = {
         ["Set C","https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316"],
         ["Set D","https://suno.com/playlist/3a82341f-95df-4b1b-91a2-4d5e6531ae08"],
         ["Set E","https://suno.com/playlist/d3ed7e46-ea14-477f-a9cf-051bdfc0c9c3"]
-      ],
-      yt:"dQw4w9WgXcQ" },
+      ], yt:"dQw4w9WgXcQ" },
   4:{ n:"Drift Space", sub:"Jokes & Riddles", bullets:"Daily punchlines • Clip-ready",
       joke:"“Reality called; we sent it to voicemail.”",
       accent:"#4de1ff", grid:"80,220,255,0.26", bubble:"215,245,255", suno:false, yt:"dQw4w9WgXcQ" },
@@ -204,62 +208,87 @@ const ROOMS = {
 };
 
 const qs = new URLSearchParams(location.search);
-let room = Math.max(1, Math.min(9, parseInt(qs.get('room')||'1',10)));
+let room = Math.max(1, Math.min(9, parseInt(qs.get('room')||localStorage.getItem('tt_last_room')||'1',10)));
 const INSTANT = qs.get('instant')==='1';
 
-/* Paint room */
+/* ---------- Core paint ---------- */
 function paint(){
   const R = ROOMS[room];
-  document.title = `Timmy Time · ${R.n} · v1.0.6`;
+  document.title = `Timmy Time · ${R.n} · v1.0.7`;
   document.documentElement.style.setProperty('--accent', R.accent);
   document.documentElement.style.setProperty('--grid-rgba', R.grid);
   document.documentElement.style.setProperty('--bubble-rgb', R.bubble);
-  document.getElementById('title').textContent = R.n;
-  document.getElementById('subtitle').textContent = `· ${R.sub}`;
-  document.getElementById('bullets').textContent = R.bullets;
-  document.getElementById('jokeLine').textContent = R.joke;
+  title.textContent = R.n;
+  subtitle.textContent = `· ${R.sub}`;
+  bullets.textContent = R.bullets;
+  jokeLine.textContent = R.joke;
 
   // Suno playlists
-  const block = document.getElementById('sunoBlock');
-  const list = document.getElementById('sunoList'); list.innerHTML='';
+  sunoList.innerHTML='';
   if (R.suno){
-    block.style.display=''; R.suno.forEach(([t,u])=>{
+    sunoBlock.style.display='';
+    R.suno.forEach(([t,u])=>{
       const li=document.createElement('li'); const a=document.createElement('a');
       a.href=u; a.target='_blank'; a.rel='noopener'; a.textContent=t;
-      li.appendChild(a); list.appendChild(li);
+      li.appendChild(a); sunoList.appendChild(li);
     });
-  } else block.style.display='none';
+  } else sunoBlock.style.display='none';
 
-  // YouTube iframe (lazy; eager with &instant=1)
-  const f = document.getElementById('ytFrame');
-  const src = `https://www.youtube.com/embed/${R.yt}`;
+  // YouTube iframe (load from memory first)
+  const f = ytFrame;
+  const saved = localStorage.getItem(`tt_room_${room}_yt`);
+  const videoId = saved ? saved : R.yt;
+  const src = `https://www.youtube.com/embed/${videoId}`;
   if (INSTANT) { f.loading="eager"; f.fetchPriority="high"; f.src = src; }
   else {
+    f.removeAttribute('src');
     const io = new IntersectionObserver((entries)=>{
       if(entries.some(e=>e.isIntersecting)){ f.src = src; io.disconnect(); }
     }, {rootMargin:"200px"});
     io.observe(f);
   }
 
-  // Prefetch next room URL for snappier hops
+  // Prefetch next room URL
   const next = room===9?1:room+1;
   const link = document.createElement('link');
-  link.rel = 'prefetch'; link.href = `./?room=${next}&v=1.0.6`;
+  link.rel='prefetch'; link.href=`./?room=${next}&v=1.0.7`;
   document.head.appendChild(link);
+
+  // Memory
+  localStorage.setItem('tt_last_room', String(room));
 }
 paint();
 
-/* Arrows (fail-safe, query-only) */
-function hop(delta){ let n = room + delta; if(n<1) n=9; if(n>9) n=1; location.href=`./?room=${n}&v=1.0.6`; }
-document.getElementById('prevBtn').onclick = (e)=>{e.preventDefault(); hop(-1);};
-document.getElementById('nextBtn').onclick = (e)=>{e.preventDefault(); hop(1);};
+/* ---------- Arrows (fail-safe, query-only) with quantum delay ---------- */
+function chime(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.type='sine'; o.frequency.value=660; g.gain.value=0.0001;
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); g.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.18);
+    o.stop(ctx.currentTime+0.2);
+  }catch(e){}
+}
+function hop(delta){
+  const fade = document.getElementById('fade');
+  fade.classList.add('on');
+  chime();
+  const jitter = 120 + Math.random()*140; // cinematic tiny delay
+  setTimeout(()=>{
+    let n = room + delta; if(n<1) n=9; if(n>9) n=1;
+    location.href = `./?room=${n}&v=1.0.7`;
+  }, jitter);
+}
+prevBtn.onclick = e=>{e.preventDefault(); hop(-1);};
+nextBtn.onclick = e=>{e.preventDefault(); hop(1);};
 
-/* Bubbles with adaptive FPS governor */
+/* ---------- Bubbles with adaptive FPS governor ---------- */
 (function bubbles(){
-  const root = document.getElementById('bubbles');
+  const root = bubbles = document.getElementById('bubbles');
   const small = innerWidth < 420;
   let count = small ? 14 : 22;
-
   function spawn(n){
     for(let i=0;i<n;i++){
       const b=document.createElement('div'); b.className='bubble';
@@ -278,7 +307,7 @@ document.getElementById('nextBtn').onclick = (e)=>{e.preventDefault(); hop(1);};
   }
   spawn(count);
 
-  // FPS check: if <45fps over a short window, trim bubbles & shadows
+  // FPS sampling -> trim bubbles & shadows when needed
   let frames=0, start;
   function tick(ts){
     if(!start) start = ts;
@@ -286,7 +315,6 @@ document.getElementById('nextBtn').onclick = (e)=>{e.preventDefault(); hop(1);};
     if(ts - start >= 1500){
       const fps = frames / ((ts-start)/1000);
       if(fps < 45){
-        // remove ~1/3 bubbles and disable heavy shadows
         const toRemove = Math.floor(root.children.length/3);
         for(let i=0;i<toRemove;i++){ const c=root.children[root.children.length-1]; if(c) c.remove(); }
         document.documentElement.style.setProperty('--shadow-on', '0');
@@ -298,26 +326,86 @@ document.getElementById('nextBtn').onclick = (e)=>{e.preventDefault(); hop(1);};
   requestAnimationFrame(tick);
 })();
 
-/* Paste-to-embed */
-function toEmbed(url){
+/* ---------- Paste-to-embed (with memory) ---------- */
+function toId(url){
   if(!url) return null;
   url = url.trim();
   let m;
-  if (m = url.match(/^https?:\/\/youtu\.be\/([a-zA-Z0-9_-]{6,})/)) return 'https://www.youtube.com/embed/'+m[1];
-  if (m = url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/)) return 'https://www.youtube.com/embed/'+m[1];
-  if (m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,})/)) return 'https://www.youtube.com/embed/'+m[1];
+  if (m = url.match(/^https?:\/\/youtu\.be\/([a-zA-Z0-9_-]{6,})/)) return m[1];
+  if (m = url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/)) return m[1];
+  if (m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,})/)) return m[1];
   return null;
 }
-document.getElementById('addBtn').addEventListener('click', ()=>{
-  const val = document.getElementById('ytInput').value;
-  const embed = toEmbed(val);
-  const f = document.getElementById('ytFrame');
-  if(embed){ f.src = embed; document.getElementById('jokeLine').textContent='Loaded. Lights up—roll camera.'; document.getElementById('ytInput').value=''; }
-  else { document.getElementById('jokeLine').textContent="Hmm… that doesn't look like a YouTube link."; }
+addBtn.addEventListener('click', ()=>{
+  const id = toId(ytInput.value);
+  if(id){
+    chime();
+    ytFrame.src = `https://www.youtube.com/embed/${id}`;
+    localStorage.setItem(`tt_room_${room}_yt`, id);
+    jokeLine.textContent='Loaded. Lights up—roll camera.';
+    ytInput.value='';
+  } else { jokeLine.textContent="Hmm… that doesn't look like a YouTube link."; }
 });
-document.getElementById('ytInput').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('addBtn').click(); });
+ytInput.addEventListener('keydown', e=>{ if(e.key==='Enter') addBtn.click(); });
 
-/* Service worker (for offline speed & caching) */
+/* ---------- Sniffer / Jumper / Healer ---------- */
+const Ship = {
+  started: performance.now(),
+  net: navigator.connection || {},
+  iframe: document.getElementById('ytFrame'),
+  healTimer: null,
+  sniff(){
+    const info = {
+      downlink: this.net.downlink || 0,
+      rtt: this.net.rtt || 0,
+      saveData: this.net.saveData || false,
+      type: this.net.effectiveType || 'unknown',
+      hidden: document.hidden
+    };
+    // If slow connection or data saver, lower bubble intensity immediately
+    if (info.saveData || /2g|slow/.test(info.type) || info.downlink && info.downlink < 1.2){
+      document.documentElement.style.setProperty('--shadow-on','0');
+    }
+    // Prefers reduced motion also trims bubbles
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches){
+      document.documentElement.style.setProperty('--shadow-on','0');
+    }
+  },
+  jumper(){
+    // If the iframe hasn't loaded after 4.5s, reload its src (gentle jump)
+    const f = this.iframe;
+    if (!f) return;
+    if (this.healTimer) clearTimeout(this.healTimer);
+    this.healTimer = setTimeout(()=>{
+      try{
+        if(!f.contentWindow || f.contentWindow.length===0){
+          const s = f.src;
+          f.src = s; // refresh
+        }
+      }catch(e){}
+    }, 4500);
+  },
+  healer(){
+    // If page regains visibility, gently re-kick iframe if blank
+    document.addEventListener('visibilitychange', ()=>{
+      if (!document.hidden){
+        try{
+          const f = this.iframe;
+          if (f && !f.src) {
+            const R = ROOMS[room]; const saved = localStorage.getItem(`tt_room_${room}_yt`) || R.yt;
+            f.src = `https://www.youtube.com/embed/${saved}`;
+          }
+        }catch(e){}
+      }
+    });
+  },
+  boot(){
+    this.sniff(); this.jumper(); this.healer();
+  }
+};
+window.addEventListener('load', ()=> Ship.boot());
+
+/* ---------- Service worker for cache ---------- */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
