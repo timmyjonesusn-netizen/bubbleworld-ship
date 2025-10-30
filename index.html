@@ -1,414 +1,337 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Timmy Time · Stage · v1.0.7 Alive</title>
-<meta name="description" content="Timmy Time · Multi-room static mirror · Matrix • Neon bubbles • Alive Mode (Sniffer/Jumper/Healer)">
-
-<!-- Speed helpers -->
-<link rel="preconnect" href="https://www.youtube.com">
-<link rel="preconnect" href="https://i.ytimg.com">
-<link rel="preconnect" href="https://www.google.com">
-<link rel="preconnect" href="https://suno.com">
-<link rel="dns-prefetch" href="//www.youtube.com">
-<link rel="dns-prefetch" href="//i.ytimg.com">
-<link rel="dns-prefetch" href="//www.google.com">
-<link rel="dns-prefetch" href="//suno.com">
+<title>TimmyTime • Bubble World Ship — Pretty Pack</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- If hosted on GitHub Pages under /bubbleworld-ship/, this base helps relative assets -->
+<base href="/bubbleworld-ship/">
 
 <style>
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%;background:#000;color:#fff;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial}
   :root{
-    --accent:#ff40ff;                 /* per-room */
-    --grid-rgba: 0,255,120,0.26;      /* per-room tint target */
-    --bubble-rgb: 255,244,255;        /* per-room */
-    --shadow-on: 1;                   /* FPS governor toggles heavy shadow */
+    --bg:#05000c;        /* deep space */
+    --ink:#fefefe;       /* default text */
+    --glass:rgba(255,255,255,.08);
+    --radius:16px;
+    --title-size: clamp(2rem, 6vw, 3rem);   /* BIG titles (law) */
+    --body-size:  clamp(1.05rem, 4vw, 1.5rem);
   }
 
-  /* Matrix background */
-  .grid{position:fixed;inset:0;pointer-events:none;contain:paint;
+  /* Reset + base */
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; background:var(--bg); color:var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  a{ color:inherit; }
+
+  /* Fullscreen visual layers that never block taps */
+  .fx-layer{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+  }
+
+  /* Rooms container */
+  main{ position:relative; z-index:1; min-height:100dvh; }
+
+  /* Each room page (SPA sections) */
+  [data-room]{ display:none; min-height:100dvh; padding:10vh 6vw 14vh; }
+  [data-room].on{ display:block; }
+
+  /* Soft spotlight + vignette per-room, rendered with CSS so it’s cheap */
+  .halo{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
     background:
-      radial-gradient(120vmin 120vmin at 10% 10%, rgba(255,255,255,.06), transparent 60%),
-      radial-gradient(100vmin 100vmin at 88% 20%, rgba(255,255,255,.06), transparent 60%),
-      radial-gradient(120vmin 120vmin at 28% 78%, rgba(255,255,255,.06), transparent 60%),
-      linear-gradient(0deg,#05000c,#000 50%,#020005)}
-  .grid::before{content:"";position:absolute;inset:0;
-    background-image:
-      linear-gradient(transparent 31px, rgba(var(--grid-rgba)) 32px, transparent 33px),
-      linear-gradient(90deg,transparent 31px, rgba(var(--grid-rgba)) 32px, transparent 33px);
-    background-size:32px 32px;opacity:.9}
-
-  /* Enter/exit transitions */
-  .fade-layer{position:fixed;inset:0;pointer-events:none;background:rgba(0,0,0,0);backdrop-filter:blur(0px);transition:background .24s ease, backdrop-filter .24s ease}
-  .fade-layer.on{background:rgba(0,0,0,.25);backdrop-filter:blur(4px)}
-
-  /* Bubbles (GPU-friendly) */
-  .bubbles{position:fixed;inset:0;pointer-events:none;overflow:hidden;contain:layout paint}
-  .bubble{
-    position:absolute;border-radius:50%;
-    width:12vmin;height:12vmin;
-    background:radial-gradient(circle at 30% 30%, rgba(var(--bubble-rgb),.18), rgba(var(--bubble-rgb),.06) 60%, rgba(var(--bubble-rgb),0) 70%);
-    border:.45vmin solid rgba(255,182,255,.16);
-    filter: drop-shadow(0 0 .6vmin rgba(255,255,255,calc(var(--shadow-on)*.22)));
-    will-change: transform;
-    animation: rise linear infinite;
-    opacity:.85;
+      radial-gradient(40vmin 40vmin at 50% 42%, var(--accent-20) 0%, transparent 65%),
+      radial-gradient(120vmax 100vmax at 50% 120%, rgba(0,0,0,.55) 0%, rgba(0,0,0,.0) 30%),
+      radial-gradient(100vmax 100vmax at -10% -10%, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 32%),
+      radial-gradient(100vmax 100vmax at 110% -10%, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 32%);
   }
-  @keyframes rise{
-    from{transform:translate3d(var(--x),110vh,0) scale(var(--s))}
-    to  {transform:translate3d(calc(var(--x) + var(--drift)), -15vh,0) scale(var(--s))}
+
+  /* Title / subtitle */
+  .title{ font-size:var(--title-size); line-height:1.1; letter-spacing:.5px; margin:0 0 .25rem; text-align:center; }
+  .subtitle{ font-size: clamp(1rem, 3.5vw, 1.25rem); opacity:.9; text-align:center; margin:0 0 2rem; }
+
+  /* Brand line above the stage */
+  .brand{
+    width:min(1100px, 92vw); margin:.25rem auto 1rem; text-align:center; font-weight:800; letter-spacing:1px;
+    color:var(--accent); text-shadow: 0 0 18px var(--accent-60);
+    font-size: clamp(1.1rem, 4.6vw, 1.8rem);
   }
+
+  /* Center-stage video frame */
+  .stage{
+    width:min(1100px, 92vw); margin:0 auto 1rem; aspect-ratio:16/9; border-radius:var(--radius);
+    overflow:hidden; background:#000; outline:1px solid var(--accent-30);
+    box-shadow: 0 10px 40px rgba(0,0,0,.5), 0 0 24px var(--accent-10);
+  }
+  .stage iframe{ width:100%; height:100%; border:0; display:block; }
+
+  /* Joke (glass card) */
+  .joke{
+    width:min(1100px, 92vw); margin:.6rem auto 0; padding:.8rem 1rem; border-radius:12px;
+    background:var(--glass); backdrop-filter: blur(6px);
+    font-size:var(--body-size);
+  }
+
+  /* Arrows — left/right edges, raised about 25vh from bottom */
+  .arrow{
+    position:fixed; bottom:25vh; /* requested raised position */
+    font-size: clamp(2rem, 8vw, 3rem); text-decoration:none; color:var(--ink);
+    padding:.35rem .6rem; border-radius:.5rem; background: var(--glass);
+    backdrop-filter: blur(6px); z-index: 9999; user-select:none;
+  }
+  .arrow.left{ left:1rem; }
+  .arrow.right{ right:1rem; }
+  .arrow:active{ transform: scale(.98); }
+
+  /* Room themes — set CSS vars used above */
+  .room-engine  { --accent:#35ff9c; --accent-60:rgba(53,255,156,.6); --accent-30:rgba(53,255,156,.28); --accent-20:rgba(53,255,156,.20); --accent-10:rgba(53,255,156,.10); }
+  .room-purple  { --accent:#bd6cff; --accent-60:rgba(189,108,255,.6); --accent-30:rgba(189,108,255,.28); --accent-20:rgba(189,108,255,.20); --accent-10:rgba(189,108,255,.10); }
+  .room-cyan    { --accent:#46eaff; --accent-60:rgba(70,234,255,.6);  --accent-30:rgba(70,234,255,.28);  --accent-20:rgba(70,234,255,.20);  --accent-10:rgba(70,234,255,.10); }
+  .room-magenta { --accent:#ff0fd6; --accent-60:rgba(255,15,214,.6); --accent-30:rgba(255,15,214,.28); --accent-20:rgba(255,15,214,.20); --accent-10:rgba(255,15,214,.10); }
+  .room-gold    { --accent:#ffd166; --accent-60:rgba(255,209,102,.6); --accent-30:rgba(255,209,102,.28); --accent-20:rgba(255,209,102,.20); --accent-10:rgba(255,209,102,.10); }
+  .room-lime    { --accent:#86ff82; --accent-60:rgba(134,255,130,.6); --accent-30:rgba(134,255,130,.28); --accent-20:rgba(134,255,130,.20); --accent-10:rgba(134,255,130,.10); }
+  .room-rose    { --accent:#ff7aa2; --accent-60:rgba(255,122,162,.6); --accent-30:rgba(255,122,162,.28); --accent-20:rgba(255,122,162,.20); --accent-10:rgba(255,122,162,.10); }
+  .room-orange  { --accent:#ff9b4a; --accent-60:rgba(255,155,74,.6);  --accent-30:rgba(255,155,74,.28);  --accent-20:rgba(255,155,74,.20);  --accent-10:rgba(255,155,74,.10); }
+  .room-blue    { --accent:#6ab8ff; --accent-60:rgba(106,184,255,.6); --accent-30:rgba(106,184,255,.28); --accent-20:rgba(106,184,255,.20); --accent-10:rgba(106,184,255,.10); }
+
+  /* Accessibility: reduce motion disables FX layers */
   @media (prefers-reduced-motion: reduce){
-    .bubble{animation:none;opacity:.25}
+    #matrix, #bubbles { display:none; }
   }
-
-  /* Layout */
-  .wrap{position:relative;min-height:100%;display:flex;flex-direction:column;gap:2rem;
-    padding:10vh 6vw 22vh}
-  .brand{display:flex;align-items:center;gap:1rem}
-  .logo{font-weight:900;letter-spacing:.4rem;line-height:.9;user-select:none;
-    text-shadow:0 0 22px color-mix(in oklab, var(--accent) 60%, #000 40%), 0 0 44px color-mix(in oklab, var(--accent) 30%, #000 70%)}
-  .logo .row{display:block;font-size:clamp(2rem,5vw,3rem)}
-  .logo .row:first-child{color:#ff7cff}.logo .row:last-child{color:#ffb3ff}
-  .ver{margin-left:auto;padding:.45rem .75rem;border:1px solid rgba(255,255,255,.22);
-    border-radius:1rem;font-size:.95rem;color:#ffc8ff;background:rgba(0,0,0,.35);
-    backdrop-filter:blur(6px);box-shadow:0 0 24px color-mix(in oklab, var(--accent) 40%, #000 60%)}
-
-  h1{font-size:clamp(2.6rem,7vw,5rem);margin:0;color:#fff4ff;
-    text-shadow:0 0 22px color-mix(in oklab, var(--accent) 60%, #000 40%)}
-  .subtitle{font-size:clamp(1.2rem,2.8vw,1.6rem);opacity:.95}
-  .bullets{font-size:clamp(1.05rem,2.6vw,1.5rem);opacity:.92}
-
-  .stage{margin-top:1rem;display:grid;gap:1rem}
-  .video-shell{
-    position:relative;width:100%;max-width:1100px;margin-inline:auto;aspect-ratio:16/9;
-    border-radius:1rem;border:2px solid color-mix(in oklab, var(--accent) 70%, #000 30%);
-    box-shadow:inset 0 0 18px color-mix(in oklab, var(--accent) 45%, #000 55%);
-    overflow:hidden;background:#070109;contain:content}
-  .video-shell iframe{width:100%;height:100%;border:0;display:block;contain:strict}
-
-  .joke{max-width:1100px;margin:.5rem auto 0;font-size:clamp(1.15rem,2.6vw,1.6rem);
-    color:#ffd6ff;text-shadow:0 0 8px color-mix(in oklab, var(--accent) 35%, #000 65%)}
-
-  .addlink{max-width:1100px;margin:.5rem auto 0;display:flex;gap:.5rem;align-items:center}
-  .addlink input{flex:1;padding:.8rem 1rem;font-size:1rem;border-radius:.8rem;
-    border:1px solid rgba(255,255,255,.22);background:rgba(15,0,22,.6);color:#fff;outline:none}
-  .addlink button{padding:.85rem 1rem;font-weight:700;border-radius:.8rem;border:1px solid rgba(255,255,255,.22);
-    background:linear-gradient(90deg,color-mix(in oklab, var(--accent) 90%, #fff 10%), #ffa0ff);
-    color:#1a001f;cursor:pointer;box-shadow:0 0 24px color-mix(in oklab, var(--accent) 30%, #000 70%)}
-
-  .suno{max-width:1100px;margin:1.5rem auto 0}
-  .suno h2{font-size:clamp(1.6rem,3.5vw,2.1rem);margin:0 0 .5rem;color:#ffd6ff;
-    text-shadow:0 0 20px color-mix(in oklab, var(--accent) 40%, #000 60%)}
-  .suno ul{margin:0;padding-left:1.1rem}.suno li{margin:.35rem 0}.suno a{color:#ffc2ff;text-decoration:underline}
-
-  .nav-arrows{position:fixed;inset:auto 0 25vh 0;display:flex;justify-content:space-between;padding:0 4vw;pointer-events:none}
-  .arrow{pointer-events:auto;width:84px;height:84px;border-radius:20px;display:grid;place-items:center;
-    border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.35);backdrop-filter:blur(6px);
-    box-shadow:0 0 24px color-mix(in oklab, var(--accent) 35%, #000 65%)}
-  .arrow svg{width:44px;height:44px;fill:#fff;opacity:.95}
-
-  .footer{max-width:1100px;margin:2rem auto 0;opacity:.9;font-size:clamp(1rem,2.2vw,1.15rem)}
-  a,button{-webkit-tap-highlight-color:transparent}
 </style>
 </head>
 <body>
-  <div class="grid"></div>
-  <div class="bubbles" id="bubbles"></div>
-  <div class="fade-layer" id="fade"></div>
 
-  <div class="wrap" id="wrap">
-    <div class="brand">
-      <div class="logo" aria-label="TIMMY TIME"><span class="row">TIMMY</span><span class="row">TIME</span></div>
-      <div class="ver">Alive Mode · <strong id="ver">v1.0.7</strong></div>
-    </div>
+<!-- Visual FX layers (never intercept clicks) -->
+<canvas id="matrix" class="fx-layer"></canvas>
+<canvas id="bubbles" class="fx-layer"></canvas>
+<div class="halo" id="halo"></div>
 
-    <div>
-      <h1 id="title">Stage</h1>
-      <div class="subtitle" id="subtitle"></div>
-      <div class="bullets" id="bullets"></div>
-    </div>
+<!-- Arrows -->
+<a class="arrow left"  href="#prev" aria-label="Previous room">◀</a>
+<a class="arrow right" href="#next" aria-label="Next room">▶</a>
 
-    <section class="stage" aria-label="Video Stage">
-      <div class="video-shell" id="videoShell">
-        <iframe id="ytFrame" title="YouTube video player" loading="lazy" fetchpriority="low"
-          referrerpolicy="origin"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen></iframe>
-      </div>
-      <div class="joke" id="jokeLine">“Creators welcome. Copyright-free vibes, neon-powered.”</div>
+<main>
+  <!-- ===== ROOMS (SPA sections) ===== -->
+  <!-- 4 = Magenta default -->
+  <section data-room="room4" class="room-magenta on">
+    <h1 class="title">Magenta Room</h1>
+    <p class="subtitle">Electric glow • Center-stage marketing</p>
+    <div class="brand">TimmyTime • Pink Neon Pulse</div>
+    <div class="stage" data-video="dQw4w9WgXcQ"></div>
+    <div class="joke">“If the bubbles are vibing, we’re already on page 2 of awesome.”</div>
+  </section>
 
-      <div class="addlink" aria-label="Add YouTube Link">
-        <input id="ytInput" type="url" inputmode="url" placeholder="Paste YouTube link (watch / shorts / youtu.be) and tap +"
-               autocomplete="off" spellcheck="false">
-        <button id="addBtn" title="Embed">+</button>
-      </div>
-    </section>
+  <section data-room="room1" class="room-engine">
+    <h1 class="title">Engine Room</h1>
+    <p class="subtitle">Matrix + Hammer strikes (FX slot)</p>
+    <div class="brand">Elevator Online • Green Core Warm</div>
+    <div class="stage" data-video="aqz-KE-bpKQ"></div>
+    <div class="joke">“If it sparks, it works.”</div>
+  </section>
 
-    <section class="suno" id="sunoBlock" style="display:none">
-      <h2>Suno Playlists</h2>
-      <ul id="sunoList"></ul>
-      <div class="note">Static mirror. For saved lists & port-hop, run <code>python app.py</code> locally.</div>
-    </section>
+  <section data-room="room2" class="room-purple">
+    <h1 class="title">Purple Play</h1>
+    <p class="subtitle">Suno Room A • 5 links</p>
+    <div class="brand">Timmy Bubbles • Creator-Safe</div>
+    <div class="stage" data-video="Zi_XLOBDo_Y"></div>
+    <div class="joke">“Certified bop, zero copyright flop.”</div>
+  </section>
 
-    <div class="footer" id="footNote"></div>
-  </div>
+  <section data-room="room3" class="room-cyan">
+    <h1 class="title">Warm Core</h1>
+    <p class="subtitle">Suno Room B • 5 links</p>
+    <div class="brand">Terrific Timmy • Feel Good</div>
+    <div class="stage" data-video="3JZ_D3ELwOQ"></div>
+    <div class="joke">“10/10 doctors recommend more vibes.”</div>
+  </section>
 
-  <!-- Fail-safe arrows (query navigation, no .html files required) -->
-  <div class="nav-arrows">
-    <a class="arrow" id="prevBtn" href="#" title="Prev">
-      <svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-    </a>
-    <a class="arrow" id="nextBtn" href="#" title="Next">
-      <svg viewBox="0 0 24 24"><path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6z"/></svg>
-    </a>
-  </div>
+  <section data-room="room5" class="room-gold">
+    <h1 class="title">Gold Rush</h1>
+    <p class="subtitle">Reels + Marketing</p>
+    <div class="brand">Tornado Timmy • Spin Up</div>
+    <div class="stage" data-video="l482T0yNkeo"></div>
+    <div class="joke">“Breaking news: bubbles rise.”</div>
+  </section>
+
+  <section data-room="room6" class="room-lime">
+    <h1 class="title">Lime Lift</h1>
+    <p class="subtitle">Quotes / Love</p>
+    <div class="brand">Timmy Fantastic</div>
+    <div class="stage" data-video="9bZkp7q19f0"></div>
+    <div class="joke">“Free refills on smiles.”</div>
+  </section>
+
+  <section data-room="room7" class="room-rose">
+    <h1 class="title">Rose Bloom</h1>
+    <p class="subtitle">Reels + Jokes</p>
+    <div class="brand">TimmyTime LIVE</div>
+    <div class="stage" data-video="fJ9rUzIMcZQ"></div>
+    <div class="joke">“Comedy calories don’t count.”</div>
+  </section>
+
+  <section data-room="room8" class="room-orange">
+    <h1 class="title">Orange Drive</h1>
+    <p class="subtitle">Center-Stage + Link bar</p>
+    <div class="brand">Creator Mode • One-Take</div>
+    <div class="stage" data-video="J---aiyznGQ"></div>
+    <div class="joke">“One button, instant swagger.”</div>
+  </section>
+
+  <section data-room="room9" class="room-blue">
+    <h1 class="title">Blue Calm (Beta Lab)</h1>
+    <p class="subtitle">Experiments • Chill</p>
+    <div class="brand">Spark • Test • Ship</div>
+    <div class="stage" data-video="60ItHLz5WEA"></div>
+    <div class="joke">“Shipping is a feature.”</div>
+  </section>
+</main>
 
 <script>
-/* ---------- Room config (tints + copy) ---------- */
-const ROOMS = {
-  1:{ n:"Magenta Stage", sub:"Reels Lab E", bullets:"Alive Mode • Matrix • Neon bubbles",
-      joke:"“Creators welcome. Copyright-free vibes, neon-powered.”",
-      accent:"#ff40ff", grid:"0,255,120,0.26", bubble:"255,244,255", suno:false,
-      yt:"dQw4w9WgXcQ" },
-  2:{ n:"Purple Play", sub:"Suno Room A", bullets:"Creator-friendly playlists • Bright shell",
-      joke:"“Laugh first, edit later.”",
-      accent:"#b86bff", grid:"120,90,255,0.26", bubble:"235,220,255", suno:[
-        ["Vibe 1 — Laugh","https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1"],
-        ["Vibe 2 — Play","https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b"],
-        ["Vibe 3 — Fun","https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f"],
-        ["Vibe 4 — Motown","https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840"],
-        ["Vibe 5 — Feeling it","https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c"]
-      ], yt:"dQw4w9WgXcQ" },
-  3:{ n:"Warm Core", sub:"Suno Room B", bullets:"Cozy glow • Feel-good sets",
-      joke:"“Good vibes only, batteries included.”",
-      accent:"#ff8fbf", grid:"255,120,200,0.24", bubble:"255,225,240",
-      suno:[
-        ["Set A","https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479"],
-        ["Set B","https://suno.com/playlist/d04a7c63-52b7-4695-b47f-64f3a3dae677"],
-        ["Set C","https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316"],
-        ["Set D","https://suno.com/playlist/3a82341f-95df-4b1b-91a2-4d5e6531ae08"],
-        ["Set E","https://suno.com/playlist/d3ed7e46-ea14-477f-a9cf-051bdfc0c9c3"]
-      ], yt:"dQw4w9WgXcQ" },
-  4:{ n:"Drift Space", sub:"Jokes & Riddles", bullets:"Daily punchlines • Clip-ready",
-      joke:"“Reality called; we sent it to voicemail.”",
-      accent:"#4de1ff", grid:"80,220,255,0.26", bubble:"215,245,255", suno:false, yt:"dQw4w9WgXcQ" },
-  5:{ n:"Terrific Timmy", sub:"Reels Lab A", bullets:"Bold edits • Big energy",
-      joke:"“Cut fast. Laugh faster.”", accent:"#ffb84d", grid:"255,200,120,0.24", bubble:"255,240,210", suno:false, yt:"dQw4w9WgXcQ" },
-  6:{ n:"Timmy Bubbles", sub:"Reels Lab B", bullets:"Floating hype • Bright hooks",
-      joke:"“If it pops, it plays.”", accent:"#7affc7", grid:"120,255,210,0.24", bubble:"220,255,245", suno:false, yt:"dQw4w9WgXcQ" },
-  7:{ n:"Tornado Timmy", sub:"Reels Lab C", bullets:"Spin up the views",
-      joke:"“We only chase storms and trends.”", accent:"#ff6b6b", grid:"255,120,120,0.24", bubble:"255,225,225", suno:false, yt:"dQw4w9WgXcQ" },
-  8:{ n:"Center Stage", sub:"Marketing Shell", bullets:"Center video • Neon frame",
-      joke:"“Frame it. Fame it.”", accent:"#ff66cc", grid:"255,120,220,0.24", bubble:"255,225,245", suno:false, yt:"dQw4w9WgXcQ" },
-  9:{ n:"Love Notes", sub:"Pink Quotes", bullets:"Two hearts • One beat",
-      joke:"“More neon, less noise.”", accent:"#ff5ea2", grid:"255,120,180,0.24", bubble:"255,220,235", suno:false, yt:"dQw4w9WgXcQ" }
-};
+/* =========================
+   SPA Router + Pretty Pack
+   ========================= */
+const ROOMS = ["room1","room2","room3","room4","room5","room6","room7","room8","room9"];
+const DEFAULT_ROOM = "room4";
 
-const qs = new URLSearchParams(location.search);
-let room = Math.max(1, Math.min(9, parseInt(qs.get('room')||localStorage.getItem('tt_last_room')||'1',10)));
-const INSTANT = qs.get('instant')==='1';
+/* Build an iframe in the .stage for each room from data-video */
+function mountVideoFor(roomId){
+  const section = document.querySelector(`[data-room="${roomId}"]`);
+  if (!section) return;
+  const stage = section.querySelector(".stage");
+  if (!stage) return;
+  const vid = stage.getAttribute("data-video");
+  if (stage.dataset.mounted === "1") return; // mount once
+  const src = vid ? `https://www.youtube.com/embed/${vid}?rel=0` : "";
+  stage.innerHTML = vid ? `<iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen src="${src}"></iframe>` : "";
+  stage.dataset.mounted = "1";
+}
 
-/* ---------- Core paint ---------- */
-function paint(){
-  const R = ROOMS[room];
-  document.title = `Timmy Time · ${R.n} · v1.0.7`;
-  document.documentElement.style.setProperty('--accent', R.accent);
-  document.documentElement.style.setProperty('--grid-rgba', R.grid);
-  document.documentElement.style.setProperty('--bubble-rgb', R.bubble);
-  title.textContent = R.n;
-  subtitle.textContent = `· ${R.sub}`;
-  bullets.textContent = R.bullets;
-  jokeLine.textContent = R.joke;
+/* Show the target room */
+function showRoom(id){
+  const room = ROOMS.includes(id) ? id : DEFAULT_ROOM;
+  document.querySelectorAll("[data-room]").forEach(el=>el.classList.remove("on"));
+  const el = document.querySelector(`[data-room="${room}"]`);
+  if (el) el.classList.add("on");
 
-  // Suno playlists
-  sunoList.innerHTML='';
-  if (R.suno){
-    sunoBlock.style.display='';
-    R.suno.forEach(([t,u])=>{
-      const li=document.createElement('li'); const a=document.createElement('a');
-      a.href=u; a.target='_blank'; a.rel='noopener'; a.textContent=t;
-      li.appendChild(a); sunoList.appendChild(li);
-    });
-  } else sunoBlock.style.display='none';
-
-  // YouTube iframe (load from memory first)
-  const f = ytFrame;
-  const saved = localStorage.getItem(`tt_room_${room}_yt`);
-  const videoId = saved ? saved : R.yt;
-  const src = `https://www.youtube.com/embed/${videoId}`;
-  if (INSTANT) { f.loading="eager"; f.fetchPriority="high"; f.src = src; }
-  else {
-    f.removeAttribute('src');
-    const io = new IntersectionObserver((entries)=>{
-      if(entries.some(e=>e.isIntersecting)){ f.src = src; io.disconnect(); }
-    }, {rootMargin:"200px"});
-    io.observe(f);
+  // Sync hash without scroll jump
+  if (location.hash.slice(1) !== room){
+    history.replaceState(null, "", "#"+room);
   }
 
-  // Prefetch next room URL
-  const next = room===9?1:room+1;
-  const link = document.createElement('link');
-  link.rel='prefetch'; link.href=`./?room=${next}&v=1.0.7`;
-  document.head.appendChild(link);
+  // Update halo accent via body class swap
+  document.body.className = "";
+  el.classList.forEach(c=>{
+    if (c.startsWith("room-")) document.body.classList.add(c);
+  });
 
-  // Memory
-  localStorage.setItem('tt_last_room', String(room));
+  // Mount video lazily for current room (others on first visit)
+  mountVideoFor(room);
 }
-paint();
 
-/* ---------- Arrows (fail-safe, query-only) with quantum delay ---------- */
-function chime(){
-  try{
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    const o = ctx.createOscillator(); const g = ctx.createGain();
-    o.type='sine'; o.frequency.value=660; g.gain.value=0.0001;
-    o.connect(g); g.connect(ctx.destination);
-    o.start(); g.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime+0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.18);
-    o.stop(ctx.currentTime+0.2);
-  }catch(e){}
+/* Arrows: move index +/- 1 with wrap */
+function currentIndex(){
+  const now = location.hash.slice(1);
+  return Math.max(0, ROOMS.indexOf(ROOMS.includes(now) ? now : DEFAULT_ROOM));
 }
-function hop(delta){
-  const fade = document.getElementById('fade');
-  fade.classList.add('on');
-  chime();
-  const jitter = 120 + Math.random()*140; // cinematic tiny delay
-  setTimeout(()=>{
-    let n = room + delta; if(n<1) n=9; if(n>9) n=1;
-    location.href = `./?room=${n}&v=1.0.7`;
-  }, jitter);
+function go(delta){
+  const i = currentIndex();
+  const j = (i + delta + ROOMS.length) % ROOMS.length;
+  location.hash = "#"+ROOMS[j]; // triggers hashchange
 }
-prevBtn.onclick = e=>{e.preventDefault(); hop(-1);};
-nextBtn.onclick = e=>{e.preventDefault(); hop(1);};
 
-/* ---------- Bubbles with adaptive FPS governor ---------- */
-(function bubbles(){
-  const root = bubbles = document.getElementById('bubbles');
-  const small = innerWidth < 420;
-  let count = small ? 14 : 22;
-  function spawn(n){
-    for(let i=0;i<n;i++){
-      const b=document.createElement('div'); b.className='bubble';
-      const size = 8 + Math.random()*18;
-      const startX = Math.random()*100;
-      const drift = (Math.random()*18-9) + 'vw';
-      const delay = (-Math.random()*18)+'s';
-      const dur = (18 + Math.random()*26) + 's';
-      b.style.width=size+'vmin'; b.style.height=size+'vmin';
-      b.style.setProperty('--x', startX+'vw');
-      b.style.setProperty('--drift', drift);
-      b.style.setProperty('--s', (0.7 + Math.random()*0.6).toFixed(2));
-      b.style.animationDuration=dur; b.style.animationDelay=delay;
-      root.appendChild(b);
-    }
+/* Wire arrows */
+document.querySelector(".arrow.left").addEventListener("click", e=>{ e.preventDefault(); go(-1); });
+document.querySelector(".arrow.right").addEventListener("click", e=>{ e.preventDefault(); go(+1); });
+
+/* Hash router */
+addEventListener("hashchange", ()=> showRoom(location.hash.slice(1)));
+
+/* Initial */
+showRoom(location.hash.slice(1) || DEFAULT_ROOM);
+
+/* =========================
+   Bubbles — outline only
+   ========================= */
+const bc = document.getElementById("bubbles");
+const bctx = bc.getContext("2d");
+let BW=0,BH=0, bubbles=[];
+function bResize(){
+  const dpr = Math.min(devicePixelRatio || 1, 2); // cap for perf
+  BW = bc.width = Math.floor(innerWidth * dpr);
+  BH = bc.height = Math.floor(innerHeight * dpr);
+  bc.style.width = "100%"; bc.style.height = "100%";
+}
+function seedBubbles(n=80){
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  bubbles = Array.from({length:n}, ()=>({
+    x: Math.random()*BW,
+    y: Math.random()*BH,
+    r: (Math.random()*18+10)*dpr,
+    s: Math.random()*0.6+0.22, // speed
+    a: Math.random()*0.12+0.10 // alpha cap ~0.22
+  }));
+}
+function drawBubbles(){
+  bctx.clearRect(0,0,BW,BH);
+  bctx.globalCompositeOperation = "lighter";
+  for(const b of bubbles){
+    b.y -= b.s * 1.2;
+    if (b.y + b.r < 0){ b.y = BH + b.r; b.x = Math.random()*BW; }
+    bctx.globalAlpha = Math.min(.22, b.a);
+    bctx.beginPath();
+    bctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    bctx.stroke();
   }
-  spawn(count);
-
-  // FPS sampling -> trim bubbles & shadows when needed
-  let frames=0, start;
-  function tick(ts){
-    if(!start) start = ts;
-    frames++;
-    if(ts - start >= 1500){
-      const fps = frames / ((ts-start)/1000);
-      if(fps < 45){
-        const toRemove = Math.floor(root.children.length/3);
-        for(let i=0;i<toRemove;i++){ const c=root.children[root.children.length-1]; if(c) c.remove(); }
-        document.documentElement.style.setProperty('--shadow-on', '0');
-      }
-      return; // stop sampling
-    }
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-})();
-
-/* ---------- Paste-to-embed (with memory) ---------- */
-function toId(url){
-  if(!url) return null;
-  url = url.trim();
-  let m;
-  if (m = url.match(/^https?:\/\/youtu\.be\/([a-zA-Z0-9_-]{6,})/)) return m[1];
-  if (m = url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/)) return m[1];
-  if (m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,})/)) return m[1];
-  return null;
+  requestAnimationFrame(drawBubbles);
 }
-addBtn.addEventListener('click', ()=>{
-  const id = toId(ytInput.value);
-  if(id){
-    chime();
-    ytFrame.src = `https://www.youtube.com/embed/${id}`;
-    localStorage.setItem(`tt_room_${room}_yt`, id);
-    jokeLine.textContent='Loaded. Lights up—roll camera.';
-    ytInput.value='';
-  } else { jokeLine.textContent="Hmm… that doesn't look like a YouTube link."; }
-});
-ytInput.addEventListener('keydown', e=>{ if(e.key==='Enter') addBtn.click(); });
+bResize(); seedBubbles();
+addEventListener("resize", bResize, {passive:true});
+bctx.lineWidth = 1 * Math.min(devicePixelRatio || 1, 2);
+drawBubbles();
 
-/* ---------- Sniffer / Jumper / Healer ---------- */
-const Ship = {
-  started: performance.now(),
-  net: navigator.connection || {},
-  iframe: document.getElementById('ytFrame'),
-  healTimer: null,
-  sniff(){
-    const info = {
-      downlink: this.net.downlink || 0,
-      rtt: this.net.rtt || 0,
-      saveData: this.net.saveData || false,
-      type: this.net.effectiveType || 'unknown',
-      hidden: document.hidden
-    };
-    // If slow connection or data saver, lower bubble intensity immediately
-    if (info.saveData || /2g|slow/.test(info.type) || info.downlink && info.downlink < 1.2){
-      document.documentElement.style.setProperty('--shadow-on','0');
-    }
-    // Prefers reduced motion also trims bubbles
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches){
-      document.documentElement.style.setProperty('--shadow-on','0');
-    }
-  },
-  jumper(){
-    // If the iframe hasn't loaded after 4.5s, reload its src (gentle jump)
-    const f = this.iframe;
-    if (!f) return;
-    if (this.healTimer) clearTimeout(this.healTimer);
-    this.healTimer = setTimeout(()=>{
-      try{
-        if(!f.contentWindow || f.contentWindow.length===0){
-          const s = f.src;
-          f.src = s; // refresh
-        }
-      }catch(e){}
-    }, 4500);
-  },
-  healer(){
-    // If page regains visibility, gently re-kick iframe if blank
-    document.addEventListener('visibilitychange', ()=>{
-      if (!document.hidden){
-        try{
-          const f = this.iframe;
-          if (f && !f.src) {
-            const R = ROOMS[room]; const saved = localStorage.getItem(`tt_room_${room}_yt`) || R.yt;
-            f.src = `https://www.youtube.com/embed/${saved}`;
-          }
-        }catch(e){}
-      }
-    });
-  },
-  boot(){
-    this.sniff(); this.jumper(); this.healer();
-  }
-};
-window.addEventListener('load', ()=> Ship.boot());
-
-/* ---------- Service worker for cache ---------- */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+/* =========================
+   Matrix drizzle — very light
+   ========================= */
+const mc = document.getElementById("matrix");
+const mctx = mc.getContext("2d");
+function mResize(){
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  mc.width = Math.floor(innerWidth * dpr);
+  mc.height = Math.floor(innerHeight * dpr);
+  mc.style.width = "100%"; mc.style.height = "100%";
 }
+mResize(); addEventListener("resize", mResize, {passive:true});
+let tick = 0;
+function matrixLoop(){
+  tick++;
+  // fade canvas slightly
+  mctx.fillStyle = "rgba(0,0,0,0.05)";
+  mctx.fillRect(0,0,mc.width,mc.height);
+  // occasional vertical drizzle columns tinted by current room accent
+  if (tick % 2 === 0){
+    const x = Math.random()*mc.width;
+    const h = (Math.random()*60+20);
+    // Pull accent from computed style
+    const accent = getComputedStyle(document.body).getPropertyValue("--accent-20") || "rgba(0,255,120,.20)";
+    mctx.fillStyle = accent.trim();
+    mctx.fillRect(x, Math.random()*mc.height, 2, h);
+  }
+  requestAnimationFrame(matrixLoop);
+}
+matrixLoop();
+
+/* =========================
+   Halo accent sync
+   ========================= */
+function updateHalo(){
+  // Halo uses current room CSS variables; nothing to compute here because it's CSS-based
+}
+new MutationObserver(updateHalo).observe(document.body, {attributes:true, attributeFilter:["class"]});
+
+/* Ensure FX never block clicks (belt & suspenders) */
+document.getElementById("matrix").style.pointerEvents = "none";
+document.getElementById("bubbles").style.pointerEvents = "none";
+document.getElementById("halo").style.pointerEvents = "none";
 </script>
 </body>
 </html>
