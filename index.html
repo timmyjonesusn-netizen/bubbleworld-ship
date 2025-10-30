@@ -1,63 +1,333 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Timmy Time Lab v1.0.4 — Static Mirror</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;800&display=swap" rel="stylesheet">
-<!-- Cache-busting query params -->
-<link rel="stylesheet" href="static/style.css?v=104r2">
-<script defer src="static/bubbles.js?v=104r2"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timmy Time · Magenta Stage · v1.0.4</title>
+<meta name="description" content="Timmy Time · Magenta Stage · Reels Lab E · Matrix background · Neon bubbles · Center-stage marketing shell">
 <style>
-/* Extra tiny styles for the static mirror banner */
-.mirror-badge{position:fixed;right:12px;top:12px;z-index:9;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);
-  padding:6px 10px;border-radius:10px;font-size:.85rem}
-.mirror-badge b{color:#ff9dfc}
-.note{opacity:.8;font-size:.95rem;margin-top:8px}
+  /* ========= RESET / BASE ========= */
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; height:100%; background:#000; color:#fff; font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol"; }
+  :root{
+    --grid: rgba(0,255,120,0.26);  /* matrix green */
+    --magenta:#ff40ff;
+    --title:#fff4ff;
+    --neon:#ffb3ff;
+    --bubble-rgb: 255,244,255;
+    --title-shadow: 0 0 22px rgba(255,64,255,0.6), 0 0 44px rgba(255,64,255,0.35);
+    --hud-shadow: 0 0 14px rgba(255,64,255,0.45);
+  }
+
+  /* ========= BACKGROUND LAYERS ========= */
+  .grid {
+    position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(120vmin 120vmin at 10% 10%, rgba(255,255,255,0.06), transparent 60%),
+      radial-gradient(100vmin 100vmin at 88% 20%, rgba(255,255,255,0.06), transparent 60%),
+      radial-gradient(120vmin 120vmin at 28% 78%, rgba(255,255,255,0.06), transparent 60%),
+      linear-gradient(0deg, #05000c, #000 50%, #020005);
+  }
+  .grid::before {
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(transparent 31px, var(--grid) 32px, transparent 33px),
+      linear-gradient(90deg, transparent 31px, var(--grid) 32px, transparent 33px);
+    background-size: 32px 32px;
+    opacity:.9;
+  }
+
+  /* Bubbles: subtle but present, always on top of grid but behind content */
+  .bubbles {
+    position: fixed; inset:0; overflow:hidden; pointer-events:none;
+  }
+  .bubble {
+    position:absolute;
+    width:12vmin; height:12vmin; border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(var(--bubble-rgb),0.22), rgba(var(--bubble-rgb),0.06) 60%, rgba(var(--bubble-rgb),0.0) 70%);
+    filter: blur(0.2vmin) drop-shadow(0 0 0.75vmin rgba(255,255,255,0.25));
+    animation: rise linear infinite;
+    opacity:0.8;
+    border: 0.5vmin solid rgba(255,182,255,0.20);
+  }
+  @keyframes rise {
+    from { transform: translateY(110vh) translateX(var(--dx)) scale(var(--s)); }
+    to   { transform: translateY(-15vh) translateX(calc(var(--dx) + var(--drift))) scale(var(--s)); }
+  }
+
+  /* ========= CONTENT WRAPPER ========= */
+  .wrap {
+    position:relative;
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    gap:2rem;
+    padding:10vh 6vw 22vh;
+  }
+
+  /* ========= HEADER ========= */
+  .brand {
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:1rem;
+  }
+  .logo {
+    display:inline-block;
+    font-weight:800;
+    letter-spacing:0.4rem;
+    line-height:0.9;
+    text-shadow: var(--title-shadow);
+  }
+  .logo .row { display:block; font-size:2rem; }
+  .logo .row:first-child { color:#ff7cff; }
+  .logo .row:last-child { color:#ffb3ff; }
+
+  .ver {
+    margin-left:auto;
+    padding:.45rem .75rem;
+    border:1px solid rgba(255,255,255,0.25);
+    border-radius:1rem;
+    font-size:.95rem;
+    color:#ffc8ff;
+    background:rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+    box-shadow: var(--hud-shadow);
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 4.4rem);
+    margin:0;
+    color: var(--title);
+    text-shadow: var(--title-shadow);
+  }
+  .subtitle {
+    font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+    color:#e9d5ff;
+    opacity:0.95;
+  }
+  .bullets {
+    font-size: clamp(1.1rem, 2.6vw, 1.5rem);
+    color:#ffffff;
+    opacity:0.92;
+  }
+
+  /* ========= VIDEO STAGE ========= */
+  .stage {
+    margin-top: 1rem;
+    display:grid;
+    gap:1rem;
+  }
+  .video-shell {
+    position:relative;
+    width:100%;
+    max-width: 1100px;
+    margin-inline:auto;
+    aspect-ratio:16/9;
+    border-radius: 1rem;
+    border: 2px solid rgba(255, 128, 255, 0.35);
+    box-shadow: 0 0 40px rgba(255, 64, 255, 0.25), inset 0 0 24px rgba(255,64,255,0.18);
+    overflow:hidden;
+    background:#070109;
+  }
+  .video-shell iframe { width:100%; height:100%; border:0; display:block; }
+
+  /* “Joke bar” under the video (short, punchy, clip-friendly) */
+  .joke {
+    max-width:1100px;
+    margin: .5rem auto 0;
+    font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+    color:#ffd6ff;
+    text-shadow: 0 0 8px rgba(255,64,255,0.35);
+  }
+
+  /* Add Link control (static mirror: no persistence) */
+  .addlink {
+    max-width:1100px;
+    margin: .5rem auto 0;
+    display:flex; gap:.5rem; align-items:center;
+  }
+  .addlink input{
+    flex:1; padding:.8rem 1rem; font-size:1rem; border-radius:.8rem; border:1px solid rgba(255,255,255,0.25);
+    background: rgba(15,0,22,0.65); color:#fff; outline:none;
+  }
+  .addlink button{
+    padding:.85rem 1rem; font-weight:700; border-radius:.8rem; border:1px solid rgba(255,255,255,0.25);
+    background: linear-gradient(90deg, #ff40ff, #ffa0ff); color:#1a001f; cursor:pointer;
+    box-shadow: var(--hud-shadow);
+  }
+
+  /* ========= SUNO PLAYLISTS (Rooms 2 & 3 visible) ========= */
+  .suno {
+    max-width:1100px; margin:1.5rem auto 0;
+  }
+  .suno h2 {
+    font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+    margin:0 0 .5rem 0; color:#ffd6ff; text-shadow: var(--title-shadow);
+  }
+  .suno ul { margin:0; padding-left:1.1rem; }
+  .suno li { margin:.35rem 0; }
+  .suno a { color:#ffc2ff; text-decoration:underline; }
+  .note { margin-top: .75rem; color:#ffdbff; opacity:.8; font-size: .95rem;}
+
+  /* ========= ARROWS (raised to 25vh) ========= */
+  .nav-arrows {
+    position: fixed; inset: auto 0 25vh 0; display:flex; justify-content:space-between; padding:0 4vw; pointer-events:none;
+  }
+  .arrow {
+    pointer-events:auto;
+    width:84px; height:84px; border-radius:20px; display:grid; place-items:center;
+    border:1px solid rgba(255,255,255,0.25);
+    background: rgba(0,0,0,0.35); backdrop-filter: blur(6px);
+    box-shadow: var(--hud-shadow);
+  }
+  .arrow svg { width:44px; height:44px; fill:#ffffff; opacity:.95; }
+
+  /* ========= FOOTER NOTE ========= */
+  .footer {
+    max-width:1100px; margin:2rem auto 0; color:#ffeaff; opacity:.9;
+    font-size: clamp(1.0rem, 2.2vw, 1.15rem);
+  }
+
+  /* Prevent iOS tap highlight */
+  a, button { -webkit-tap-highlight-color: transparent; }
 </style>
 </head>
-<body class="theme-magenta">
-<canvas id="bubble-canvas"></canvas>
-<div class="matrix"></div>
+<body>
+  <!-- Background layers -->
+  <div class="grid"></div>
+  <div class="bubbles" id="bubbles"></div>
 
-<header class="top">
-  <div class="brand">TIMMY TIME</div>
-  <div class="room-title">Magenta Stage <span class="sub">· Reels Lab E</span></div>
-</header>
+  <!-- Content -->
+  <div class="wrap">
 
-<div class="mirror-badge">Static Mirror · <b>v1.0.4</b></div>
-
-<main>
-  <section class="stage">
-    <div class="marketing">Center-stage marketing shell • Matrix background • Neon bubbles</div>
-
-    <div class="video-box">
-      <iframe class="yt" src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        title="YouTube video" frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <div class="brand">
+      <div class="logo" aria-label="TIMMY TIME">
+        <span class="row">TIMMY</span>
+        <span class="row">TIME</span>
+      </div>
+      <div class="ver">Static Mirror · <strong>v1.0.4</strong></div>
     </div>
 
-    <div class="suno-wrap">
-      <div class="suno-title">Suno Playlists</div>
+    <div>
+      <h1>Magenta Stage <span class="subtitle">· Reels Lab E</span></h1>
+      <div class="bullets">Center-stage marketing shell • Matrix background • Neon bubbles</div>
+    </div>
+
+    <section class="stage" aria-label="Video Stage">
+      <div class="video-shell" id="videoShell">
+        <!-- Default embed; will swap when user pastes a link -->
+        <iframe id="ytFrame"
+          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          title="YouTube video player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+
+      <div class="joke" id="jokeLine">“Creators welcome. Copyright-free vibes, neon-powered.”</div>
+
+      <!-- Add Link control (static-only; no persistence) -->
+      <div class="addlink" aria-label="Add YouTube Link">
+        <input id="ytInput" type="url" inputmode="url" placeholder="Paste YouTube link (watch / shorts / youtu.be) and tap +"
+               autocomplete="off" spellcheck="false">
+        <button id="addBtn" title="Embed">+</button>
+      </div>
+    </section>
+
+    <!-- Suno playlists visible (Rooms 2 & 3) -->
+    <section class="suno">
+      <h2>Suno Playlists</h2>
       <ul>
-        <li><a target="_blank" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1">Laugh</a></li>
-        <li><a target="_blank" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b">Play</a></li>
-        <li><a target="_blank" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f">Fun</a></li>
-        <li><a target="_blank" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840">Motown</a></li>
-        <li><a target="_blank" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c">Feeling it</a></li>
+        <!-- Room 2 — “Laugh / Play / Fun / Motown / Feeling it” -->
+        <li><a href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank" rel="noopener">Vibe 1 — Laugh</a></li>
+        <li><a href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank" rel="noopener">Vibe 2 — Play</a></li>
+        <li><a href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank" rel="noopener">Vibe 3 — Fun</a></li>
+        <li><a href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank" rel="noopener">Vibe 4 — Motown</a></li>
+        <li><a href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank" rel="noopener">Vibe 5 — Feeling it</a></li>
       </ul>
-      <div class="note">This is the **static** Pages preview. To save links & hop ports, run <code>python app.py</code> locally.</div>
+      <div class="note">This is the <strong>static</strong> Pages preview. To save links & hop ports, run <code>python app.py</code> locally (the live Flask app handles memory & hopping).</div>
+    </section>
+
+    <div class="footer">
+      Cache tip: append <code>?v=1.0.4</code> to your Pages URL or bump the number on each publish to see updates instantly.
     </div>
+  </div>
 
-    <div class="joke">Center stage: you + the moment. (Static v1.0.4)</div>
-  </section>
+  <!-- Arrows (raised to 25vh) -->
+  <div class="nav-arrows" aria-hidden="true">
+    <a class="arrow" href="#prev" title="Prev">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </a>
+    <a class="arrow" href="#next" title="Next">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+    </a>
+  </div>
 
-  <nav class="arrows">
-    <a class="prev" href="#">←</a>
-    <a class="next" href="#">→</a>
-  </nav>
-</main>
+<script>
+/* ========= Neon Bubbles (light but visible) ========= */
+(function makeBubbles(){
+  const root = document.getElementById('bubbles');
+  const count = 22; // balanced for mobile
+  for (let i=0;i<count;i++){
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const size = 8 + Math.random()*18;     // vmin
+    const startX = Math.random()*100;      // vw
+    const drift = (Math.random()*20-10) + 'vw';
+    const delay = (-Math.random()*18)+'s';
+    const dur = (18 + Math.random()*26) + 's';
+    b.style.width = size+'vmin';
+    b.style.height = size+'vmin';
+    b.style.left = startX+'vw';
+    b.style.setProperty('--dx', (Math.random()*12-6) + 'vw');
+    b.style.setProperty('--drift', drift);
+    b.style.setProperty('--s', (0.7 + Math.random()*0.6).toFixed(2));
+    b.style.animationDuration = dur;
+    b.style.animationDelay = delay;
+    root.appendChild(b);
+  }
+})();
+
+/* ========= Add Link → auto-embed (static; no persistence) ========= */
+function toEmbed(url){
+  if(!url) return null;
+  try{
+    url = url.trim();
+    // youtu.be/<id>
+    const short = url.match(/^https?:\/\/youtu\.be\/([a-zA-Z0-9_-]{6,})/);
+    if (short) return 'https://www.youtube.com/embed/'+short[1];
+
+    // youtube.com/watch?v=<id>
+    const watch = url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/);
+    if (watch) return 'https://www.youtube.com/embed/'+watch[1];
+
+    // youtube.com/shorts/<id>
+    const shorts = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,})/);
+    if (shorts) return 'https://www.youtube.com/embed/'+shorts[1];
+
+    return null;
+  }catch(e){ return null; }
+}
+
+document.getElementById('addBtn').addEventListener('click', ()=>{
+  const val = document.getElementById('ytInput').value;
+  const embed = toEmbed(val);
+  if(embed){
+    const f = document.getElementById('ytFrame');
+    f.src = embed;
+    // small wink in the joke line so it feels alive
+    document.getElementById('jokeLine').textContent = 'Loaded. Lights up—roll camera.';
+    document.getElementById('ytInput').value = '';
+  }else{
+    document.getElementById('jokeLine').textContent = 'Hmm… that link doesn’t look like YouTube.';
+  }
+});
+
+/* Optional: support pressing Enter */
+document.getElementById('ytInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){ document.getElementById('addBtn').click(); }
+});
+</script>
 </body>
 </html>
