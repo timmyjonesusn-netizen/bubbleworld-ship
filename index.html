@@ -2,106 +2,108 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>TimmyTime • Bubble World Ship — Pretty Pack</title>
+<title>TimmyTime • Bubble World Ship — Pretty Pack v1.1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- If hosted on GitHub Pages under /bubbleworld-ship/, this base helps relative assets -->
 <base href="/bubbleworld-ship/">
 
 <style>
   :root{
-    --bg:#05000c;        /* deep space */
-    --ink:#fefefe;       /* default text */
-    --glass:rgba(255,255,255,.08);
+    --bg:#05000c;
+    --ink:#fefefe;
+    --glass:rgba(255,255,255,.10);
     --radius:16px;
-    --title-size: clamp(2rem, 6vw, 3rem);   /* BIG titles (law) */
+    --title-size: clamp(2rem, 6vw, 3rem);
     --body-size:  clamp(1.05rem, 4vw, 1.5rem);
   }
-
-  /* Reset + base */
   *{ box-sizing:border-box; }
-  html,body{ height:100%; margin:0; background:var(--bg); color:var(--ink);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  html,body{
+    height:100%; margin:0; background:var(--bg); color:var(--ink);
+    font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
   a{ color:inherit; }
 
-  /* Fullscreen visual layers that never block taps */
-  .fx-layer{
-    position:fixed; inset:0; pointer-events:none; z-index:0;
-  }
+  /* FX layers never intercept taps */
+  .fx-layer{ position:fixed; inset:0; pointer-events:none; z-index:0; }
 
-  /* Rooms container */
   main{ position:relative; z-index:1; min-height:100dvh; }
-
-  /* Each room page (SPA sections) */
   [data-room]{ display:none; min-height:100dvh; padding:10vh 6vw 14vh; }
   [data-room].on{ display:block; }
 
-  /* Soft spotlight + vignette per-room, rendered with CSS so it’s cheap */
+  /* Soft halo + vignette using room accent */
   .halo{
     position:fixed; inset:0; z-index:0; pointer-events:none;
     background:
-      radial-gradient(40vmin 40vmin at 50% 42%, var(--accent-20) 0%, transparent 65%),
-      radial-gradient(120vmax 100vmax at 50% 120%, rgba(0,0,0,.55) 0%, rgba(0,0,0,.0) 30%),
+      radial-gradient(44vmin 44vmin at 50% 42%, var(--accent-18) 0%, transparent 66%),
+      radial-gradient(120vmax 100vmax at 50% 120%, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 30%),
       radial-gradient(100vmax 100vmax at -10% -10%, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 32%),
       radial-gradient(100vmax 100vmax at 110% -10%, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 32%);
   }
 
-  /* Title / subtitle */
   .title{ font-size:var(--title-size); line-height:1.1; letter-spacing:.5px; margin:0 0 .25rem; text-align:center; }
   .subtitle{ font-size: clamp(1rem, 3.5vw, 1.25rem); opacity:.9; text-align:center; margin:0 0 2rem; }
 
-  /* Brand line above the stage */
   .brand{
-    width:min(1100px, 92vw); margin:.25rem auto 1rem; text-align:center; font-weight:800; letter-spacing:1px;
-    color:var(--accent); text-shadow: 0 0 18px var(--accent-60);
+    width:min(1100px,92vw); margin:.25rem auto 1rem; text-align:center; font-weight:800; letter-spacing:1px;
+    color:var(--accent); text-shadow:0 0 18px var(--accent-60);
     font-size: clamp(1.1rem, 4.6vw, 1.8rem);
   }
 
-  /* Center-stage video frame */
   .stage{
-    width:min(1100px, 92vw); margin:0 auto 1rem; aspect-ratio:16/9; border-radius:var(--radius);
-    overflow:hidden; background:#000; outline:1px solid var(--accent-30);
+    width:min(1100px,92vw); margin:0 auto 1rem; aspect-ratio:16/9; border-radius:var(--radius);
+    overflow:hidden; background:#000; outline:1px solid var(--accent-28);
     box-shadow: 0 10px 40px rgba(0,0,0,.5), 0 0 24px var(--accent-10);
   }
   .stage iframe{ width:100%; height:100%; border:0; display:block; }
 
-  /* Joke (glass card) */
   .joke{
-    width:min(1100px, 92vw); margin:.6rem auto 0; padding:.8rem 1rem; border-radius:12px;
+    width:min(1100px,92vw); margin:.6rem auto 0; padding:.8rem 1rem; border-radius:12px;
     background:var(--glass); backdrop-filter: blur(6px);
     font-size:var(--body-size);
   }
 
-  /* Arrows — left/right edges, raised about 25vh from bottom */
+  /* Suno Links block */
+  .links{
+    width:min(1100px,92vw); margin:.8rem auto 0; padding:0; list-style:none;
+    display:grid; gap:.5rem;
+  }
+  .links a{
+    display:block; text-decoration:none; padding:.7rem .9rem; border-radius:10px;
+    background:rgba(255,255,255,.06); backdrop-filter: blur(6px);
+    outline:1px solid var(--accent-18);
+    font-size: clamp(0.95rem, 3.4vw, 1.2rem);
+  }
+  .links a:hover{ background:rgba(255,255,255,.10); }
+
+  /* Arrows raised ~25vh */
   .arrow{
-    position:fixed; bottom:25vh; /* requested raised position */
+    position:fixed; bottom:25vh;
     font-size: clamp(2rem, 8vw, 3rem); text-decoration:none; color:var(--ink);
     padding:.35rem .6rem; border-radius:.5rem; background: var(--glass);
-    backdrop-filter: blur(6px); z-index: 9999; user-select:none;
+    backdrop-filter: blur(6px); z-index:9999; user-select:none;
   }
   .arrow.left{ left:1rem; }
   .arrow.right{ right:1rem; }
   .arrow:active{ transform: scale(.98); }
 
-  /* Room themes — set CSS vars used above */
-  .room-engine  { --accent:#35ff9c; --accent-60:rgba(53,255,156,.6); --accent-30:rgba(53,255,156,.28); --accent-20:rgba(53,255,156,.20); --accent-10:rgba(53,255,156,.10); }
-  .room-purple  { --accent:#bd6cff; --accent-60:rgba(189,108,255,.6); --accent-30:rgba(189,108,255,.28); --accent-20:rgba(189,108,255,.20); --accent-10:rgba(189,108,255,.10); }
-  .room-cyan    { --accent:#46eaff; --accent-60:rgba(70,234,255,.6);  --accent-30:rgba(70,234,255,.28);  --accent-20:rgba(70,234,255,.20);  --accent-10:rgba(70,234,255,.10); }
-  .room-magenta { --accent:#ff0fd6; --accent-60:rgba(255,15,214,.6); --accent-30:rgba(255,15,214,.28); --accent-20:rgba(255,15,214,.20); --accent-10:rgba(255,15,214,.10); }
-  .room-gold    { --accent:#ffd166; --accent-60:rgba(255,209,102,.6); --accent-30:rgba(255,209,102,.28); --accent-20:rgba(255,209,102,.20); --accent-10:rgba(255,209,102,.10); }
-  .room-lime    { --accent:#86ff82; --accent-60:rgba(134,255,130,.6); --accent-30:rgba(134,255,130,.28); --accent-20:rgba(134,255,130,.20); --accent-10:rgba(134,255,130,.10); }
-  .room-rose    { --accent:#ff7aa2; --accent-60:rgba(255,122,162,.6); --accent-30:rgba(255,122,162,.28); --accent-20:rgba(255,122,162,.20); --accent-10:rgba(255,122,162,.10); }
-  .room-orange  { --accent:#ff9b4a; --accent-60:rgba(255,155,74,.6);  --accent-30:rgba(255,155,74,.28);  --accent-20:rgba(255,155,74,.20);  --accent-10:rgba(255,155,74,.10); }
-  .room-blue    { --accent:#6ab8ff; --accent-60:rgba(106,184,255,.6); --accent-30:rgba(106,184,255,.28); --accent-20:rgba(106,184,255,.20); --accent-10:rgba(106,184,255,.10); }
+  /* Room themes (CSS vars) */
+  .room-engine  { --accent:#35ff9c; --accent-60:rgba(53,255,156,.60); --accent-28:rgba(53,255,156,.28); --accent-18:rgba(53,255,156,.18); --accent-10:rgba(53,255,156,.10); }
+  .room-purple  { --accent:#bd6cff; --accent-60:rgba(189,108,255,.60); --accent-28:rgba(189,108,255,.28); --accent-18:rgba(189,108,255,.18); --accent-10:rgba(189,108,255,.10); }
+  .room-cyan    { --accent:#46eaff; --accent-60:rgba(70,234,255,.60);  --accent-28:rgba(70,234,255,.28);  --accent-18:rgba(70,234,255,.18);  --accent-10:rgba(70,234,255,.10); }
+  .room-magenta { --accent:#ff0fd6; --accent-60:rgba(255,15,214,.60); --accent-28:rgba(255,15,214,.28); --accent-18:rgba(255,15,214,.18); --accent-10:rgba(255,15,214,.10); }
+  .room-gold    { --accent:#ffd166; --accent-60:rgba(255,209,102,.60); --accent-28:rgba(255,209,102,.28); --accent-18:rgba(255,209,102,.18); --accent-10:rgba(255,209,102,.10); }
+  .room-lime    { --accent:#86ff82; --accent-60:rgba(134,255,130,.60); --accent-28:rgba(134,255,130,.28); --accent-18:rgba(134,255,130,.18); --accent-10:rgba(134,255,130,.10); }
+  .room-rose    { --accent:#ff7aa2; --accent-60:rgba(255,122,162,.60); --accent-28:rgba(255,122,162,.28); --accent-18:rgba(255,122,162,.18); --accent-10:rgba(255,122,162,.10); }
+  .room-orange  { --accent:#ff9b4a; --accent-60:rgba(255,155,74,.60);  --accent-28:rgba(255,155,74,.28);  --accent-18:rgba(255,155,74,.18);  --accent-10:rgba(255,155,74,.10); }
+  .room-blue    { --accent:#6ab8ff; --accent-60:rgba(106,184,255,.60); --accent-28:rgba(106,184,255,.28); --accent-18:rgba(106,184,255,.18); --accent-10:rgba(106,184,255,.10); }
 
-  /* Accessibility: reduce motion disables FX layers */
   @media (prefers-reduced-motion: reduce){
-    #matrix, #bubbles { display:none; }
+    #matrix,#bubbles{ display:none; }
   }
 </style>
 </head>
 <body>
 
-<!-- Visual FX layers (never intercept clicks) -->
+<!-- FX layers -->
 <canvas id="matrix" class="fx-layer"></canvas>
 <canvas id="bubbles" class="fx-layer"></canvas>
 <div class="halo" id="halo"></div>
@@ -111,8 +113,7 @@
 <a class="arrow right" href="#next" aria-label="Next room">▶</a>
 
 <main>
-  <!-- ===== ROOMS (SPA sections) ===== -->
-  <!-- 4 = Magenta default -->
+  <!-- Default: Room 4 (Magenta) -->
   <section data-room="room4" class="room-magenta on">
     <h1 class="title">Magenta Room</h1>
     <p class="subtitle">Electric glow • Center-stage marketing</p>
@@ -121,6 +122,7 @@
     <div class="joke">“If the bubbles are vibing, we’re already on page 2 of awesome.”</div>
   </section>
 
+  <!-- 1 -->
   <section data-room="room1" class="room-engine">
     <h1 class="title">Engine Room</h1>
     <p class="subtitle">Matrix + Hammer strikes (FX slot)</p>
@@ -129,22 +131,40 @@
     <div class="joke">“If it sparks, it works.”</div>
   </section>
 
+  <!-- 2 — Suno Room A (5 links) -->
   <section data-room="room2" class="room-purple">
     <h1 class="title">Purple Play</h1>
     <p class="subtitle">Suno Room A • 5 links</p>
     <div class="brand">Timmy Bubbles • Creator-Safe</div>
     <div class="stage" data-video="Zi_XLOBDo_Y"></div>
+    <ul class="links">
+      <!-- Room 2 from your saved Vibe set -->
+      <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1">Vibe 1 — Laugh</a></li>
+      <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b">Vibe 2 — Play</a></li>
+      <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f">Vibe 3 — Fun</a></li>
+      <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840">Vibe 4 — Motown</a></li>
+      <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c">Vibe 5 — Feeling It</a></li>
+    </ul>
     <div class="joke">“Certified bop, zero copyright flop.”</div>
   </section>
 
+  <!-- 3 — Suno Room B (your 5 links) -->
   <section data-room="room3" class="room-cyan">
     <h1 class="title">Warm Core</h1>
     <p class="subtitle">Suno Room B • 5 links</p>
     <div class="brand">Terrific Timmy • Feel Good</div>
     <div class="stage" data-video="3JZ_D3ELwOQ"></div>
+    <ul class="links">
+      <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479">Suno Set 1</a></li>
+      <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/d04a7c63-52b7-4695-b47f-64f3a3dae677">Suno Set 2</a></li>
+      <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316">Suno Set 3</a></li>
+      <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/3a82341f-95df-4b1b-91a2-4d5e6531ae08">Suno Set 4</a></li>
+      <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/d3ed7e46-ea14-477f-a9cf-051bdfc0c9c3">Suno Set 5</a></li>
+    </ul>
     <div class="joke">“10/10 doctors recommend more vibes.”</div>
   </section>
 
+  <!-- 5 -->
   <section data-room="room5" class="room-gold">
     <h1 class="title">Gold Rush</h1>
     <p class="subtitle">Reels + Marketing</p>
@@ -153,6 +173,7 @@
     <div class="joke">“Breaking news: bubbles rise.”</div>
   </section>
 
+  <!-- 6 -->
   <section data-room="room6" class="room-lime">
     <h1 class="title">Lime Lift</h1>
     <p class="subtitle">Quotes / Love</p>
@@ -161,6 +182,7 @@
     <div class="joke">“Free refills on smiles.”</div>
   </section>
 
+  <!-- 7 -->
   <section data-room="room7" class="room-rose">
     <h1 class="title">Rose Bloom</h1>
     <p class="subtitle">Reels + Jokes</p>
@@ -169,6 +191,7 @@
     <div class="joke">“Comedy calories don’t count.”</div>
   </section>
 
+  <!-- 8 -->
   <section data-room="room8" class="room-orange">
     <h1 class="title">Orange Drive</h1>
     <p class="subtitle">Center-Stage + Link bar</p>
@@ -177,6 +200,7 @@
     <div class="joke">“One button, instant swagger.”</div>
   </section>
 
+  <!-- 9 -->
   <section data-room="room9" class="room-blue">
     <h1 class="title">Blue Calm (Beta Lab)</h1>
     <p class="subtitle">Experiments • Chill</p>
@@ -188,47 +212,38 @@
 
 <script>
 /* =========================
-   SPA Router + Pretty Pack
+   SPA Router + Video Mount
    ========================= */
 const ROOMS = ["room1","room2","room3","room4","room5","room6","room7","room8","room9"];
 const DEFAULT_ROOM = "room4";
 
-/* Build an iframe in the .stage for each room from data-video */
 function mountVideoFor(roomId){
   const section = document.querySelector(`[data-room="${roomId}"]`);
   if (!section) return;
   const stage = section.querySelector(".stage");
-  if (!stage) return;
+  if (!stage || stage.dataset.mounted === "1") return;
   const vid = stage.getAttribute("data-video");
-  if (stage.dataset.mounted === "1") return; // mount once
   const src = vid ? `https://www.youtube.com/embed/${vid}?rel=0` : "";
   stage.innerHTML = vid ? `<iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen src="${src}"></iframe>` : "";
   stage.dataset.mounted = "1";
 }
 
-/* Show the target room */
 function showRoom(id){
   const room = ROOMS.includes(id) ? id : DEFAULT_ROOM;
   document.querySelectorAll("[data-room]").forEach(el=>el.classList.remove("on"));
   const el = document.querySelector(`[data-room="${room}"]`);
   if (el) el.classList.add("on");
 
-  // Sync hash without scroll jump
-  if (location.hash.slice(1) !== room){
-    history.replaceState(null, "", "#"+room);
-  }
+  if (location.hash.slice(1) !== room) history.replaceState(null, "", "#"+room);
 
-  // Update halo accent via body class swap
+  // Room theme sync to body
   document.body.className = "";
-  el.classList.forEach(c=>{
-    if (c.startsWith("room-")) document.body.classList.add(c);
-  });
+  el.classList.forEach(c=>{ if (c.startsWith("room-")) document.body.classList.add(c); });
 
-  // Mount video lazily for current room (others on first visit)
+  // Mount video lazily
   mountVideoFor(room);
 }
 
-/* Arrows: move index +/- 1 with wrap */
 function currentIndex(){
   const now = location.hash.slice(1);
   return Math.max(0, ROOMS.indexOf(ROOMS.includes(now) ? now : DEFAULT_ROOM));
@@ -236,48 +251,50 @@ function currentIndex(){
 function go(delta){
   const i = currentIndex();
   const j = (i + delta + ROOMS.length) % ROOMS.length;
-  location.hash = "#"+ROOMS[j]; // triggers hashchange
+  location.hash = "#"+ROOMS[j];
 }
-
-/* Wire arrows */
 document.querySelector(".arrow.left").addEventListener("click", e=>{ e.preventDefault(); go(-1); });
 document.querySelector(".arrow.right").addEventListener("click", e=>{ e.preventDefault(); go(+1); });
-
-/* Hash router */
 addEventListener("hashchange", ()=> showRoom(location.hash.slice(1)));
-
-/* Initial */
 showRoom(location.hash.slice(1) || DEFAULT_ROOM);
 
 /* =========================
-   Bubbles — outline only
+   Bubbles — brighter outlines
    ========================= */
 const bc = document.getElementById("bubbles");
 const bctx = bc.getContext("2d");
-let BW=0,BH=0, bubbles=[];
+let BW=0,BH=0,bubbles=[];
 function bResize(){
   const dpr = Math.min(devicePixelRatio || 1, 2); // cap for perf
   BW = bc.width = Math.floor(innerWidth * dpr);
   BH = bc.height = Math.floor(innerHeight * dpr);
   bc.style.width = "100%"; bc.style.height = "100%";
+  bctx.lineWidth = 1.2 * dpr;
 }
-function seedBubbles(n=80){
+function seedBubbles(n=90){
   const dpr = Math.min(devicePixelRatio || 1, 2);
   bubbles = Array.from({length:n}, ()=>({
     x: Math.random()*BW,
     y: Math.random()*BH,
-    r: (Math.random()*18+10)*dpr,
-    s: Math.random()*0.6+0.22, // speed
-    a: Math.random()*0.12+0.10 // alpha cap ~0.22
+    r: (Math.random()*24+14)*dpr,    // bigger = more visible
+    s: Math.random()*0.7+0.25,       // varied speeds
+    a: Math.random()*0.14+0.12       // stronger alpha (max ~0.26)
   }));
+}
+function bubbleStrokeStyle(){
+  // Pull the current accent color for visibility
+  const cs = getComputedStyle(document.body);
+  // Fallback to a soft white if no accent
+  return cs.getPropertyValue("--accent-60").trim() || "rgba(255,255,255,.45)";
 }
 function drawBubbles(){
   bctx.clearRect(0,0,BW,BH);
   bctx.globalCompositeOperation = "lighter";
+  bctx.strokeStyle = bubbleStrokeStyle();
   for(const b of bubbles){
-    b.y -= b.s * 1.2;
+    b.y -= b.s * 1.1;
     if (b.y + b.r < 0){ b.y = BH + b.r; b.x = Math.random()*BW; }
-    bctx.globalAlpha = Math.min(.22, b.a);
+    bctx.globalAlpha = Math.min(.26, b.a);
     bctx.beginPath();
     bctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
     bctx.stroke();
@@ -286,11 +303,10 @@ function drawBubbles(){
 }
 bResize(); seedBubbles();
 addEventListener("resize", bResize, {passive:true});
-bctx.lineWidth = 1 * Math.min(devicePixelRatio || 1, 2);
 drawBubbles();
 
 /* =========================
-   Matrix drizzle — very light
+   Matrix drizzle — visible
    ========================= */
 const mc = document.getElementById("matrix");
 const mctx = mc.getContext("2d");
@@ -301,37 +317,36 @@ function mResize(){
   mc.style.width = "100%"; mc.style.height = "100%";
 }
 mResize(); addEventListener("resize", mResize, {passive:true});
-let tick = 0;
+
+let mTick = 0;
+function matrixTint(){
+  const cs = getComputedStyle(document.body);
+  return cs.getPropertyValue("--accent-18").trim() || "rgba(0,255,120,.18)";
+}
 function matrixLoop(){
-  tick++;
-  // fade canvas slightly
-  mctx.fillStyle = "rgba(0,0,0,0.05)";
+  mTick++;
+  // Gentle fade so old trails persist slightly
+  mctx.fillStyle = "rgba(0,0,0,0.04)";
   mctx.fillRect(0,0,mc.width,mc.height);
-  // occasional vertical drizzle columns tinted by current room accent
-  if (tick % 2 === 0){
+
+  // Draw a few visible columns each frame
+  const tint = matrixTint();
+  for (let k=0;k<6;k++){
     const x = Math.random()*mc.width;
-    const h = (Math.random()*60+20);
-    // Pull accent from computed style
-    const accent = getComputedStyle(document.body).getPropertyValue("--accent-20") || "rgba(0,255,120,.20)";
-    mctx.fillStyle = accent.trim();
-    mctx.fillRect(x, Math.random()*mc.height, 2, h);
+    const y = Math.random()*mc.height;
+    const h = (Math.random()*70+28);
+    mctx.fillStyle = tint;
+    mctx.fillRect(x, y, 2, h);
   }
   requestAnimationFrame(matrixLoop);
 }
 matrixLoop();
 
-/* =========================
-   Halo accent sync
-   ========================= */
-function updateHalo(){
-  // Halo uses current room CSS variables; nothing to compute here because it's CSS-based
-}
-new MutationObserver(updateHalo).observe(document.body, {attributes:true, attributeFilter:["class"]});
-
-/* Ensure FX never block clicks (belt & suspenders) */
-document.getElementById("matrix").style.pointerEvents = "none";
-document.getElementById("bubbles").style.pointerEvents = "none";
-document.getElementById("halo").style.pointerEvents = "none";
+/* Belt + suspenders: FX never block taps */
+["matrix","bubbles","halo"].forEach(id=>{
+  const el = document.getElementById(id);
+  if (el) el.style.pointerEvents = "none";
+});
 </script>
 </body>
 </html>
