@@ -1,1 +1,32 @@
+{
+  "rooms": {
+    "2": {
+      "suno": [
+        "https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1",
+        "https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b",
+        "https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f",
+        "https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840",
+        "https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c"
+      ],
+      "youtube": []
+    },
+    "3": {
+      "suno": [
+        "https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479",
+        "https://suno.com/playlist/d04a7c63-52b7-4695-b47f-64f3a3dae677",
+        "https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316",
+        "https://suno.com/playlist/3a82341f-95df-4b1b-91a2-4d5e6531ae08",
+        "https://suno.com/playlist/d3ed7e46-ea14-477f-a9cf-051bdfc0c9c3"
+      ],
+      "youtube": []
+    },
+    "4": {"youtube": []},
+    "5": {"youtube": []},
+    "6": {"youtube": []},
+    "7": {"youtube": []},
+    "8": {"youtube": []},
+    "9": {"youtube": []}
+  },
+  "weather": { "zip": "", "cache": { "high": "", "low": "", "cond": "", "ts": 0 } }
+}
 
