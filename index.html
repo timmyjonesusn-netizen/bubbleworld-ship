@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>TimmyTime • Bubble World Ship — Pretty Pack v1.1</title>
+<title>TimmyTime • Bubble World Ship — Pretty Pack v1.2</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <base href="/bubbleworld-ship/">
 
@@ -26,7 +26,7 @@
   .fx-layer{ position:fixed; inset:0; pointer-events:none; z-index:0; }
 
   main{ position:relative; z-index:1; min-height:100dvh; }
-  [data-room]{ display:none; min-height:100dvh; padding:10vh 6vw 14vh; }
+  [data-room]{ display:none; min-height:100dvh; padding:10vh 6vw 16vh; }
   [data-room].on{ display:block; }
 
   /* Soft halo + vignette using room accent */
@@ -85,15 +85,59 @@
   .arrow.right{ right:1rem; }
   .arrow:active{ transform: scale(.98); }
 
+  /* Plus button: sits BELOW the joke (out of frame for your screen recordings) */
+  .plus-wrap{
+    width:min(1100px,92vw); margin:.8rem auto 0; display:flex; justify-content:flex-end;
+  }
+  .plus-btn{
+    display:inline-flex; align-items:center; gap:.5rem; cursor:pointer;
+    padding:.55rem .8rem; border-radius:999px; border:1px solid var(--accent-18);
+    background:rgba(255,255,255,.06); backdrop-filter: blur(6px);
+    font-size: clamp(.95rem,3.2vw,1.05rem); user-select:none;
+  }
+  .plus-btn .dot{ font-size:1.3em; line-height:1; }
+
+  /* Input sheet (collapsible) */
+  .sheet{
+    width:min(1100px,92vw); margin:.6rem auto 0; border-radius:12px; overflow:hidden;
+    background:rgba(255,255,255,.06); backdrop-filter: blur(8px);
+    border:1px solid var(--accent-18); display:none;
+  }
+  .sheet.on{ display:block; }
+  .sheet-inner{ padding:.8rem; display:grid; gap:.6rem; }
+  .sheet label{ font-size:.95rem; opacity:.9; }
+  .sheet input{
+    width:100%; padding:.7rem .9rem; border-radius:10px; border:1px solid rgba(255,255,255,.18);
+    background:rgba(0,0,0,.35); color:#fff; font-size:1rem;
+  }
+  .sheet .actions{ display:flex; gap:.6rem; flex-wrap:wrap; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:.5rem; cursor:pointer;
+    padding:.6rem .9rem; border-radius:10px; border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.07);
+    font-size:1rem; user-select:none; text-decoration:none; color:#fff;
+  }
+  .btn.primary{ border-color:var(--accent-28); box-shadow: 0 0 12px var(--accent-10) inset; }
+  .hint{ font-size:.9rem; opacity:.8; }
+
+  /* Toast */
+  #ship-toast{
+    position:fixed; left:50%; bottom:8vh; transform:translateX(-50%);
+    padding:10px 14px; border-radius:10px; z-index:99999;
+    background:rgba(0,0,0,.55); color:#fff; backdrop-filter: blur(6px);
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    font-size:14px; opacity:0; transition:opacity .2s ease;
+  }
+
   /* Room themes (CSS vars) */
   .room-engine  { --accent:#35ff9c; --accent-60:rgba(53,255,156,.60); --accent-28:rgba(53,255,156,.28); --accent-18:rgba(53,255,156,.18); --accent-10:rgba(53,255,156,.10); }
   .room-purple  { --accent:#bd6cff; --accent-60:rgba(189,108,255,.60); --accent-28:rgba(189,108,255,.28); --accent-18:rgba(189,108,255,.18); --accent-10:rgba(189,108,255,.10); }
-  .room-cyan    { --accent:#46eaff; --accent-60:rgba(70,234,255,.60);  --accent-28:rgba(70,234,255,.28);  --accent-18:rgba(70,234,255,.18);  --accent-10:rgba(70,234,255,.10); }
+  .room-cyan    { --accent:#46eaff; --accent-60:rgba(70,234,255,.60);  --accent-28:rgba(70,234,255,.28);  --accent-18:rgba(70,234,255,.18); --accent-10:rgba(70,234,255,.10); }
   .room-magenta { --accent:#ff0fd6; --accent-60:rgba(255,15,214,.60); --accent-28:rgba(255,15,214,.28); --accent-18:rgba(255,15,214,.18); --accent-10:rgba(255,15,214,.10); }
   .room-gold    { --accent:#ffd166; --accent-60:rgba(255,209,102,.60); --accent-28:rgba(255,209,102,.28); --accent-18:rgba(255,209,102,.18); --accent-10:rgba(255,209,102,.10); }
   .room-lime    { --accent:#86ff82; --accent-60:rgba(134,255,130,.60); --accent-28:rgba(134,255,130,.28); --accent-18:rgba(134,255,130,.18); --accent-10:rgba(134,255,130,.10); }
   .room-rose    { --accent:#ff7aa2; --accent-60:rgba(255,122,162,.60); --accent-28:rgba(255,122,162,.28); --accent-18:rgba(255,122,162,.18); --accent-10:rgba(255,122,162,.10); }
-  .room-orange  { --accent:#ff9b4a; --accent-60:rgba(255,155,74,.60);  --accent-28:rgba(255,155,74,.28);  --accent-18:rgba(255,155,74,.18);  --accent-10:rgba(255,155,74,.10); }
+  .room-orange  { --accent:#ff9b4a; --accent-60:rgba(255,155,74,.60);  --accent-28:rgba(255,155,74,.28);  --accent-18:rgba(255,155,74,.18); --accent-10:rgba(255,155,74,.10); }
   .room-blue    { --accent:#6ab8ff; --accent-60:rgba(106,184,255,.60); --accent-28:rgba(106,184,255,.28); --accent-18:rgba(106,184,255,.18); --accent-10:rgba(106,184,255,.10); }
 
   @media (prefers-reduced-motion: reduce){
@@ -120,6 +164,21 @@
     <div class="brand">TimmyTime • Pink Neon Pulse</div>
     <div class="stage" data-video="dQw4w9WgXcQ"></div>
     <div class="joke">“If the bubbles are vibing, we’re already on page 2 of awesome.”</div>
+
+    <div class="plus-wrap">
+      <button class="plus-btn" data-linker="#linker-room4"><span class="dot">＋</span> Add Link</button>
+    </div>
+    <div class="sheet" id="linker-room4">
+      <div class="sheet-inner">
+        <label for="input-room4">Paste a YouTube link (watch / shorts / youtu.be) or an ID:</label>
+        <input id="input-room4" type="url" inputmode="url" placeholder="https://youtu.be/VIDEO or https://youtube.com/watch?v=VIDEO">
+        <div class="actions">
+          <button class="btn primary" data-apply="room4">Set Video</button>
+          <button class="btn" data-reset="room4">Reset to Default</button>
+          <span class="hint">Saves to this room only (local)</span>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 1 -->
@@ -129,6 +188,21 @@
     <div class="brand">Elevator Online • Green Core Warm</div>
     <div class="stage" data-video="aqz-KE-bpKQ"></div>
     <div class="joke">“If it sparks, it works.”</div>
+
+    <div class="plus-wrap">
+      <button class="plus-btn" data-linker="#linker-room1"><span class="dot">＋</span> Add Link</button>
+    </div>
+    <div class="sheet" id="linker-room1">
+      <div class="sheet-inner">
+        <label for="input-room1">Paste a YouTube link or ID:</label>
+        <input id="input-room1" type="url" inputmode="url" placeholder="https://youtu.be/VIDEO or ID">
+        <div class="actions">
+          <button class="btn primary" data-apply="room1">Set Video</button>
+          <button class="btn" data-reset="room1">Reset to Default</button>
+          <span class="hint">Room 1 only (local)</span>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 2 — Suno Room A (5 links) -->
@@ -138,7 +212,6 @@
     <div class="brand">Timmy Bubbles • Creator-Safe</div>
     <div class="stage" data-video="Zi_XLOBDo_Y"></div>
     <ul class="links">
-      <!-- Room 2 from your saved Vibe set -->
       <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1">Vibe 1 — Laugh</a></li>
       <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b">Vibe 2 — Play</a></li>
       <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f">Vibe 3 — Fun</a></li>
@@ -146,6 +219,21 @@
       <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c">Vibe 5 — Feeling It</a></li>
     </ul>
     <div class="joke">“Certified bop, zero copyright flop.”</div>
+
+    <div class="plus-wrap">
+      <button class="plus-btn" data-linker="#linker-room2"><span class="dot">＋</span> Add Link</button>
+    </div>
+    <div class="sheet" id="linker-room2">
+      <div class="sheet-inner">
+        <label for="input-room2">Paste a YouTube link or ID:</label>
+        <input id="input-room2" type="url" inputmode="url" placeholder="https://youtube.com/shorts/VIDEO">
+        <div class="actions">
+          <button class="btn primary" data-apply="room2">Set Video</button>
+          <button class="btn" data-reset="room2">Reset to Default</button>
+          <span class="hint">Room 2 only (local)</span>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 3 — Suno Room B (your 5 links) -->
@@ -162,6 +250,21 @@
       <li><a target="_blank" rel="noopener" href="https://suno.com/playlist/d3ed7e46-ea14-477f-a9cf-051bdfc0c9c3">Suno Set 5</a></li>
     </ul>
     <div class="joke">“10/10 doctors recommend more vibes.”</div>
+
+    <div class="plus-wrap">
+      <button class="plus-btn" data-linker="#linker-room3"><span class="dot">＋</span> Add Link</button>
+    </div>
+    <div class="sheet" id="linker-room3">
+      <div class="sheet-inner">
+        <label for="input-room3">Paste a YouTube link or ID:</label>
+        <input id="input-room3" type="url" inputmode="url" placeholder="https://youtube.com/watch?v=VIDEO">
+        <div class="actions">
+          <button class="btn primary" data-apply="room3">Set Video</button>
+          <button class="btn" data-reset="room3">Reset to Default</button>
+          <span class="hint">Room 3 only (local)</span>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 5 -->
@@ -171,6 +274,21 @@
     <div class="brand">Tornado Timmy • Spin Up</div>
     <div class="stage" data-video="l482T0yNkeo"></div>
     <div class="joke">“Breaking news: bubbles rise.”</div>
+
+    <div class="plus-wrap">
+      <button class="plus-btn" data-linker="#linker-room5"><span class="dot">＋</span> Add Link</button>
+    </div>
+    <div class="sheet" id="linker-room5">
+      <div class="sheet-inner">
+        <label for="input-room5">Paste a YouTube link or ID:</label>
+        <input id="input-room5" type="url" inputmode="url" placeholder="VIDEO id or URL">
+        <div class="actions">
+          <button class="btn primary" data-apply="room5">Set Video</button>
+          <button class="btn" data-reset="room5">Reset to Default</button>
+          <span class="hint">Room 5 only (local)</span>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 6 -->
@@ -180,6 +298,21 @@
     <div class="brand">Timmy Fantastic</div>
     <div class="stage" data-video="9bZkp7q19f0"></div>
     <div class="joke">“Free refills on smiles.”</div>
+
+    <div class="plus-wrap">
+      <button class="plus-btn" data-linker="#linker-room6"><span class="dot">＋</span> Add Link</button>
+    </div>
+    <div class="sheet" id="linker-room6">
+      <div class="sheet-inner">
+        <label for="input-room6">Paste a YouTube link or ID:</label>
+        <input id="input-room6" type="url" inputmode="url" placeholder="VIDEO id or URL">
+        <div class="actions">
+          <button class="btn primary" data-apply="room6">Set Video</button>
+          <button class="btn" data-reset="room6">Reset to Default</button>
+          <span class="hint">Room 6 only (local)</span>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 7 -->
@@ -189,6 +322,21 @@
     <div class="brand">TimmyTime LIVE</div>
     <div class="stage" data-video="fJ9rUzIMcZQ"></div>
     <div class="joke">“Comedy calories don’t count.”</div>
+
+    <div class="plus-wrap">
+      <button class="plus-btn" data-linker="#linker-room7"><span class="dot">＋</span> Add Link</button>
+    </div>
+    <div class="sheet" id="linker-room7">
+      <div class="sheet-inner">
+        <label for="input-room7">Paste a YouTube link or ID:</label>
+        <input id="input-room7" type="url" inputmode="url" placeholder="VIDEO id or URL">
+        <div class="actions">
+          <button class="btn primary" data-apply="room7">Set Video</button>
+          <button class="btn" data-reset="room7">Reset to Default</button>
+          <span class="hint">Room 7 only (local)</span>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 8 -->
@@ -198,6 +346,21 @@
     <div class="brand">Creator Mode • One-Take</div>
     <div class="stage" data-video="J---aiyznGQ"></div>
     <div class="joke">“One button, instant swagger.”</div>
+
+    <div class="plus-wrap">
+      <button class="plus-btn" data-linker="#linker-room8"><span class="dot">＋</span> Add Link</button>
+    </div>
+    <div class="sheet" id="linker-room8">
+      <div class="sheet-inner">
+        <label for="input-room8">Paste a YouTube link or ID:</label>
+        <input id="input-room8" type="url" inputmode="url" placeholder="VIDEO id or URL">
+        <div class="actions">
+          <button class="btn primary" data-apply="room8">Set Video</button>
+          <button class="btn" data-reset="room8">Reset to Default</button>
+          <span class="hint">Room 8 only (local)</span>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 9 -->
@@ -207,8 +370,25 @@
     <div class="brand">Spark • Test • Ship</div>
     <div class="stage" data-video="60ItHLz5WEA"></div>
     <div class="joke">“Shipping is a feature.”</div>
+
+    <div class="plus-wrap">
+      <button class="plus-btn" data-linker="#linker-room9"><span class="dot">＋</span> Add Link</button>
+    </div>
+    <div class="sheet" id="linker-room9">
+      <div class="sheet-inner">
+        <label for="input-room9">Paste a YouTube link or ID:</label>
+        <input id="input-room9" type="url" inputmode="url" placeholder="VIDEO id or URL">
+        <div class="actions">
+          <button class="btn primary" data-apply="room9">Set Video</button>
+          <button class="btn" data-reset="room9">Reset to Default</button>
+          <span class="hint">Room 9 only (local)</span>
+        </div>
+      </div>
+    </div>
   </section>
 </main>
+
+<div id="ship-toast"></div>
 
 <script>
 /* =========================
@@ -217,12 +397,55 @@
 const ROOMS = ["room1","room2","room3","room4","room5","room6","room7","room8","room9"];
 const DEFAULT_ROOM = "room4";
 
+/* YouTube ID parser: supports watch, shorts, youtu.be, embed, or raw ID */
+function ytIdFrom(input){
+  if (!input) return "";
+  let s = (""+input).trim();
+  // If it's already a plain 11-char ID (basic check)
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+
+  try{
+    const u = new URL(s);
+    const host = u.hostname.replace(/^www\./,"");
+    if (host === "youtu.be"){
+      return u.pathname.split("/").filter(Boolean)[0] || "";
+    }
+    if (host === "youtube.com" || host === "m.youtube.com" || host === "music.youtube.com"){
+      // watch?v=ID
+      const v = u.searchParams.get("v");
+      if (v) return v;
+      // shorts/ID
+      if (u.pathname.startsWith("/shorts/")){
+        return u.pathname.split("/")[2] || "";
+      }
+      // embed/ID
+      if (u.pathname.startsWith("/embed/")){
+        return u.pathname.split("/")[2] || "";
+      }
+    }
+  }catch(e){
+    // not a URL, ignore
+  }
+  // Fallback: strip params like ?t=30s
+  s = s.split(/[?&]/)[0];
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  return "";
+}
+
+/* localStorage helpers */
+function keyFor(room){ return `timmy:room:${room}:video`; }
+function saveVideo(room, vid){ try{ localStorage.setItem(keyFor(room), vid); }catch(e){} }
+function loadVideo(room){ try{ return localStorage.getItem(keyFor(room)) || ""; }catch(e){ return ""; } }
+function clearVideo(room){ try{ localStorage.removeItem(keyFor(room)); }catch(e){} }
+
+/* Build an iframe in the .stage for each room from data-video or stored override */
 function mountVideoFor(roomId){
   const section = document.querySelector(`[data-room="${roomId}"]`);
   if (!section) return;
   const stage = section.querySelector(".stage");
-  if (!stage || stage.dataset.mounted === "1") return;
-  const vid = stage.getAttribute("data-video");
+  if (!stage) return;
+  const stored = loadVideo(roomId);
+  const vid = stored || stage.getAttribute("data-video") || "";
   const src = vid ? `https://www.youtube.com/embed/${vid}?rel=0` : "";
   stage.innerHTML = vid ? `<iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen src="${src}"></iframe>` : "";
   stage.dataset.mounted = "1";
@@ -236,11 +459,11 @@ function showRoom(id){
 
   if (location.hash.slice(1) !== room) history.replaceState(null, "", "#"+room);
 
-  // Room theme sync to body
+  // Theme sync
   document.body.className = "";
   el.classList.forEach(c=>{ if (c.startsWith("room-")) document.body.classList.add(c); });
 
-  // Mount video lazily
+  // Mount/refresh video for current room every time (so override shows immediately)
   mountVideoFor(room);
 }
 
@@ -265,7 +488,7 @@ const bc = document.getElementById("bubbles");
 const bctx = bc.getContext("2d");
 let BW=0,BH=0,bubbles=[];
 function bResize(){
-  const dpr = Math.min(devicePixelRatio || 1, 2); // cap for perf
+  const dpr = Math.min(devicePixelRatio || 1, 2);
   BW = bc.width = Math.floor(innerWidth * dpr);
   BH = bc.height = Math.floor(innerHeight * dpr);
   bc.style.width = "100%"; bc.style.height = "100%";
@@ -276,15 +499,13 @@ function seedBubbles(n=90){
   bubbles = Array.from({length:n}, ()=>({
     x: Math.random()*BW,
     y: Math.random()*BH,
-    r: (Math.random()*24+14)*dpr,    // bigger = more visible
-    s: Math.random()*0.7+0.25,       // varied speeds
-    a: Math.random()*0.14+0.12       // stronger alpha (max ~0.26)
+    r: (Math.random()*24+14)*dpr,
+    s: Math.random()*0.7+0.25,
+    a: Math.random()*0.14+0.12
   }));
 }
 function bubbleStrokeStyle(){
-  // Pull the current accent color for visibility
   const cs = getComputedStyle(document.body);
-  // Fallback to a soft white if no accent
   return cs.getPropertyValue("--accent-60").trim() || "rgba(255,255,255,.45)";
 }
 function drawBubbles(){
@@ -295,9 +516,7 @@ function drawBubbles(){
     b.y -= b.s * 1.1;
     if (b.y + b.r < 0){ b.y = BH + b.r; b.x = Math.random()*BW; }
     bctx.globalAlpha = Math.min(.26, b.a);
-    bctx.beginPath();
-    bctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
-    bctx.stroke();
+    bctx.beginPath(); bctx.arc(b.x, b.y, b.r, 0, Math.PI*2); bctx.stroke();
   }
   requestAnimationFrame(drawBubbles);
 }
@@ -317,19 +536,15 @@ function mResize(){
   mc.style.width = "100%"; mc.style.height = "100%";
 }
 mResize(); addEventListener("resize", mResize, {passive:true});
-
-let mTick = 0;
 function matrixTint(){
   const cs = getComputedStyle(document.body);
   return cs.getPropertyValue("--accent-18").trim() || "rgba(0,255,120,.18)";
 }
 function matrixLoop(){
-  mTick++;
-  // Gentle fade so old trails persist slightly
+  // fade canvas slightly
   mctx.fillStyle = "rgba(0,0,0,0.04)";
   mctx.fillRect(0,0,mc.width,mc.height);
-
-  // Draw a few visible columns each frame
+  // draw visible columns
   const tint = matrixTint();
   for (let k=0;k<6;k++){
     const x = Math.random()*mc.width;
@@ -342,10 +557,42 @@ function matrixLoop(){
 }
 matrixLoop();
 
-/* Belt + suspenders: FX never block taps */
-["matrix","bubbles","halo"].forEach(id=>{
-  const el = document.getElementById(id);
-  if (el) el.style.pointerEvents = "none";
+/* =========================
+   Add Link UI (per-room)
+   ========================= */
+function toast(msg){
+  const t = document.getElementById("ship-toast");
+  t.textContent = msg; t.style.opacity = "1";
+  setTimeout(()=> t.style.opacity = "0", 1600);
+}
+// Toggle sheets
+document.querySelectorAll(".plus-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const sel = btn.getAttribute("data-linker");
+    const sheet = document.querySelector(sel);
+    if (sheet) sheet.classList.toggle("on");
+  });
+});
+// Apply / Reset buttons
+document.querySelectorAll("[data-apply]").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    const room = b.getAttribute("data-apply");
+    const input = document.getElementById(`input-${room}`);
+    if (!input) return;
+    const id = ytIdFrom(input.value);
+    if (!id){ toast("Hmm… couldn’t read that link."); return; }
+    saveVideo(room, id);
+    mountVideoFor(room);
+    toast("Video updated for this room.");
+  });
+});
+document.querySelectorAll("[data-reset]").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    const room = b.getAttribute("data-reset");
+    clearVideo(room);
+    mountVideoFor(room);
+    toast("Back to default video.");
+  });
 });
 </script>
 </body>
