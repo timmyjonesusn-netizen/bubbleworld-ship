@@ -1,0 +1,23 @@
+[
+  {
+    "message": "HUI Primer drop: Reality is the field aware of itself. ⚡️ #HUIPrimer #TimmyHUI",
+    "link": "https://timmyjonesusn-netizen.github.io/bubbleworld-ship/",
+    "scheduled_at": "2025-11-01 14:00",
+    "targets": ["MAIN_PAGE"],
+    "posted_by": {}
+  },
+  {
+    "message": "Neon bubble field test 🌈",
+    "image_path": "assets/images/neon-bubbles.jpg",
+    "scheduled_at": "2025-11-01 16:30",
+    "targets": ["MAIN_PAGE","ART_PAGE"],
+    "posted_by": {}
+  },
+  {
+    "message": "Mr. Bill says: oh no! 🎬",
+    "video_path": "assets/videos/mrbill_ohno.mp4",
+    "scheduled_at": "2025-11-01 21:00",
+    "targets": ["TIMMYPOD_GROUP"],
+    "posted_by": {}
+  }
+]
