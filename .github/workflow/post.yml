@@ -1,0 +1,26 @@
+name: Facebook Autoposter
+
+on:
+  workflow_dispatch:
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Post to TimmyArt Page
+        run: |
+          curl -X POST "https://graph.facebook.com/v21.0/103332976145231/feed" \
+          -H "Content-Type: application/json" \
+          -d '{"message":"🚀 Hello from the Ship — TimmyArt connection online!","link":"https://timmyjonesusn-netizen.github.io/bubbleworld-ship/"}' \
+          -d "access_token=${{ secrets.FB_TOKEN_TIMMYART_PAGE }}"
+
+      - name: Post to Ragland Page
+        run: |
+          curl -X POST "https://graph.facebook.com/v21.0/102207312932531/feed" \
+          -H "Content-Type: application/json" \
+          -d '{"message":"🌎 Hello from the Ship — Ragland page connection confirmed!","link":"https://timmyjonesusn-netizen.github.io/bubbleworld-ship/"}' \
+          -d "access_token=${{ secrets.FB_TOKEN_RAGLAND_PAGE }}"
