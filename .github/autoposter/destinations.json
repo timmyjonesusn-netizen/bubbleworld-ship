@@ -1,0 +1,20 @@
+{
+  "destinations": [
+    {
+      "alias": "RAGLAND_PAGE",
+      "type": "page",
+      "page_name": "What is Really Happening in Ragland",
+      "page_id": "102207312932531",
+      "token_env": "FB_TOKEN_RAGLAND_PAGE",
+      "active": true
+    },
+    {
+      "alias": "TIMMYART_PAGE",
+      "type": "page",
+      "page_name": "Timmyart",
+      "page_id": "103332976145231",
+      "token_env": "FB_TOKEN_TIMMYART_PAGE",
+      "active": true
+    }
+  ]
+}
