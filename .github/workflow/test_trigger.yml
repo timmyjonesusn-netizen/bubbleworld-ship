@@ -1,0 +1,7 @@
+name: Test Trigger
+on: workflow_dispatch
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "👋 GitHub Actions Wake Test"
