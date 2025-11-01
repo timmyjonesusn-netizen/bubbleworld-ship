@@ -1,0 +1,20 @@
+[
+  {
+    "alias": "MAIN_PAGE",
+    "type": "page",
+    "id": "111111111111111",
+    "token_env": "FB_TOKEN_MAIN_PAGE"
+  },
+  {
+    "alias": "ART_PAGE",
+    "type": "page",
+    "id": "222222222222222",
+    "token_env": "FB_TOKEN_ART_PAGE"
+  },
+  {
+    "alias": "TIMMYPOD_GROUP",
+    "type": "group",
+    "id": "333333333333333",
+    "token_env": "FB_TOKEN_TIMMYPOD_GROUP"
+  }
+]
