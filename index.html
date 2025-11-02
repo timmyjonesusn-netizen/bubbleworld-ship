@@ -1,19 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Room 1 • Redirect</title>
-  <meta name="robots" content="noindex,nofollow">
-  <!-- Fast, Safari/FB-safe, relative redirect -->
-  <meta http-equiv="refresh" content="0;url=../#room1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>TimmyTime • Bubble World Ship</title>
+  <meta name="description" content="Step aboard Timmy’s Bubble World Ship — The Engine Room." />
+
+  <!-- 🔮 Full-screen iOS/Android settings -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bubble Ship">
+  <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icon-180.png">
+  <link rel="icon" href="assets/favicon.png">
+
+  <!-- 🌌 Style -->
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #002b15 0%, #000 100%);
+      font-family: 'Trebuchet MS', sans-serif;
+      color: #00ff99;
+      text-align: center;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-top: 3.5rem;
+      color: #fff;
+      text-shadow: 0 0 20px #00ffcc;
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ff99; }
+      to { text-shadow: 0 0 30px #00ffcc, 0 0 60px #00ffaa; }
+    }
+    p {
+      color: #aaa;
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+    }
+
+    .nav {
+      position: fixed;
+      bottom: 30px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 2rem;
+    }
+    .arrow {
+      font-size: 2.5rem;
+      color: #fff;
+      cursor: pointer;
+      text-shadow: 0 0 15px #00ffcc;
+      transition: transform 0.2s;
+    }
+    .arrow:hover {
+      transform: scale(1.2);
+    }
+    .pill {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 255, 170, 0.3);
+      border: 1px solid #00ffaa;
+      border-radius: 50px;
+      padding: 0.6rem 1.5rem;
+      font-size: 1.2rem;
+      backdrop-filter: blur(6px);
+      color: #fff;
+      box-shadow: 0 0 10px #00ffaa;
+    }
+
+    /* bubbles */
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      background: rgba(0, 255, 150, 0.15);
+      border-radius: 50%;
+      animation: rise 20s infinite ease-in;
+    }
+    @keyframes rise {
+      0% { transform: translateY(0) scale(1); opacity: 0.7; }
+      100% { transform: translateY(-110vh) scale(1.5); opacity: 0; }
+    }
+
+    iframe {
+      margin-top: 2rem;
+      width: 90%;
+      max-width: 560px;
+      height: 315px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00ff99;
+    }
+  </style>
 </head>
 <body>
-  <p>Redirecting to Room 1… <a href="../#room1">tap here if it doesn’t auto-open</a></p>
+  <div id="app" class="app">
+    <h1>Engine Room</h1>
+    <p>Green Matrix • Thor’s Hammer • Lightning</p>
+
+    <iframe src="https://www.youtube.com/embed/YE7VzlLtp-4" allowfullscreen></iframe>
+
+    <div class="pill">Timmy Time Music Zone</div>
+
+    <div class="nav">
+      <div class="arrow" onclick="go('/room10')">⟵</div>
+      <div class="arrow" onclick="go('/room2')">⟶</div>
+    </div>
+  </div>
+
   <script>
-    (function () {
-      var target = "../#room1";
-      try { location.replace(target); } catch (e) { location.href = target; }
+    // Clean visible URL (no hash or params)
+    (function cleanURL(){
+      try {
+        var base = "/bubbleworld-ship/";
+        if (location.pathname !== base || location.search || location.hash) {
+          history.replaceState(null, "", base);
+        }
+      } catch(e){}
     })();
+
+    // PWA mark
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+      document.body.classList.add('pwa');
+    }
+
+    // Bubble animation
+    const bubbleCount = 20;
+    for (let i = 0; i < bubbleCount; i++) {
+      const b = document.createElement('div');
+      const size = Math.random() * 60 + 20;
+      b.classList.add('bubble');
+      b.style.width = `${size}px`;
+      b.style.height = `${size}px`;
+      b.style.left = `${Math.random() * 100}%`;
+      b.style.animationDuration = `${10 + Math.random() * 15}s`;
+      b.style.animationDelay = `${Math.random() * 10}s`;
+      document.body.appendChild(b);
+    }
+
+    function go(path){ window.location.href = path; }
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator){
+      navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+    }
   </script>
 </body>
 </html>
