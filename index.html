@@ -1,29 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Engine Room — TimmyTime Ship v3.3.1</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="preload" href="static/style.css?v=331" as="style">
-  <link rel="stylesheet" href="static/style.css?v=331">
-  <meta property="og:title" content="TimmyTime — BubbleWorld Ship">
-  <meta property="og:description" content="Engine Room (green) launch panel.">
-  <meta property="og:image" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/default.jpg">
-  <meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/">
-</head>
-<body class="engine-bg">
-  <main class="center">
-    <h1>Engine Room</h1>
-    <p>Green core online — TimmyTime ready for launch.</p>
+// Fast bubbles: capped DPR, fewer circles, ~30fps
+(function(){
+  const c = document.getElementById('bubble-canvas'); if(!c) return;
+  const ctx = c.getContext('2d', {alpha:true});
+  const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+  let w=0,h=0,bubbles=[], last=0;
 
-    <div class="cta">
-      <a class="btn" href="room1.html">Go to Room 1</a>
-    </div>
-  </main>
+  function resize(){
+    w = c.width = Math.floor(innerWidth * DPR);
+    h = c.height = Math.floor(innerHeight * DPR);
+  }
+  addEventListener('resize', resize, {passive:true});
+  resize();
 
-  <a class="arrow left" href="room9.html" aria-label="Previous">⟵</a>
-  <a class="arrow right" href="room1.html" aria-label="Next">⟶</a>
+  const TARGET = 20; // number of bubbles (was ~36)
+  function spawn(){
+    const r = (Math.random()*18+8)*DPR;
+    bubbles.push({
+      x: Math.random()*w,
+      y: h + r + Math.random()*h*0.15,
+      r,
+      vy: (0.05 + Math.random()*0.10)*28*DPR,  // upward speed
+      vx: (Math.random()-0.5)*0.35*DPR
+    });
+  }
+  for(let i=0;i<TARGET;i++) spawn();
 
-  <div class="pill">🎵 Timmy Time Music</div>
-</body>
-</html>
+  function frame(ts){
+    if(ts - last < 33){ requestAnimationFrame(frame); return; } // ~30fps
+    last = ts;
+
+    ctx.clearRect(0,0,w,h);
+    for(const b of bubbles){
+      b.y -= b.vy;
+      b.x += b.vx;
+      ctx.beginPath();
+      ctx.arc(b.x,b.y,b.r,0,6.283);
+      ctx.fillStyle = 'rgba(255,244,255,0.08)';
+      ctx.fill();
+      ctx.lineWidth = 1*DPR;
+      ctx.strokeStyle = 'rgba(255,244,255,0.22)';
+      ctx.stroke();
+    }
+    bubbles = bubbles.filter(b => b.y + b.r > -40*DPR);
+    while(bubbles.length < TARGET) spawn();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
