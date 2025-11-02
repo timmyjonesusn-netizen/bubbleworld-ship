@@ -9,17 +9,19 @@
   <meta property="og:image" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/og.jpg">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=331">
 </head>
 <body>
+  <!-- ENGINE -->
   <section id="engine" class="scene">
     <h1>Engine Room</h1>
-    <p>Green core online — TimmyTime ready for launch.</p>
+    <p>Green core online — TimmyTime ready for launch</p>
     <div class="cta">
       <a href="#room1" class="btn">Go to Room 1</a>
     </div>
   </section>
 
+  <!-- ROOM 1 -->
   <section id="room1" class="scene hidden">
     <h1>Room 1 — Purple Play</h1>
     <p>Neon bubbles active. TimmyTime Music online.</p>
@@ -30,15 +32,16 @@
     </div>
   </section>
 
+  <!-- ROOM 2 -->
   <section id="room2" class="scene hidden">
     <h1>Room 2 — Timmy Time Music Zone</h1>
     <p>Official Suno Vibes (1 – 5)</p>
     <div class="cta">
-      <a class="btn" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">Laugh</a>
-      <a class="btn" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">Play</a>
-      <a class="btn" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">Fun</a>
-      <a class="btn" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">Motown</a>
-      <a class="btn" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">Feeling It</a>
+      <a class="btn" target="_blank" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1">Laugh</a>
+      <a class="btn" target="_blank" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b">Play</a>
+      <a class="btn" target="_blank" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f">Fun</a>
+      <a class="btn" target="_blank" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840">Motown</a>
+      <a class="btn" target="_blank" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c">Feeling It</a>
     </div>
     <div class="cta">
       <a href="#room3" class="btn">Next Room ⟶</a>
@@ -46,19 +49,20 @@
     </div>
   </section>
 
-  <!-- placeholder scenes for rooms 3–9, filled by main.js -->
-  <section id="room3" class="scene hidden"><h1>Room 3</h1></section>
-  <section id="room4" class="scene hidden"><h1>Room 4</h1></section>
-  <section id="room5" class="scene hidden"><h1>Room 5</h1></section>
-  <section id="room6" class="scene hidden"><h1>Room 6</h1></section>
-  <section id="room7" class="scene hidden"><h1>Room 7</h1></section>
-  <section id="room8" class="scene hidden"><h1>Room 8</h1></section>
-  <section id="room9" class="scene hidden"><h1>Room 9</h1></section>
+  <!-- ROOMS 3–9 (titles only; your content stays the same) -->
+  <section id="room3" class="scene hidden"><h1>Room 3</h1><div class="cta"><a href="#room4" class="btn">Next ⟶</a><a href="#room2" class="btn">⟵ Prev</a></div></section>
+  <section id="room4" class="scene hidden"><h1>Room 4</h1><div class="cta"><a href="#room5" class="btn">Next ⟶</a><a href="#room3" class="btn">⟵ Prev</a></div></section>
+  <section id="room5" class="scene hidden"><h1>Room 5</h1><div class="cta"><a href="#room6" class="btn">Next ⟶</a><a href="#room4" class="btn">⟵ Prev</a></div></section>
+  <section id="room6" class="scene hidden"><h1>Room 6</h1><div class="cta"><a href="#room7" class="btn">Next ⟶</a><a href="#room5" class="btn">⟵ Prev</a></div></section>
+  <section id="room7" class="scene hidden"><h1>Room 7</h1><div class="cta"><a href="#room8" class="btn">Next ⟶</a><a href="#room6" class="btn">⟵ Prev</a></div></section>
+  <section id="room8" class="scene hidden"><h1>Room 8</h1><div class="cta"><a href="#room9" class="btn">Next ⟶</a><a href="#room7" class="btn">⟵ Prev</a></div></section>
+  <section id="room9" class="scene hidden"><h1>Room 9</h1><div class="cta"><a href="#engine" class="btn">⟵ Engine</a><a href="#room8" class="btn">⟵ Prev</a></div></section>
 
+  <!-- arrows + pill -->
   <a href="#engine" class="arrow left">⟵</a>
   <a href="#room9" class="arrow right">⟶</a>
   <div id="music-pill">🎵 Timmy Time Music</div>
 
-  <script src="main.js"></script>
+  <script src="main.js?v=331"></script>
 </body>
 </html>
