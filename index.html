@@ -2,45 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>TimmyTime — BubbleWorld Ship Core</title>
+  <title>TimmyTime — BubbleWorld Ship Core v3.3.1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Social preview (root only; hashes get stripped by some platforms) -->
   <meta property="og:title" content="TimmyTime — BubbleWorld Ship">
-  <meta property="og:description" content="Engine Room (green) and Room 1 (purple) — TimmyTime Ship.">
+  <meta property="og:description" content="The interactive multi-room ship experience.">
+  <meta property="og:image" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/og.jpg">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/">
-  <meta property="og:image" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/og.jpg">
-  <link rel="icon" href="./assets/img/icon.png">
-  <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- ENGINE ROOM (green) -->
   <section id="engine" class="scene">
     <h1>Engine Room</h1>
-    <p>Green core online — TimmyTime ready for launch</p>
+    <p>Green core online — TimmyTime ready for launch.</p>
     <div class="cta">
       <a href="#room1" class="btn">Go to Room 1</a>
-      <a href="#engine" class="btn ghost">Stay in Engine</a>
     </div>
   </section>
 
-  <!-- ROOM 1 (purple) -->
   <section id="room1" class="scene hidden">
     <h1>Room 1 — Purple Play</h1>
     <p>Neon bubbles active. TimmyTime Music online.</p>
-    <div id="bubble-layer" aria-hidden="true"></div>
+    <div id="bubble-layer"></div>
     <div class="cta">
-      <a href="#engine" class="btn">Back to Engine</a>
+      <a href="#room2" class="btn">Next Room ⟶</a>
+      <a href="#engine" class="btn">⟵ Back to Engine</a>
     </div>
   </section>
 
-  <!-- Permanent arrows -->
-  <a href="#engine" class="arrow left" aria-label="Engine">⟵</a>
-  <a href="#room1" class="arrow right" aria-label="Room 1">⟶</a>
+  <section id="room2" class="scene hidden">
+    <h1>Room 2 — Timmy Time Music Zone</h1>
+    <p>Official Suno Vibes (1 – 5)</p>
+    <div class="cta">
+      <a class="btn" href="https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1" target="_blank">Laugh</a>
+      <a class="btn" href="https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b" target="_blank">Play</a>
+      <a class="btn" href="https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f" target="_blank">Fun</a>
+      <a class="btn" href="https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840" target="_blank">Motown</a>
+      <a class="btn" href="https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c" target="_blank">Feeling It</a>
+    </div>
+    <div class="cta">
+      <a href="#room3" class="btn">Next Room ⟶</a>
+      <a href="#room1" class="btn">⟵ Prev</a>
+    </div>
+  </section>
 
-  <!-- Music pill (always present) -->
+  <!-- placeholder scenes for rooms 3–9, filled by main.js -->
+  <section id="room3" class="scene hidden"><h1>Room 3</h1></section>
+  <section id="room4" class="scene hidden"><h1>Room 4</h1></section>
+  <section id="room5" class="scene hidden"><h1>Room 5</h1></section>
+  <section id="room6" class="scene hidden"><h1>Room 6</h1></section>
+  <section id="room7" class="scene hidden"><h1>Room 7</h1></section>
+  <section id="room8" class="scene hidden"><h1>Room 8</h1></section>
+  <section id="room9" class="scene hidden"><h1>Room 9</h1></section>
+
+  <a href="#engine" class="arrow left">⟵</a>
+  <a href="#room9" class="arrow right">⟶</a>
   <div id="music-pill">🎵 Timmy Time Music</div>
 
-  <script src="./assets/js/main.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
