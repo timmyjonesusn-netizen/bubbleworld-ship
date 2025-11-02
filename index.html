@@ -1,47 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>TimmyTime • Bubble World Ship</title>
-  <meta name="description" content="Step aboard Timmy’s Bubble World Ship — The Engine Room." />
-
-  <!-- 🔮 Full-screen iOS/Android settings -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Bubble Ship">
-  <meta name="theme-color" content="#000000">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="assets/icon-180.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TimmyTime • Bubble World Ship — Engine Room</title>
+  <meta name="description" content="TimmyTime Bubble World Ship — Engine Room Core.">
   <link rel="icon" href="assets/favicon.png">
 
-  <!-- 🌌 Style -->
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       overflow: hidden;
-      background: radial-gradient(circle at center, #002b15 0%, #000 100%);
+      background: radial-gradient(circle at center, #001100 0%, #000000 100%);
       font-family: 'Trebuchet MS', sans-serif;
       color: #00ff99;
       text-align: center;
     }
+
     h1 {
       font-size: 3rem;
-      margin-top: 3.5rem;
       color: #fff;
+      margin-top: 3.5rem;
       text-shadow: 0 0 20px #00ffcc;
       animation: glow 3s ease-in-out infinite alternate;
     }
+
     @keyframes glow {
       from { text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ff99; }
       to { text-shadow: 0 0 30px #00ffcc, 0 0 60px #00ffaa; }
     }
+
     p {
       color: #aaa;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       margin-top: 0.5rem;
+    }
+
+    iframe {
+      margin-top: 2rem;
+      width: 90%;
+      max-width: 560px;
+      height: 315px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00ff99;
     }
 
     .nav {
@@ -52,6 +56,7 @@
       justify-content: space-between;
       padding: 0 2rem;
     }
+
     .arrow {
       font-size: 2.5rem;
       color: #fff;
@@ -59,9 +64,11 @@
       text-shadow: 0 0 15px #00ffcc;
       transition: transform 0.2s;
     }
+
     .arrow:hover {
       transform: scale(1.2);
     }
+
     .pill {
       position: fixed;
       bottom: 10px;
@@ -77,27 +84,18 @@
       box-shadow: 0 0 10px #00ffaa;
     }
 
-    /* bubbles */
+    /* floating bubbles */
     .bubble {
       position: absolute;
       bottom: -100px;
-      background: rgba(0, 255, 150, 0.15);
+      background: rgba(0, 255, 150, 0.1);
       border-radius: 50%;
       animation: rise 20s infinite ease-in;
     }
+
     @keyframes rise {
       0% { transform: translateY(0) scale(1); opacity: 0.7; }
       100% { transform: translateY(-110vh) scale(1.5); opacity: 0; }
-    }
-
-    iframe {
-      margin-top: 2rem;
-      width: 90%;
-      max-width: 560px;
-      height: 315px;
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 0 20px #00ff99;
     }
   </style>
 </head>
@@ -117,23 +115,8 @@
   </div>
 
   <script>
-    // Clean visible URL (no hash or params)
-    (function cleanURL(){
-      try {
-        var base = "/bubbleworld-ship/";
-        if (location.pathname !== base || location.search || location.hash) {
-          history.replaceState(null, "", base);
-        }
-      } catch(e){}
-    })();
-
-    // PWA mark
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-      document.body.classList.add('pwa');
-    }
-
     // Bubble animation
-    const bubbleCount = 20;
+    const bubbleCount = 25;
     for (let i = 0; i < bubbleCount; i++) {
       const b = document.createElement('div');
       const size = Math.random() * 60 + 20;
@@ -146,11 +129,8 @@
       document.body.appendChild(b);
     }
 
-    function go(path){ window.location.href = path; }
-
-    // Register Service Worker
-    if ('serviceWorker' in navigator){
-      navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+    function go(path) {
+      window.location.href = path;
     }
   </script>
 </body>
