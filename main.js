@@ -1,5 +1,4 @@
 // BubbleWorld Ship Core v3.3.1 — Routing + Bubbles + Room Control
-
 (function(){
   const rooms = [
     'engine','room1','room2','room3','room4',
@@ -50,8 +49,7 @@
     }
   }
 
-  // listeners
   window.addEventListener('hashchange',route,false);
   window.addEventListener('load',route,false);
-  setTimeout(route,100); // iOS safety poke
+  setTimeout(route,100);
 })();
