@@ -2,82 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>TimmyTime — BubbleWorld Ship Core v3.3.1</title>
+  <title>TimmyTime — BubbleWorld Ship Core</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Social preview (root only; hashes get stripped by some platforms) -->
   <meta property="og:title" content="TimmyTime — BubbleWorld Ship">
-  <meta property="og:description" content="The interactive multi-room ship experience.">
-  <meta property="og:image" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/og.jpg">
+  <meta property="og:description" content="Engine Room (green) and Room 1 (purple) — TimmyTime Ship.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/">
+  <meta property="og:image" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/og.jpg">
   <link rel="icon" href="./assets/img/icon.png">
   <link rel="stylesheet" href="./assets/css/style.css">
-  <style>
-    body,html{margin:0;padding:0;height:100%;width:100%;overflow:hidden;font-family:-apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
-    #engine,#room1{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;transition:opacity 1s ease;}
-    #engine{background:radial-gradient(circle at 50% 40%,#1dfc8a 0%,#0ea765 25%,#065d3b 60%,#003622 100%);}
-    #room1{background:radial-gradient(ellipse at 50% 50%,#3b0066 0%,#6a00a3 30%,#a800ff 60%,#180021 100%);}
-    .hidden{opacity:0;pointer-events:none;}
-    h1{font-size:3rem;margin:0;}
-    p{font-size:1.5rem;margin:.5rem 0 1rem 0;}
-    .btn{padding:14px 24px;margin:10px;font-size:1.25rem;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;text-decoration:none;cursor:pointer;transition:background .3s;}
-    .btn:hover{background:rgba(255,255,255,.25);}
-    .bubble{position:absolute;border-radius:50%;opacity:.5;animation:rise linear infinite;}
-    @keyframes rise{from{transform:translateY(100vh) scale(.8);}to{transform:translateY(-20vh) scale(1.1);}}
-    #music-pill{position:fixed;bottom:15px;right:15px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:10px 18px;font-size:1rem;color:white;backdrop-filter:blur(5px);}
-    .arrow{position:fixed;top:50%;transform:translateY(-50%);font-size:3rem;color:white;text-decoration:none;user-select:none;}
-    .left-arrow{left:20px;}
-    .right-arrow{right:20px;}
-  </style>
 </head>
 <body>
-  <div id="engine">
+  <!-- ENGINE ROOM (green) -->
+  <section id="engine" class="scene">
     <h1>Engine Room</h1>
     <p>Green core online — TimmyTime ready for launch</p>
-    <a href="#room1" class="btn">Go to Room 1</a>
-    <a href="#engine" class="btn">Stay in Engine</a>
-  </div>
+    <div class="cta">
+      <a href="#room1" class="btn">Go to Room 1</a>
+      <a href="#engine" class="btn ghost">Stay in Engine</a>
+    </div>
+  </section>
 
-  <div id="room1" class="hidden">
+  <!-- ROOM 1 (purple) -->
+  <section id="room1" class="scene hidden">
     <h1>Room 1 — Purple Play</h1>
     <p>Neon bubbles active. TimmyTime Music online.</p>
-    <div id="bubble-layer"></div>
-    <a href="#engine" class="btn">Back to Engine</a>
-  </div>
+    <div id="bubble-layer" aria-hidden="true"></div>
+    <div class="cta">
+      <a href="#engine" class="btn">Back to Engine</a>
+    </div>
+  </section>
 
-  <a href="#engine" class="arrow left-arrow">⟵</a>
-  <a href="#room1" class="arrow right-arrow">⟶</a>
+  <!-- Permanent arrows -->
+  <a href="#engine" class="arrow left" aria-label="Engine">⟵</a>
+  <a href="#room1" class="arrow right" aria-label="Room 1">⟶</a>
 
+  <!-- Music pill (always present) -->
   <div id="music-pill">🎵 Timmy Time Music</div>
 
-  <script>
-    // BubbleWorld Ship Core Router
-    const engine = document.getElementById('engine');
-    const room1 = document.getElementById('room1');
-    const bubbleLayer = document.getElementById('bubble-layer');
-
-    function route(){
-      const hash = window.location.hash || '#engine';
-      if(hash === '#room1'){showRoom(room1, engine);}else{showRoom(engine, room1);}
-    }
-    function showRoom(show, hide){
-      show.classList.remove('hidden'); hide.classList.add('hidden');
-      if(show.id === 'room1'){seedBubbles();}
-    }
-    function seedBubbles(){
-      bubbleLayer.innerHTML = '';
-      for(let i=0;i<36;i++){
-        const b = document.createElement('div');
-        b.className = 'bubble';
-        const s = 24 + Math.random()*120;
-        b.style.width = s+'px'; b.style.height = s+'px';
-        b.style.left = Math.random()*100+'vw';
-        b.style.animationDuration = (8 + Math.random()*10)+'s';
-        b.style.background = 'rgba(255,255,255,.4)';
-        bubbleLayer.appendChild(b);
-      }
-    }
-    window.addEventListener('hashchange', route);
-    window.addEventListener('load', route);
-  </script>
+  <script src="./assets/js/main.js"></script>
 </body>
 </html>
