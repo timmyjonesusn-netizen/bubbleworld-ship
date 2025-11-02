@@ -1,37 +1,133 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <title>TimmyTime • Engine Room (Room 1)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TimmyTime • Bubble World Ship — Pretty Pack v1.3</title>
 
-  <!-- Absolute URLs so Facebook uses your preview exactly -->
+  <!-- 🔮 Meta description -->
+  <meta name="description" content="Step aboard Timmy’s Bubble World Ship — Pretty Pack v1.3. The Engine Room of neon dreams, music, and motion.">
+
+  <!-- ⚡ Open Graph for Facebook, Discord, etc -->
+  <meta property="og:title" content="TimmyTime • Bubble World Ship — Pretty Pack v1.3">
+  <meta property="og:description" content="Step aboard Timmy’s Bubble World Ship — Pretty Pack v1.3. The Engine Room of neon dreams, music, and motion.">
+  <meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/#room1">
+  <meta property="og:image" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/assets/share-preview-room1.jpg">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="TimmyTime • Engine Room (Room 1)">
-  <meta property="og:description" content="Enter the Engine Room — core of the BubbleWorld Ship.">
-  <meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/share/room1/">
+  <meta property="og:site_name" content="TimmyTime">
 
-  <!-- Use a YouTube thumbnail as the OG image (works great) -->
-  <!-- Replace VIDEO_ID with your flagship clip -->
-  <meta property="og:image" content="https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-
-  <!-- Optional Twitter card -->
+  <!-- 🐦 Twitter/X share -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="TimmyTime • Engine Room (Room 1)">
-  <meta name="twitter:description" content="Enter the Engine Room — core of the BubbleWorld Ship.">
-  <meta name="twitter:image" content="https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg">
+  <meta name="twitter:title" content="TimmyTime • Bubble World Ship — Pretty Pack v1.3">
+  <meta name="twitter:description" content="Neon worlds collide. Step into Timmy’s Bubble World Ship.">
+  <meta name="twitter:image" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/assets/share-preview-room1.jpg">
 
-  <!-- Humans get redirected into your SPA’s Room 1 instantly -->
-  <meta http-equiv="refresh" content="0; url=https://timmyjonesusn-netizen.github.io/bubbleworld-ship/#room1">
-  <script>location.replace("https://timmyjonesusn-netizen.github.io/bubbleworld-ship/#room1");</script>
+  <!-- 🧩 Favicon -->
+  <link rel="icon" type="image/png" href="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/assets/favicon.png">
 
-  <link rel="canonical" href="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/share/room1/">
+  <!-- 🪩 Core styling -->
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #00ff99 0%, #001a0f 100%);
+      font-family: 'Trebuchet MS', sans-serif;
+      color: #fff;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-top: 4rem;
+      text-shadow: 0 0 20px #00ffcc;
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ff99; }
+      to { text-shadow: 0 0 30px #00ffcc, 0 0 60px #00ffaa; }
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      animation: rise 15s infinite ease-in;
+    }
+
+    @keyframes rise {
+      0% { transform: translateY(0) scale(1); opacity: 0.7; }
+      100% { transform: translateY(-110vh) scale(1.5); opacity: 0; }
+    }
+
+    .nav {
+      position: fixed;
+      bottom: 30px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 2rem;
+    }
+
+    .arrow {
+      font-size: 2.5rem;
+      color: #fff;
+      cursor: pointer;
+      text-shadow: 0 0 15px #00ffcc;
+      transition: transform 0.2s;
+    }
+
+    .arrow:hover {
+      transform: scale(1.2);
+    }
+
+    .pill {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 255, 170, 0.3);
+      border: 1px solid #00ffaa;
+      border-radius: 50px;
+      padding: 0.6rem 1.5rem;
+      font-size: 1.2rem;
+      backdrop-filter: blur(6px);
+      color: #fff;
+      box-shadow: 0 0 10px #00ffaa;
+    }
+  </style>
 </head>
 <body>
-  <noscript>
-    Loading Engine Room… <a href="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/#room1">Continue</a>
-  </noscript>
+  <h1>🚀 Welcome to Room 1 — The Engine Room</h1>
+  <div class="pill">Timmy Time Music Zone</div>
+
+  <div class="nav">
+    <div class="arrow" onclick="go('/room10')">⟵</div>
+    <div class="arrow" onclick="go('/room2')">⟶</div>
+  </div>
+
+  <script>
+    // Simple navigation
+    function go(path) {
+      window.location.href = path;
+    }
+
+    // Bubble generator
+    const bubbleCount = 20;
+    for (let i = 0; i < bubbleCount; i++) {
+      const b = document.createElement('div');
+      const size = Math.random() * 60 + 20;
+      b.classList.add('bubble');
+      b.style.width = `${size}px`;
+      b.style.height = `${size}px`;
+      b.style.left = `${Math.random() * 100}%`;
+      b.style.animationDuration = `${10 + Math.random() * 10}s`;
+      b.style.animationDelay = `${Math.random() * 10}s`;
+      document.body.appendChild(b);
+    }
+  </script>
 </body>
 </html>
