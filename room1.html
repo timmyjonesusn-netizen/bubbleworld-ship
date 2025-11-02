@@ -2,10 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0;url=/bubbleworld-ship/#room1">
-  <title>Redirecting…</title>
+  <title>Room 1 — Purple Play</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preload" href="static/style.css?v=331" as="style">
+  <link rel="stylesheet" href="static/style.css?v=331">
 </head>
-<body>
-  <p><a href="/bubbleworld-ship/#room1">Tap here if it doesn’t auto-open</a></p>
+<body class="room1-bg">
+  <main class="center">
+    <h1>Room 1 — Purple Play</h1>
+    <p>Neon bubbles active. TimmyTime Music online.</p>
+
+    <div id="bubble-layer" aria-hidden="true"></div>
+
+    <div class="cta">
+      <a class="btn" href="room2.html">Next Room ⟶</a>
+      <a class="btn" href="index.html">⟵ Back to Engine</a>
+    </div>
+  </main>
+
+  <a class="arrow left" href="index.html" aria-label="Previous">⟵</a>
+  <a class="arrow right" href="room2.html" aria-label="Next">⟶</a>
+  <div class="pill">🎵 Timmy Time Music</div>
+
+  <script src="static/bubbles.js?v=331"></script>
 </body>
 </html>
