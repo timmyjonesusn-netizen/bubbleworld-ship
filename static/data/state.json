@@ -27,12 +27,12 @@
     ]
   },
   "videos": {
-    "4": "",
-    "5": "",
-    "6": "",
-    "7": "",
-    "8": "",
-    "9": ""
+    "4": "https://youtube.com/shorts/BRoTqtY70ZQ?si=50v1ISh-D_dU9THH",
+    "5": "https://youtube.com/shorts/eBS0vNo-8Pg?si=J5xiiNLV78A8zf4m",
+    "6": "https://youtube.com/shorts/6soN9RAQa5Q?si=AfCPN3xOzgopwmIw",
+    "7": "https://youtube.com/shorts/SlVYzBNySzI?si=OM5mmy5E-St0ONlu",
+    "8": "https://youtube.com/shorts/99uTTUSdh_I?si=NOU_wviymO83kt1G",
+    "9": "https://youtube.com/shorts/0sf6lNyvMHo?si=xCITkRUJuSMCM1g6"
   },
   "marketing": {
     "4": "TimmyTime",
@@ -43,46 +43,18 @@
     "9": "Timmy Official"
   },
   "punchlines": {
-    "4": [
-      "Ship it shiny.",
-      "Tape it, post it, toast it.",
-      "Small reel, big feel."
-    ],
-    "5": [
-      "Bubble up, never down.",
-      "Pop. Laugh. Repeat.",
-      "Neon makes everything taste better."
-    ],
-    "6": [
-      "Spin up greatness.",
-      "Hold my tornado.",
-      "We remix the wind."
-    ],
-    "7": [
-      "Too good to gatekeep.",
-      "Perfectly ridiculous.",
-      "Built for giggles."
-    ],
-    "8": [
-      "Fantastic at 15 seconds.",
-      "Smile-engine engaged.",
-      "Glows before it goes."
-    ],
-    "9": [
-      "Timmy says hi.",
-      "Clip quick. Win big.",
-      "We film joy here."
-    ]
+    "4": ["Ship it shiny.", "Tape it, post it, toast it.", "Small reel, big feel."],
+    "5": ["Bubble up, never down.", "Pop. Laugh. Repeat.", "Neon makes everything taste better."],
+    "6": ["Spin up greatness.", "Hold my tornado.", "We remix the wind."],
+    "7": ["Too good to gatekeep.", "Perfectly ridiculous.", "Built for giggles."],
+    "8": ["Fantastic at 15 seconds.", "Smile-engine engaged.", "Glows before it goes."],
+    "9": ["Timmy says hi.", "Clip quick. Win big.", "We film joy here."]
   },
   "weather": {
     "location": "",
     "lat": null,
     "lon": null,
-    "today": {
-      "hi": null,
-      "lo": null,
-      "text": ""
-    },
+    "today": {"hi": null, "lo": null, "text": ""},
     "ts": 0
   },
   "branding": "TIMMYTIME • BUBBLE WORLD"
