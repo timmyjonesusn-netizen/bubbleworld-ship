@@ -2,235 +2,82 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>TimmyTime — Ship Safe-Boot</title>
+  <title>TimmyTime — BubbleWorld Ship Core v3.3.1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Basic OG for FB/Twitter (kept minimal + absolute URLs) -->
   <meta property="og:title" content="TimmyTime — BubbleWorld Ship">
-  <meta property="og:description" content="Engine Room & Room 1 (Safe-Boot).">
+  <meta property="og:description" content="The interactive multi-room ship experience.">
+  <meta property="og:image" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/og.jpg">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/">
-  <meta property="og:image" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/og.jpg">
-
+  <link rel="icon" href="./assets/img/icon.png">
+  <link rel="stylesheet" href="./assets/css/style.css">
   <style>
-    :root{
-      --bg-engine: radial-gradient(circle at 50% 40%, #1dfc8a 0%, #0ea765 25%, #065d3b 60%, #003622 100%);
-      --bg-room1: radial-gradient(ellipse at 50% 50%, #3b0066 0%, #6a00a3 30%, #a800ff 60%, #180021 100%);
-      --text: #fff;
-      --muted: #cbd5e1;
-      --accent: #ffd166;
-    }
-    html,body{height:100%;margin:0}
-    body{
-      font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      color:var(--text);
-      background:#0b0b0b;
-    }
-    /* Safe fallback: show Engine Room content even if JS doesn't run */
-    .app{
-      min-height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: var(--bg-engine);
-      background-attachment: fixed;
-      transition: background 400ms ease;
-    }
-    .card{
-      width:min(920px, 92vw);
-      border-radius:20px;
-      padding:24px 20px;
-      backdrop-filter: blur(6px);
-      background: rgba(0,0,0,0.35);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.06);
-    }
-    h1{font-size:3rem; line-height:1.1; margin:0 0 10px}
-    p{font-size:1.25rem; margin:8px 0 0; color:var(--muted)}
-    .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:18px}
-    .btn{
-      font-size:1.125rem;
-      padding:14px 18px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      color:#fff; text-decoration:none;
-      cursor:pointer;
-      transition: transform .06s ease, background .2s ease, border-color .2s ease;
-      -webkit-tap-highlight-color: transparent;
-      display:inline-flex; align-items:center; gap:10px;
-    }
-    .btn:hover{transform: translateY(-1px); background:rgba(255,255,255,0.12)}
-    .btn:active{transform: translateY(0)}
-    .pill{
-      padding:.5rem .8rem; border-radius:999px; font-weight:600; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
-    }
-
-    /* Bubbles for Room 1 */
-    .bubble-layer{position:fixed; inset:0; overflow:hidden; pointer-events:none}
-    .bubble{position:absolute; border-radius:50%; opacity:.5; animation: rise linear forwards}
-    @keyframes rise{
-      0%{ transform: translateY(100vh) scale(.8); }
-      100%{ transform: translateY(-20vh) scale(1.1); }
-    }
-
-    /* Bottom nav */
-    .nav{
-      position:fixed; left:0; right:0; bottom:12px; display:flex; justify-content:center; pointer-events:none;
-    }
-    .nav .btn{pointer-events:auto}
-
-    /* Tiny diagnostics bar */
-    .diag{
-      position:fixed; top:0; left:0; right:0;
-      background: rgba(0,0,0,0.55);
-      color:#fff; font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      padding:6px 10px; display:flex; gap:16px; flex-wrap:wrap; align-items:center;
-      border-bottom:1px solid rgba(255,255,255,0.1);
-    }
-    .diag b{color:var(--accent)}
-    .hide-on-clean{opacity:.9}
-    .noscript{
-      background:#111; border:1px solid #333; padding:10px; border-radius:8px; margin-top:10px; color:#ffd1d1;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .bubble{animation-duration: 0.01s; opacity:0.2}
-    }
+    body,html{margin:0;padding:0;height:100%;width:100%;overflow:hidden;font-family:-apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+    #engine,#room1{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;text-align:center;transition:opacity 1s ease;}
+    #engine{background:radial-gradient(circle at 50% 40%,#1dfc8a 0%,#0ea765 25%,#065d3b 60%,#003622 100%);}
+    #room1{background:radial-gradient(ellipse at 50% 50%,#3b0066 0%,#6a00a3 30%,#a800ff 60%,#180021 100%);}
+    .hidden{opacity:0;pointer-events:none;}
+    h1{font-size:3rem;margin:0;}
+    p{font-size:1.5rem;margin:.5rem 0 1rem 0;}
+    .btn{padding:14px 24px;margin:10px;font-size:1.25rem;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;text-decoration:none;cursor:pointer;transition:background .3s;}
+    .btn:hover{background:rgba(255,255,255,.25);}
+    .bubble{position:absolute;border-radius:50%;opacity:.5;animation:rise linear infinite;}
+    @keyframes rise{from{transform:translateY(100vh) scale(.8);}to{transform:translateY(-20vh) scale(1.1);}}
+    #music-pill{position:fixed;bottom:15px;right:15px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:10px 18px;font-size:1rem;color:white;backdrop-filter:blur(5px);}
+    .arrow{position:fixed;top:50%;transform:translateY(-50%);font-size:3rem;color:white;text-decoration:none;user-select:none;}
+    .left-arrow{left:20px;}
+    .right-arrow{right:20px;}
   </style>
 </head>
 <body>
-  <div class="diag" id="diag">
-    <span>hash: <b id="d-hash"></b></span>
-    <span>route: <b id="d-route"></b></span>
-    <span>status: <b id="d-status">boot</b></span>
-    <span class="hide-on-clean">err: <b id="d-err">none</b></span>
+  <div id="engine">
+    <h1>Engine Room</h1>
+    <p>Green core online — TimmyTime ready for launch</p>
+    <a href="#room1" class="btn">Go to Room 1</a>
+    <a href="#engine" class="btn">Stay in Engine</a>
   </div>
 
-  <div id="app" class="app" data-scene="engine">
-    <main class="card" id="content">
-      <h1>Engine Room — Safe-Boot</h1>
-      <p>This renders even if JavaScript fails. If you’re seeing this with <em>#room1</em> in the URL, routing didn’t fire.</p>
-      <div class="row" style="margin-top:14px">
-        <span class="pill">TimmyTime</span>
-        <span class="pill">BubbleWorld Ship</span>
-        <span class="pill">Green core</span>
-      </div>
-      <div class="row">
-        <a class="btn" href="#engine" id="btn-engine">Engine</a>
-        <a class="btn" href="#room1" id="btn-room1">Go to Room 1</a>
-        <a class="btn" href="#" id="btn-root">Root</a>
-      </div>
-      <noscript>
-        <div class="noscript">JavaScript is disabled — routing won’t work. Enable JS to switch rooms. (Fallback view shown.)</div>
-      </noscript>
-    </main>
-    <div class="bubble-layer" id="bubbles" aria-hidden="true"></div>
+  <div id="room1" class="hidden">
+    <h1>Room 1 — Purple Play</h1>
+    <p>Neon bubbles active. TimmyTime Music online.</p>
+    <div id="bubble-layer"></div>
+    <a href="#engine" class="btn">Back to Engine</a>
   </div>
+
+  <a href="#engine" class="arrow left-arrow">⟵</a>
+  <a href="#room1" class="arrow right-arrow">⟶</a>
+
+  <div id="music-pill">🎵 Timmy Time Music</div>
 
   <script>
-    (function(){
-      const app = document.getElementById('app');
-      const content = document.getElementById('content');
-      const bubbles = document.getElementById('bubbles');
+    // BubbleWorld Ship Core Router
+    const engine = document.getElementById('engine');
+    const room1 = document.getElementById('room1');
+    const bubbleLayer = document.getElementById('bubble-layer');
 
-      const dHash = document.getElementById('d-hash');
-      const dRoute = document.getElementById('d-route');
-      const dStatus = document.getElementById('d-status');
-      const dErr = document.getElementById('d-err');
-
-      const routes = {
-        "": "engine",
-        "#": "engine",
-        "#engine": "engine",
-        "#room1": "room1"
-      };
-
-      function setScene(scene){
-        app.setAttribute('data-scene', scene);
-        if(scene === 'room1'){
-          document.body.style.background = 'black'; // base layer to deepen contrast
-          app.style.background = 'var(--bg-room1)';
-          renderRoom1();
-        } else {
-          app.style.background = 'var(--bg-engine)';
-          renderEngine();
-        }
-        dStatus.textContent = 'ok';
+    function route(){
+      const hash = window.location.hash || '#engine';
+      if(hash === '#room1'){showRoom(room1, engine);}else{showRoom(engine, room1);}
+    }
+    function showRoom(show, hide){
+      show.classList.remove('hidden'); hide.classList.add('hidden');
+      if(show.id === 'room1'){seedBubbles();}
+    }
+    function seedBubbles(){
+      bubbleLayer.innerHTML = '';
+      for(let i=0;i<36;i++){
+        const b = document.createElement('div');
+        b.className = 'bubble';
+        const s = 24 + Math.random()*120;
+        b.style.width = s+'px'; b.style.height = s+'px';
+        b.style.left = Math.random()*100+'vw';
+        b.style.animationDuration = (8 + Math.random()*10)+'s';
+        b.style.background = 'rgba(255,255,255,.4)';
+        bubbleLayer.appendChild(b);
       }
-
-      function renderEngine(){
-        bubbles.innerHTML = '';
-        content.innerHTML = `
-          <h1>Engine Room — Safe-Boot</h1>
-          <p>Green core online. Hash-router active. If FB mangles query strings, this build still paints.</p>
-          <div class="row" style="margin-top:14px">
-            <span class="pill">TimmyTime</span>
-            <span class="pill">Engine Core</span>
-            <span class="pill">No External Files</span>
-          </div>
-          <div class="row">
-            <a class="btn" href="#room1">Go to Room 1</a>
-            <a class="btn" href="#">Root</a>
-          </div>
-        `;
-      }
-
-      function renderRoom1(){
-        content.innerHTML = `
-          <h1>Room 1 — Purple Play (Safe)</h1>
-          <p>Neon bubbles online. If you can see this, your “black screen” is cured. 🎉</p>
-          <div class="row" style="margin-top:14px">
-            <span class="pill">TimmyTime Music</span>
-            <span class="pill">Neon Field</span>
-            <span class="pill">8-sec Reels Ready</span>
-          </div>
-          <div class="row">
-            <a class="btn" href="#engine">Back to Engine</a>
-          </div>
-        `;
-        seedBubbles();
-      }
-
-      function seedBubbles(){
-        bubbles.innerHTML = '';
-        const n = 36;
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        for(let i=0;i<n;i++){
-          const el = document.createElement('div');
-          el.className = 'bubble';
-          const size = rand(24, 140);
-          const left = rand(-10, 95);
-          const delay = rand(0, 6000);
-          const dur = rand(8000, 18000);
-          el.style.width = size + 'px';
-          el.style.height = size + 'px';
-          el.style.left = left + 'vw';
-          el.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.15))`;
-          el.style.animationDuration = dur + 'ms';
-          el.style.animationDelay = delay + 'ms';
-          bubbles.appendChild(el);
-        }
-      }
-
-      function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-
-      function route(){
-        const h = window.location.hash || '';
-        dHash.textContent = h || '(empty)';
-        const scene = routes[h] || 'engine';
-        dRoute.textContent = scene;
-        setScene(scene);
-      }
-
-      window.addEventListener('hashchange', route);
-      window.addEventListener('error', (e)=>{
-        dErr.textContent = String(e.message||e.error||'unknown');
-        dStatus.textContent = 'error';
-      });
-
-      // initial
-      route();
-    })();
+    }
+    window.addEventListener('hashchange', route);
+    window.addEventListener('load', route);
   </script>
 </body>
 </html>
