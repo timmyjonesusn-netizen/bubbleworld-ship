@@ -1,49 +1,179 @@
-// Fast bubbles: capped DPR, fewer circles, ~30fps
-(function(){
-  const c = document.getElementById('bubble-canvas'); if(!c) return;
-  const ctx = c.getContext('2d', {alpha:true});
-  const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
-  let w=0,h=0,bubbles=[], last=0;
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Timmy Time Lab v1.0.4 — Static Mirror</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <link rel="stylesheet" href="static/base.css" />
+  <meta name="description" content="TIMMYTIME • BUBBLE WORLD — Static public mirror with neon matrix, bubbles, and room carousel." />
+</head>
+<body data-room="1">
+  <!-- Visual layers -->
+  <div class="canvas-wrap">
+    <canvas id="matrix"></canvas>
+    <canvas id="bubbles"></canvas>
+  </div>
 
-  function resize(){
-    w = c.width = Math.floor(innerWidth * DPR);
-    h = c.height = Math.floor(innerHeight * DPR);
+  <!-- Content -->
+  <div class="container" id="app">
+    <!-- filled by JS -->
+  </div>
+
+  <!-- Arrows -->
+  <div class="arrows" id="arrows">
+    <!-- filled by JS -->
+  </div>
+
+  <!-- Scripts -->
+  <script>
+  // ------- STATIC SHIP: hash router + renderer (public mirror) -------
+  // Rooms & labels (mirror of Flask ROOMS/punchlines/branding)
+  const APP_NAME = "Timmy Time Lab v1.0.4";
+  const BRANDING = "TIMMYTIME • BUBBLE WORLD";
+
+  const ROOMS = {
+    1: { name:"Engine Room",    subtitle:"Pink Halo Reactor", type:"engine" },
+    2: { name:"Purple Play",    subtitle:"Suno Room A",       type:"suno"   },
+    3: { name:"Warm Core",      subtitle:"Suno Room B",       type:"suno"   },
+    4: { name:"Creator Stage 4",subtitle:"Reel Area",         type:"video"  },
+    5: { name:"Creator Stage 5",subtitle:"Reel Area",         type:"video"  },
+    6: { name:"Creator Stage 6",subtitle:"Reel Area",         type:"video"  },
+    7: { name:"Creator Stage 7",subtitle:"Reel Area",         type:"video"  },
+    8: { name:"Creator Stage 8",subtitle:"Reel Area",         type:"video"  },
+    9: { name:"Creator Stage 9",subtitle:"Reel Area",         type:"video"  }
+  };
+
+  const DAILY_LINES = [
+    "Be like a bubble: rise anyway.",
+    "Creators create daily — ship small, ship bright.",
+    "Neon soul, steady hands.",
+    "Love big. Laugh often. Ship daily.",
+    "Marketing is storytelling with lighting.",
+    "Tiny reel, huge feel.",
+    "Flow where the glow goes.",
+    "Calm core, wild edges."
+  ];
+
+  const MARKETING = {
+    4:"TimmyTime", 5:"TimmyBubbles", 6:"TornadoTimmy",
+    7:"TerrificTimmy", 8:"TimmyFantastic", 9:"Timmy Official"
+  };
+
+  const PUNCH = {
+    4:["Ship it shiny.","Tape it, post it, toast it.","Small reel, big feel."],
+    5:["Bubble up, never down.","Pop. Laugh. Repeat.","Neon makes everything taste better."],
+    6:["Spin up greatness.","Hold my tornado.","We remix the wind."],
+    7:["Too good to gatekeep.","Perfectly ridiculous.","Built for giggles."],
+    8:["Fantastic at 15 seconds.","Smile-engine engaged.","Glows before it goes."],
+    9:["Timmy says hi.","Clip quick. Win big.","We film joy here."]
+  };
+
+  // Public Suno buttons (room 2/3) — uses your playlists
+  const SUNO = {
+    2: [
+      "https://suno.com/playlist/bb594ef1-d260-46b7-af7f-e3a3286d39b1",
+      "https://suno.com/playlist/2ec04889-1c23-4e2d-9c27-8a2b6475da4b",
+      "https://suno.com/playlist/e95ddd12-7e37-43e2-b3e0-fe342085a19f",
+      "https://suno.com/playlist/c387adf4-abdb-4f74-9075-c4cb460c8840",
+      "https://suno.com/playlist/34190a09-abb2-470d-85a5-a1201f5e827c"
+    ],
+    3: [
+      "https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479",
+      "https://suno.com/playlist/d04a7c63-52b7-4695-b47f-64f3a3dae677",
+      "https://suno.com/playlist/06b80fa9-8c72-4e0a-b277-88d00c441316",
+      "https://suno.com/playlist/3a82341f-95df-4b1b-91a2-4d5e6531ae08",
+      "https://suno.com/playlist/d3ed7e46-ea14-477f-a9cf-051bdfc0c9c3"
+    ]
+  };
+
+  // Optional public embeds for Rooms 4–9 (YouTube). Leave "" to hide.
+  // Replace VIDEO_ID with your pick to show an embed publicly.
+  const VIDEOS = {
+    4:"", 5:"", 6:"", 7:"", 8:"", 9:""
+    // Example: 4:"dQw4w9WgXcQ"
+  };
+
+  // Helpers ---------------------------------------------------------
+  const $ = s => document.querySelector(s);
+  function todayKey(){ const d = new Date(); return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0"); }
+  function hashIndex(seed,len){ // deterministic daily pick
+    let h = 0; for (let i=0;i<seed.length;i++){ h = (h*31 + seed.charCodeAt(i)) >>> 0; }
+    return h % Math.max(1,len);
   }
-  addEventListener('resize', resize, {passive:true});
-  resize();
-
-  const TARGET = 20; // number of bubbles (was ~36)
-  function spawn(){
-    const r = (Math.random()*18+8)*DPR;
-    bubbles.push({
-      x: Math.random()*w,
-      y: h + r + Math.random()*h*0.15,
-      r,
-      vy: (0.05 + Math.random()*0.10)*28*DPR,  // upward speed
-      vx: (Math.random()-0.5)*0.35*DPR
-    });
+  function pickDaily(arr){ if(!arr || !arr.length) return ""; return arr[hashIndex(todayKey(), arr.length)]; }
+  function ytEmbed(id){ return id ? `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1&playsinline=1` : ""; }
+  function getRoomFromHash(){
+    const m = (location.hash || "#room1").match(/room(\d)/i);
+    const r = m ? parseInt(m[1],10) : 1;
+    return (r>=1 && r<=9) ? r : 1;
   }
-  for(let i=0;i<TARGET;i++) spawn();
+  function goRoom(r){ location.hash = `#room${r}`; }
 
-  function frame(ts){
-    if(ts - last < 33){ requestAnimationFrame(frame); return; } // ~30fps
-    last = ts;
+  // Render ----------------------------------------------------------
+  function render(){
+    const r = getRoomFromHash();
+    document.body.setAttribute("data-room", String(r));
+    const room = ROOMS[r];
+    const app = $("#app");
+    document.title = `${APP_NAME} — Room ${r}`;
 
-    ctx.clearRect(0,0,w,h);
-    for(const b of bubbles){
-      b.y -= b.vy;
-      b.x += b.vx;
-      ctx.beginPath();
-      ctx.arc(b.x,b.y,b.r,0,6.283);
-      ctx.fillStyle = 'rgba(255,244,255,0.08)';
-      ctx.fill();
-      ctx.lineWidth = 1*DPR;
-      ctx.strokeStyle = 'rgba(255,244,255,0.22)';
-      ctx.stroke();
+    let content = "";
+    const branding = (room.type === "video") ? (MARKETING[r] || BRANDING) : BRANDING;
+    const daily = pickDaily(DAILY_LINES);
+
+    if(room.type === "engine"){
+      content = `
+        <div class="brand-tag text-glow pulse badge">${branding}</div>
+        <div class="room-title text-glow">${room.name}</div>
+        <div class="room-sub">${room.subtitle}</div>
+        <div class="card halo" style="text-align:center;">
+          <div style="font-size:2rem; margin:.5rem 0 1rem;">⚡️🛠️ Thor’s Hammer Online</div>
+          <div class="hint">Static public mirror (visuals only). Private Engine runs local-only.</div>
+        </div>
+        <div class="daily-line">${daily}</div>
+      `;
+    } else if(room.type === "suno"){
+      const links = (SUNO[r] || []).slice(0,5);
+      const btns = links.map((l,i)=>`<a class="btn btn-glow" href="${l}" target="_blank" rel="noopener">🎵 Suno ${i+1}</a>`).join("");
+      content = `
+        <div class="brand-tag text-glow pulse badge">${branding}</div>
+        <div class="room-title text-glow">${room.name}</div>
+        <div class="room-sub">${room.subtitle}</div>
+        <div class="playlist-grid">${btns || `<div class="hint">No playlists yet.</div>`}</div>
+        <div class="daily-line">${daily}</div>
+      `;
+    } else {
+      const label = MARKETING[r] || branding;
+      const vid = ytEmbed(VIDEOS[r] || "");
+      const block = vid
+        ? `<div class="card halo"><iframe class="video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen src="${vid}"></iframe></div>`
+        : `<div class="card halo"><div class="hint" style="text-align:center; padding:2rem 1rem;">Public mirror — add a VIDEO_ID in <code>VIDEOS</code> to show a reel here.</div></div>`;
+      const punch = pickDaily(PUNCH[r] || []) || daily;
+      content = `
+        <div class="brand-tag text-glow pulse badge">${label}</div>
+        <div class="room-title text-glow">${room.name}</div>
+        <div class="room-sub">${room.subtitle}</div>
+        ${block}
+        <div class="daily-line">${punch}</div>
+      `;
     }
-    bubbles = bubbles.filter(b => b.y + b.r > -40*DPR);
-    while(bubbles.length < TARGET) spawn();
-    requestAnimationFrame(frame);
+    app.innerHTML = content;
+
+    // Arrows
+    const L = (r===1) ? 9 : (r-1);
+    const R = (r===9) ? 1 : (r+1);
+    $("#arrows").innerHTML = `
+      <a class="btn" href="#room${L}">← Room ${L}</a>
+      <a class="btn" href="#room${R}">Room ${R} →</a>
+    `;
   }
-  requestAnimationFrame(frame);
-})();
+
+  window.addEventListener("hashchange", render);
+  window.addEventListener("load", render);
+  </script>
+
+  <!-- Visual engines (after page content) -->
+  <script src="static/matrix.js"></script>
+  <script src="static/bubbles.js"></script>
+</body>
+</html>
