@@ -1,7 +1,5 @@
 /* BubbleWorld Ship Core v3.3.1 — Unified Style Sheet */
-
-/* General setup */
-:root {
+:root{
   --green0:#1dfc8a; --green1:#0ea765; --green2:#065d3b; --green3:#003622;
   --p0:#3b0066; --p1:#6a00a3; --p2:#a800ff; --p3:#180021;
   --text:#fff; --muted:rgba(255,255,255,.85);
@@ -32,7 +30,7 @@ p{font-size:1.5rem;margin:0 0 20px;color:var(--muted)}
 .btn{
   display:inline-block;padding:14px 24px;font-size:1.25rem;border-radius:12px;
   border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);
-  color:#fff;text-decoration:none;transition:background .25s ease,transform .1s ease;
+  color:#fff;text-decoration:none;transition:background .25s,transform .1s;
 }
 .btn:hover{background:rgba(255,255,255,.25);transform:translateY(-2px)}
 .btn:active{transform:translateY(0)}
