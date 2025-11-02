@@ -1,63 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>TimmyTime • Bubble World Ship</title>
-  <meta name="description" content="Step aboard Timmy’s Bubble World Ship." />
-
-  <!-- PWA: iOS full-screen (no URL bar when launched from Home Screen) -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Bubble World Ship">
-  <!-- PWA: Android/Chrome -->
-  <meta name="theme-color" content="#000000">
-  <link rel="manifest" href="manifest.webmanifest">
-  <!-- iOS icons (use your own 180x180; keep path & name) -->
-  <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <!-- Favicon (optional) -->
-  <link rel="icon" href="assets/favicon.png">
-
-  <style>
-    html, body { margin:0; height:100%; background:#000; color:#fff; }
-    body.pwa { overscroll-behavior:none; }
-    /* remove safari rubber band gap on notch devices */
-    .app { min-height:100vh; padding-bottom: env(safe-area-inset-bottom); }
-  </style>
+  <meta charset="utf-8">
+  <title>Room 1 • Redirect</title>
+  <meta name="robots" content="noindex,nofollow">
+  <!-- Fast, Safari/FB-safe, relative redirect -->
+  <meta http-equiv="refresh" content="0;url=../#room1">
 </head>
 <body>
-  <div id="app" class="app">
-    <!-- ENGINE ROOM -->
-    <!-- Your existing Engine Room markup goes here exactly as-is -->
-    <h1 style="text-align:center;margin-top:3rem">Engine Room</h1>
-    <p style="text-align:center;opacity:.7">Green Matrix • Thor’s Hammer • Lightning</p>
-  </div>
-
+  <p>Redirecting to Room 1… <a href="../#room1">tap here if it doesn’t auto-open</a></p>
   <script>
-    // 1) Clean the address bar in normal tabs (hide fragments/params)
-    (function cleanURL() {
-      try {
-        var base = "/bubbleworld-ship/"; // <- your repo path on github.io
-        if (location.pathname !== base || location.search || location.hash) {
-          history.replaceState(null, "", base);
-        }
-      } catch (e) { /* ignore */ }
+    (function () {
+      var target = "../#room1";
+      try { location.replace(target); } catch (e) { location.href = target; }
     })();
-
-    // 2) Mark when running as PWA (standalone = no URL bar)
-    (function markPWA() {
-      if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-        document.body.classList.add('pwa');
-      }
-    })();
-
-    // 3) Register Service Worker for app-shell + instant starts
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-    }
-
-    // 4) Your existing ship router can stay the same.
-    // If you used go('/roomX'), keep it. URL stays clean due to replaceState above.
   </script>
 </body>
 </html>
