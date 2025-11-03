@@ -2,135 +2,74 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Bubble World • Room 9</title>
+  <title>BubbleWorld Ship • Room 9 (Future Slot)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Timmy Bubble World — Room 9">
-  <meta property="og:description" content="Timmy YouTube drop (Room 9).">
-  <meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/room9.html">
   <style>
-    :root {
-      --bg1: #4a0039;
-      --bg2: #ff3c6d;
-      --accent: #ffe7f0;
+    :root { --bg: radial-gradient(circle at 10% 0%, #00ff9d 0%, #7100ff 55%, #000 100%); }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;min-height:100vh;background:var(--bg);background-size:cover;
+      background-attachment:fixed;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:#fff;display:flex;align-items:center;justify-content:center;padding:1.2rem;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: radial-gradient(circle at 0% 0%, var(--bg2) 0%, var(--bg1) 65%, #000 100%);
-      min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: #fff;
-      overflow: hidden;
+    main{
+      width:min(1100px,100%);background:rgba(0,0,0,0.35);
+      border:1px solid rgba(255,255,255,0.07);border-radius:26px;
+      backdrop-filter:blur(15px);box-shadow:0 20px 60px rgba(0,0,0,0.55);
+      padding:1.3rem 1.3rem 1rem;position:relative;overflow:hidden;
     }
-    .bubbles { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
-    .bubble {
-      position: absolute;
-      bottom: -8rem;
-      width: 6rem;
-      height: 6rem;
-      background: rgba(255,231,240,0.08);
-      border: 1px solid rgba(255,231,240,0.25);
-      border-radius: 50%;
-      animation: rise 20s linear infinite;
-      filter: drop-shadow(0 0 10px rgba(255,60,109,0.8));
+    h1{font-size:2.4rem;margin:.2rem 0 .4rem;}
+    p.sub{opacity:.75;margin-bottom:1rem;}
+    .embed-box{
+      background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.02);
+      border-radius:16px;min-height:220px;display:flex;align-items:center;justify-content:center;
+      text-align:center;margin-bottom:1rem;padding:1rem;
     }
-    .bubble:nth-child(2) { left: 16%; width: 4rem; height: 4rem; animation-duration: 14s; }
-    .bubble:nth-child(3) { left: 34%; width: 7rem; height: 7rem; animation-duration: 26s; }
-    .bubble:nth-child(4) { left: 52%; width: 3.5rem; height: 3.5rem; animation-duration: 16s; }
-    .bubble:nth-child(5) { left: 70%; width: 5rem; height: 5rem; animation-duration: 22s; }
-    .bubble:nth-child(6) { left: 86%; width: 3.5rem; height: 3.5rem; animation-duration: 18s; }
-
-    @keyframes rise {
-      0% { transform: translateY(0); opacity: 0; }
-      10% { opacity: 1; }
-      100% { transform: translateY(-110vh); opacity: 0; }
+    .nav-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;}
+    .arrow-btn{
+      width:74px;height:74px;border-radius:999px;
+      border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.55);
+      display:inline-flex;align-items:center;justify-content:center;
+      color:#fff;text-decoration:none;font-size:2.3rem;
+      box-shadow:0 12px 35px rgba(0,0,0,0.4);
     }
-
-    .wrap {
-      position: relative;
-      z-index: 5;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      padding: 1.5rem 1rem 2rem;
-      text-align: center;
+    .bottom{
+      border-top:1px solid rgba(255,255,255,0.04);margin-top:.7rem;padding-top:.6rem;
+      display:flex;justify-content:space-between;gap:.5rem;align-items:center;
+      font-size:.7rem;opacity:.6;
     }
-    header h1 { font-size: 3rem; margin: 0.25rem 0 0.5rem; }
-    header p { margin: 0; }
-    .yt-holder {
-      margin: 0 auto;
-      width: min(100%, 540px);
-      aspect-ratio: 9/16;
-      background: rgba(0,0,0,0.35);
-      border: 4px solid rgba(255,255,255,0.12);
-      border-radius: 1.5rem;
-      overflow: hidden;
-      box-shadow: 0 14px 38px rgba(0,0,0,0.4);
+    .home-btn{
+      text-decoration:none;color:#fff;background:rgba(0,0,0,0.35);
+      border-radius:999px;padding:.35rem .9rem;border:1px solid rgba(255,255,255,0.03);
+      font-size:.7rem;
     }
-    .yt-holder iframe { width: 100%; height: 100%; border: 0; }
-    .timmy-pill {
-      display: inline-flex;
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,231,240,0.6);
-      border-radius: 999px;
-      padding: 0.65rem 1.2rem;
-      margin: 0 auto;
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-    .room-nav {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-top: auto;
-      flex-wrap: wrap;
-    }
-    .room-nav a {
-      text-decoration: none;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,255,255,0.25);
-      width: 3rem;
-      height: 3rem;
-      border-radius: 999px;
-      display: grid;
-      place-items: center;
-      color: #fff;
-      font-weight: 600;
-    }
-    .room-nav a.active {
-      background: rgba(255,60,109,0.25);
-      border-color: rgba(255,60,109,0.85);
+    @media(max-width:580px){
+      h1{font-size:2.1rem;}
+      .arrow-btn{width:62px;height:62px;font-size:2rem;}
+      .bottom{flex-wrap:wrap;}
     }
   </style>
 </head>
 <body>
-  <div class="bubbles">
-    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
-    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
-  </div>
+  <main>
+    <h1>Room 9 • Future Slot</h1>
+    <p class="sub">Last room in the chain. This one loops back to Engine.</p>
 
-  <div class="wrap">
-    <header>
-      <div class="timmy-pill">Timmy Time • Creator Stage</div>
-      <h1>Room 9</h1>
-      <p>Fifth YouTube short — full run.</p>
-    </header>
-
-    <div class="yt-holder">
-      <iframe src="https://www.youtube.com/embed/Io7X8O-IKG4?rel=0&modestbranding=1"
-              title="Timmy YouTube Short 5" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    <div class="embed-box">
+      <!-- ROOM 9 EMBED -->
+      <p>Room 9 embed area</p>
     </div>
 
-    <nav class="room-nav">
-      <a href="room4.html">4</a>
-      <a href="room5.html">5</a>
-      <a href="room6.html">6</a>
-      <a href="room7.html">7</a>
-      <a href="room8.html">8</a>
-      <a href="room9.html" class="active">9</a>
-    </nav>
-  </div>
+    <div class="nav-row">
+      <a class="arrow-btn" href="room8.html" aria-label="Previous room">‹</a>
+      <!-- loop back to engine -->
+      <a class="arrow-btn" href="engine.html" aria-label="Next room">›</a>
+    </div>
+
+    <div class="bottom">
+      <a class="home-btn" href="index.html">🏠 Ship</a>
+      <span>room9.html • video room • arrows on • loops</span>
+    </div>
+  </main>
 </body>
 </html>
