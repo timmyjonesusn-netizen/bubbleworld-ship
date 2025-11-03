@@ -1,9 +1,204 @@
-<meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/room/1/">
-<meta property="og:title" content="TimmyTime • Room 1 — Hammer Online">
-<meta property="og:description" content="Bubble World Ship — Creator Vibes, Reels & Reality.">
-<meta property="og:image" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/static/og/ship_default_1200x630.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:type" content="website">
-<meta property="og:video:url" content="https://www.youtube-nocookie.com/embed/ax5gOaIoV-Y">
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>BubbleWorld Ship • Engine Room</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 10% 0%, #1cff7a 0%, #004a2a 58%, #000 100%);
+      --panel: rgba(0,0,0,0.35);
+      --line: rgba(255,255,255,0.15);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #000;
+      background-image: var(--bg);
+      background-attachment: fixed;
+      background-size: cover;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .engine-shell {
+      width: min(1050px, 100%);
+      background: rgba(0,0,0,0.28);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 26px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      padding: 1.4rem 1.4rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .title-pill {
+      display: inline-block;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 0.35rem 1rem;
+      font-size: 0.75rem;
+      letter-spacing: .04em;
+      margin-bottom: 0.85rem;
+    }
+    .engine-title {
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .engine-sub {
+      opacity: 0.75;
+      max-width: 45rem;
+      margin-bottom: 1.25rem;
+      font-size: 1.05rem;
+    }
+    .rooms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.65rem;
+      margin-bottom: 1.3rem;
+    }
+    .room-btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.35);
+      border-radius: 16px;
+      padding: 0.7rem 0.6rem;
+      color: #fff;
+      font-weight: 600;
+      text-align: center;
+      font-size: 0.9rem;
+      transition: transform .1s ease-out, background .1s ease-out;
+    }
+    .room-btn small {
+      display: block;
+      opacity: 0.55;
+      font-weight: 400;
+      font-size: 0.68rem;
+      margin-top: 0.25rem;
+    }
+    .room-btn:hover,
+    .room-btn:active {
+      background: rgba(0,0,0,0.7);
+      transform: translateY(-2px);
+    }
+    /* bottom bar */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: .6rem;
+      border-top: 1px solid rgba(255,255,255,0.045);
+      padding-top: .7rem;
+    }
+    .arrow-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.45);
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      color: #fff;
+      font-size: 1.25rem;
+    }
+    .music-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 999px;
+      padding: 0.4rem 1rem;
+      text-decoration: none;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .music-pill span {
+      opacity: 0.6;
+      font-size: 0.65rem;
+    }
+    .home-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 999px;
+      padding: 0.35rem .9rem;
+      text-decoration: none;
+      color: #fff;
+      font-size: 0.75rem;
+    }
+    @media (max-width: 560px) {
+      body { padding: .7rem; }
+      .engine-shell { border-radius: 18px; }
+      .engine-title { font-size: 2.2rem; }
+      .bottom-nav { flex-wrap: wrap; gap: .4rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="engine-shell">
+    <div class="title-pill">Engine Room • Ship Online</div>
+    <div class="engine-title">TimmyTime BubbleWorld</div>
+    <p class="engine-sub">
+      Engine is green. Routes are clean. Pick any room below — all files live in root:
+      engine → room2 → room3 → room4 → room9.
+    </p>
+
+    <div class="rooms-grid">
+      <a class="room-btn" href="engine.html">Room 1 • Engine
+        <small>current</small>
+      </a>
+      <a class="room-btn" href="room2.html">Room 2 • Play
+        <small>music / embeds</small>
+      </a>
+      <a class="room-btn" href="room3.html">Room 3 • Warm
+        <small>comfort space</small>
+      </a>
+      <a class="room-btn" href="room4.html">Room 4 • Creator
+        <small>public mirror</small>
+      </a>
+      <a class="room-btn" href="room5.html">Room 5
+        <small>marketing set</small>
+      </a>
+      <a class="room-btn" href="room6.html">Room 6
+        <small>reels zone</small>
+      </a>
+      <a class="room-btn" href="room7.html">Room 7
+        <small>UFC drop</small>
+      </a>
+      <a class="room-btn" href="room8.html">Room 8
+        <small>Yeti / Bill</small>
+      </a>
+      <a class="room-btn" href="room9.html">Room 9
+        <small>future slot</small>
+      </a>
+    </div>
+
+    <div class="bottom-nav">
+      <!-- left goes to last room so you never get stuck -->
+      <a class="arrow-btn" href="room9.html" aria-label="Previous room">‹</a>
+
+      <a class="home-btn" href="index.html">🏠 Ship root</a>
+
+      <!-- music pill, stays in every room -->
+      <a class="music-pill" href="room2.html">🎵 Timmy Time Music <span>vibe in room 2</span></a>
+
+      <!-- right goes to room2 from engine -->
+      <a class="arrow-btn" href="room2.html" aria-label="Next room">›</a>
+    </div>
+  </main>
+</body>
+</html>
