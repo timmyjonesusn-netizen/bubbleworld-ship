@@ -2,134 +2,127 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Timmy • BubbleWorld Ship • Engine Router</title>
+  <title>BubbleWorld Ship • Engine Room</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <style>
     :root {
       --bg: radial-gradient(circle at 10% 0%, #1cff7a 0%, #004a2a 55%, #000 100%);
-      --card: rgba(0,0,0,0.35);
-      --line: rgba(255,255,255,0.16);
     }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; }
     body {
-      margin: 0;
       min-height: 100vh;
-      background: #000;
-      background-image: var(--bg);
+      background: var(--bg) fixed;
       background-size: cover;
-      background-attachment: fixed;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #fff;
-      padding: 80px 16px 32px;
+      padding: 80px 16px 40px;
     }
     header {
       position: fixed;
-      inset: 0 0 auto 0;
-      height: 64px;
-      background: rgba(0,0,0,0.32);
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      background: rgba(0,0,0,0.35);
       backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.12);
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.09);
       z-index: 10;
     }
     .brand { font-weight: 700; }
     .pill {
       background: linear-gradient(90deg, #ff00ff, #ff8400);
-      padding: 4px 12px;
+      padding: 5px 14px;
       border-radius: 999px;
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       font-weight: 600;
+      white-space: nowrap;
     }
-    h1 {
-      font-size: 2.7rem;
-      margin-bottom: 10px;
-      line-height: 1;
-    }
-    .grid {
+    main {
       max-width: 1100px;
       margin: 0 auto;
       display: grid;
       gap: 16px;
     }
     .room-card {
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.05);
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.04);
       border-radius: 18px;
-      padding: 18px 16px 16px;
-      backdrop-filter: blur(6px);
+      padding: 16px 14px 14px;
     }
+    .room-card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+    .room-card small { opacity: 0.65; }
     .room-card a {
       display: inline-block;
       margin-top: 10px;
       background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
       border-radius: 999px;
       padding: 6px 14px;
       text-decoration: none;
       color: #fff;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
     }
-    .room-title {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    @media (min-width: 900px) {
-      .grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
+    @media(min-width: 860px){
+      main { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="brand">BubbleWorld Ship • Engine</div>
+    <div class="brand">BubbleWorld Ship • Engine Room</div>
     <div class="pill">Timmy Time Music</div>
   </header>
 
-  <main class="grid">
+  <main>
     <div class="room-card">
-      <div class="room-title">Room 2 — Suno Set (Oct 26)</div>
-      <small>Laugh / Play / Fun / Motown / Feeling It</small><br>
-      <a href="room2.html">Enter Room 2 →</a>
+      <h2>Room 1</h2>
+      <small>(optional / legacy)</small><br>
+      <a href="room1.html">Enter →</a>
     </div>
     <div class="room-card">
-      <div class="room-title">Room 3 — Suno 5 (Nov)</div>
-      <small>New 5 you just sent</small><br>
-      <a href="room3.html">Enter Room 3 →</a>
+      <h2>Room 2 — Suno (Oct 26)</h2>
+      <small>Laugh / Play / Fun / Motown / Feeling it</small><br>
+      <a href="room2.html">Enter →</a>
     </div>
-    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(255,0,128,0.35), rgba(0,0,0,0.2));">
-      <div class="room-title">Room 4 — YT Short</div>
+    <div class="room-card">
+      <h2>Room 3 — Suno (Nov 3)</h2>
+      <small>Your 5 new playlists</small><br>
+      <a href="room3.html">Enter →</a>
+    </div>
+    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(255,0,128,0.35), rgba(0,0,0,0.28));">
+      <h2>Room 4 — YT Short</h2>
       <small>qQ8_okFoxxk…</small><br>
-      <a href="room4.html">Enter Room 4 →</a>
+      <a href="room4.html">Enter →</a>
     </div>
-    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(0,191,255,0.25), rgba(0,0,0,0.2));">
-      <div class="room-title">Room 5 — YT Short</div>
+    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(0,191,255,0.25), rgba(0,0,0,0.28));">
+      <h2>Room 5 — YT Short</h2>
       <small>Io7X8O-IKG4…</small><br>
-      <a href="room5.html">Enter Room 5 →</a>
+      <a href="room5.html">Enter →</a>
     </div>
-    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(255,187,0,0.25), rgba(0,0,0,0.2));">
-      <div class="room-title">Room 6 — YT Short</div>
+    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(255,187,0,0.25), rgba(0,0,0,0.28));">
+      <h2>Room 6 — YT Short</h2>
       <small>4YLNBoRtgCk…</small><br>
-      <a href="room6.html">Enter Room 6 →</a>
+      <a href="room6.html">Enter →</a>
     </div>
-    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(150,0,255,0.28), rgba(0,0,0,0.2));">
-      <div class="room-title">Room 7 — YT Short</div>
+    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(150,0,255,0.28), rgba(0,0,0,0.28));">
+      <h2>Room 7 — YT Short</h2>
       <small>vMGqoNkVHLQ…</small><br>
-      <a href="room7.html">Enter Room 7 →</a>
+      <a href="room7.html">Enter →</a>
     </div>
-    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(0,255,160,0.28), rgba(0,0,0,0.2));">
-      <div class="room-title">Room 8 — YT Short</div>
+    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(0,255,160,0.28), rgba(0,0,0,0.28));">
+      <h2>Room 8 — YT Short</h2>
       <small>EamtDmhEzZ4…</small><br>
-      <a href="room8.html">Enter Room 8 →</a>
+      <a href="room8.html">Enter →</a>
     </div>
-    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(255,0,50,0.28), rgba(0,0,0,0.2));">
-      <div class="room-title">Room 9 — YT Short</div>
+    <div class="room-card" style="background: radial-gradient(circle at 30% 0%, rgba(255,0,50,0.28), rgba(0,0,0,0.28));">
+      <h2>Room 9 — YT Short</h2>
       <small>0l99j5T3OrA…</small><br>
-      <a href="room9.html">Enter Room 9 →</a>
+      <a href="room9.html">Enter →</a>
     </div>
   </main>
 </body>
