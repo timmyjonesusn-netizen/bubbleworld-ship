@@ -2,186 +2,157 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Timmy • BubbleWorld Ship • Engine Router</title>
+  <title>Timmy • BubbleWorld Ship • Index Router</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     :root {
       --bg: radial-gradient(circle at 10% 0%, #1cff7a 0%, #004a2a 55%, #000 100%);
-      --glass: rgba(0,0,0,0.38);
+      --panel: rgba(0,0,0,0.35);
       --line: rgba(255,255,255,0.18);
     }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
       background: #000;
+      background-image: var(--bg);
+      background-attachment: fixed;
+      background-size: cover;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #fff;
-    }
-    /* bubble / matrix background */
-    .bg-layer {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at 10% 0%, rgba(28,255,122,0.4) 0%, rgba(0,0,0,0) 45%), #000;
-      pointer-events: none;
-      z-index: 1;
-    }
-    .bubble {
-      position: absolute;
-      bottom: -8rem;
-      width: 6rem;
-      height: 6rem;
-      background: rgba(210,255,230,0.03);
-      border: 1px solid rgba(210,255,230,0.25);
-      border-radius: 50%;
-      animation: rise 20s linear infinite;
-      filter: drop-shadow(0 0 10px rgba(140,255,196,0.45));
-    }
-    .bubble:nth-child(2) { left: 12%; width: 4rem; height: 4rem; animation-duration: 14s; }
-    .bubble:nth-child(3) { left: 30%; width: 8rem; height: 8rem; animation-duration: 25s; }
-    .bubble:nth-child(4) { left: 50%; width: 3.5rem; height: 3.5rem; animation-duration: 16s; }
-    .bubble:nth-child(5) { left: 70%; width: 5rem; height: 5rem; animation-duration: 21s; }
-    .bubble:nth-child(6) { left: 84%; width: 7rem; height: 7rem; animation-duration: 26s; }
-    @keyframes rise {
-      0% { transform: translateY(0); opacity: 0; }
-      10% { opacity: 1; }
-      100% { transform: translateY(-110vh); opacity: 0; }
-    }
-
-    /* iframe shell */
-    .viewport {
-      position: relative;
-      z-index: 5;
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    iframe {
-      border: none;
-      width: 100%;
-      height: 100%;
-      background: transparent;
-    }
-
-    /* thumb-zone arrows */
-    .nav-arrow {
-      position: fixed;
-      bottom: 1rem;
-      width: 3.4rem;
-      height: 3.4rem;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.55);
-      border: 1px solid rgba(255,255,255,0.25);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.7rem;
-      z-index: 50;
-      backdrop-filter: blur(8px);
-      cursor: pointer;
-      user-select: none;
-      -webkit-user-select: none;
+      padding: 1.5rem;
     }
-    .nav-left {
-      left: 1rem;
+    .shell {
+      width: min(900px, 100%);
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      padding: 1.5rem 1.5rem 1rem;
     }
-    .nav-right {
-      right: 1rem;
+    .title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
     }
-    .nav-arrow:active {
-      transform: scale(0.97);
+    .subtitle {
+      opacity: 0.7;
+      margin-bottom: 1.5rem;
     }
-
-    /* tiny top label so you know what room you're on */
-    .room-label {
-      position: fixed;
-      top: 0.6rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 40;
-      background: rgba(0,0,0,0.42);
+    .rooms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.8rem;
+      margin-bottom: 1.3rem;
+    }
+    .room-btn {
       border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 999px;
-      padding: 0.25rem 1rem;
-      font-size: 0.75rem;
-      letter-spacing: 0.02em;
-      backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.25);
+      border-radius: 16px;
+      padding: 0.85rem 0.7rem;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 600;
+      text-align: center;
+      transition: transform 0.15s ease-out, background 0.15s ease-out;
+      font-size: 0.95rem;
     }
-
-    @media (max-width: 520px) {
-      .nav-arrow {
-        width: 3.2rem;
-        height: 3.2rem;
-        font-size: 1.6rem;
-      }
-      .room-label {
-        font-size: 0.68rem;
-      }
+    .room-btn small {
+      display: block;
+      font-weight: 400;
+      opacity: 0.6;
+      font-size: 0.7rem;
+      margin-top: 0.25rem;
+    }
+    .room-btn:hover,
+    .room-btn:active {
+      background: rgba(0,0,0,0.6);
+      transform: translateY(-2px);
+    }
+    .footer {
+      border-top: 1px solid rgba(255,255,255,0.04);
+      margin-top: 1.2rem;
+      padding-top: 0.7rem;
+      display: flex;
+      gap: 0.5rem;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      opacity: 0.55;
+    }
+    .arrows {
+      display: flex;
+      gap: 0.4rem;
+    }
+    .arrow-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    @media (max-width: 480px) {
+      .title { font-size: 1.9rem; }
+      .rooms-grid { grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); }
     }
   </style>
 </head>
 <body>
-  <!-- background -->
-  <div class="bg-layer">
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-  </div>
+  <main class="shell">
+    <div class="title">BubbleWorld Ship</div>
+    <div class="subtitle">Root router • all rooms now in root • no template hops.</div>
 
-  <!-- shell -->
-  <div class="viewport">
-    <div id="roomTag" class="room-label">Room 1 • Engine</div>
-    <iframe id="roomFrame" src="room1.html" title="BubbleWorld Ship"></iframe>
-  </div>
+    <div class="rooms-grid">
+      <!-- Engine is now in root as engine.html -->
+      <a class="room-btn" href="engine.html">Room 1 • Engine
+        <small>Ship core / law</small>
+      </a>
+      <a class="room-btn" href="room2.html">Room 2
+        <small>Play / music</small>
+      </a>
+      <a class="room-btn" href="room3.html">Room 3
+        <small>Warm core</small>
+      </a>
+      <a class="room-btn" href="room4.html">Room 4
+        <small>Creator stage</small>
+      </a>
+      <a class="room-btn" href="room5.html">Room 5
+        <small>Marketing set</small>
+      </a>
+      <a class="room-btn" href="room6.html">Room 6
+        <small>Reels zone</small>
+      </a>
+      <a class="room-btn" href="room7.html">Room 7
+        <small>UFC drop</small>
+      </a>
+      <a class="room-btn" href="room8.html">Room 8
+        <small>Yeti / Bill</small>
+      </a>
+      <a class="room-btn" href="room9.html">Room 9
+        <small>Spare / future</small>
+      </a>
+    </div>
 
-  <!-- thumb arrows -->
-  <div class="nav-arrow nav-left" onclick="hop(-1)" aria-label="Previous room">‹</div>
-  <div class="nav-arrow nav-right" onclick="hop(1)" aria-label="Next room">›</div>
-
-  <script>
-    // full 1–9 loop, no skipping
-    var rooms = [
-      { file: 'room1.html', label: 'Room 1 • Engine' },
-      { file: 'room2.html', label: 'Room 2 • Music / Vibe' },
-      { file: 'room3.html', label: 'Room 3 • Music / Core' },
-      { file: 'room4.html', label: 'Room 4 • Creator Stage' },
-      { file: 'room5.html', label: 'Room 5 • Short Set 1' },
-      { file: 'room6.html', label: 'Room 6 • Short Set 2' },
-      { file: 'room7.html', label: 'Room 7 • Short Set 3' },
-      { file: 'room8.html', label: 'Room 8 • Short Set 4' },
-      { file: 'room9.html', label: 'Room 9 • Short Set 5' }
-    ];
-
-    var current = 0;
-
-    function loadRoom(index) {
-      var frame = document.getElementById('roomFrame');
-      var tag = document.getElementById('roomTag');
-      frame.src = rooms[index].file;
-      tag.textContent = rooms[index].label;
-      current = index;
-    }
-
-    function hop(dir) {
-      var next = current + dir;
-      if (next < 0) {
-        next = rooms.length - 1; // go from 1 back to 9
-      } else if (next >= rooms.length) {
-        next = 0; // go from 9 back to 1
-      }
-      loadRoom(next);
-    }
-
-    // ensure first load is engine
-    loadRoom(0);
-  </script>
+    <div class="footer">
+      <span>Router matched to root files • 1–9 unified.</span>
+      <div class="arrows">
+        <!-- arrows go to engine and last room -->
+        <a class="arrow-btn" href="engine.html">‹</a>
+        <a class="arrow-btn" href="room9.html">›</a>
+      </div>
+    </div>
+  </main>
 </body>
 </html>
