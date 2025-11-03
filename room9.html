@@ -2,190 +2,135 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Creator Stage 9 — TimmyTime • Bubble World</title>
+  <title>Bubble World • Room 9</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="TIMMYTIME • BUBBLE WORLD">
-  <meta property="og:title" content="Creator Stage 9 — Reel Area">
-  <meta property="og:description" content="Final slot / promo — close the loop.">
+  <meta property="og:title" content="Timmy Bubble World — Room 9">
+  <meta property="og:description" content="Timmy YouTube drop (Room 9).">
   <meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/room9.html">
-  <meta property="og:image" content="https://img.youtube.com/vi/9bZkp7q19f0/hqdefault.jpg">
-
-  <link rel="canonical" href="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/room9.html">
-
   <style>
-    :root { --accent:#6ef5d3; --sub:rgba(255,255,255,0.7); }
-    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    :root {
+      --bg1: #4a0039;
+      --bg2: #ff3c6d;
+      --accent: #ffe7f0;
+    }
+    * { box-sizing: border-box; }
     body {
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:radial-gradient(circle at top, rgba(0,255,200,0.2), #000);
-      min-height:100vh;
-      color:#fff;
-      position:relative;
-      overflow-x:hidden;
+      margin: 0;
+      background: radial-gradient(circle at 0% 0%, var(--bg2) 0%, var(--bg1) 65%, #000 100%);
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #fff;
+      overflow: hidden;
     }
-    body::before {
-      content:"";
-      position:fixed;
-      inset:0;
-      background-image:url("https://timmyjonesusn-netizen.github.io/bubbleworld-ship/assets/matrix-bg.jpg");
-      background-size:cover;
-      background-position:center;
-      opacity:0.22;
-      pointer-events:none;
-      z-index:-2;
+    .bubbles { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+    .bubble {
+      position: absolute;
+      bottom: -8rem;
+      width: 6rem;
+      height: 6rem;
+      background: rgba(255,231,240,0.08);
+      border: 1px solid rgba(255,231,240,0.25);
+      border-radius: 50%;
+      animation: rise 20s linear infinite;
+      filter: drop-shadow(0 0 10px rgba(255,60,109,0.8));
     }
-    .top-chip {
-      margin:1.1rem auto .5rem;
-      background:rgba(0,0,0,.35);
-      border:1px solid rgba(110,245,211,.3);
-      border-radius:999px;
-      padding:.35rem 1.4rem;
-      font-weight:600;
-      backdrop-filter:blur(8px);
-      display:inline-block;
+    .bubble:nth-child(2) { left: 16%; width: 4rem; height: 4rem; animation-duration: 14s; }
+    .bubble:nth-child(3) { left: 34%; width: 7rem; height: 7rem; animation-duration: 26s; }
+    .bubble:nth-child(4) { left: 52%; width: 3.5rem; height: 3.5rem; animation-duration: 16s; }
+    .bubble:nth-child(5) { left: 70%; width: 5rem; height: 5rem; animation-duration: 22s; }
+    .bubble:nth-child(6) { left: 86%; width: 3.5rem; height: 3.5rem; animation-duration: 18s; }
+
+    @keyframes rise {
+      0% { transform: translateY(0); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(-110vh); opacity: 0; }
     }
+
     .wrap {
-      width:min(100%,900px);
-      margin:0 auto;
-      padding:0 1.25rem 5.5rem;
-      text-align:center;
+      position: relative;
+      z-index: 5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 1.5rem 1rem 2rem;
+      text-align: center;
     }
-    h1 {
-      font-size:3rem;
-      margin:.3rem 0 .35rem;
-      text-shadow:0 0 30px rgba(110,245,211,.6);
+    header h1 { font-size: 3rem; margin: 0.25rem 0 0.5rem; }
+    header p { margin: 0; }
+    .yt-holder {
+      margin: 0 auto;
+      width: min(100%, 540px);
+      aspect-ratio: 9/16;
+      background: rgba(0,0,0,0.35);
+      border: 4px solid rgba(255,255,255,0.12);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 14px 38px rgba(0,0,0,0.4);
     }
-    .subtitle {
-      font-size:1.6rem;
-      color:var(--sub);
-      margin-bottom:1.5rem;
+    .yt-holder iframe { width: 100%; height: 100%; border: 0; }
+    .timmy-pill {
+      display: inline-flex;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,231,240,0.6);
+      border-radius: 999px;
+      padding: 0.65rem 1.2rem;
+      margin: 0 auto;
+      font-weight: 600;
+      font-size: 0.95rem;
     }
-    .reel-panel {
-      background:radial-gradient(circle,rgba(0,0,0,.7),rgba(0,0,0,.4));
-      border:1px solid rgba(110,245,211,.25);
-      border-radius:1.4rem;
-      padding:.75rem;
-      backdrop-filter:blur(5px);
+    .room-nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: auto;
+      flex-wrap: wrap;
     }
-    .tag-pill {
-      display:inline-block;
-      background:rgba(110,245,211,.12);
-      border:1px solid rgba(110,245,211,.45);
-      border-radius:999px;
-      padding:.25rem .9rem;
-      font-size:.7rem;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      margin-bottom:.65rem;
+    .room-nav a {
+      text-decoration: none;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.25);
+      width: 3rem;
+      height: 3rem;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 600;
     }
-    .reel-frame {
-      position:relative;
-      width:100%;
-      padding-top:56.25%;
-      border-radius:1rem;
-      overflow:hidden;
-      background:#000;
-      margin-bottom:.4rem;
-    }
-    .reel-frame iframe {
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      border:none;
-    }
-    .reel-desc {
-      color:var(--sub);
-      margin-bottom:.35rem;
-    }
-    .footline {
-      margin-top:1.4rem;
-      font-size:1.25rem;
-    }
-    .nav-row {
-      margin-top:1.5rem;
-      display:flex;
-      gap:1rem;
-    }
-    .nav-btn {
-      flex:1;
-      background:rgba(0,0,0,.65);
-      border:1px solid rgba(110,245,211,.25);
-      border-radius:999px;
-      padding:.7rem .4rem;
-      font-size:1.1rem;
-      color:#fff;
-      text-decoration:none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:.45rem;
-      backdrop-filter:blur(6px);
-    }
-    .dock {
-      position:fixed;
-      bottom:.65rem;
-      left:50%;
-      transform:translateX(-50%);
-      background:rgba(0,0,0,.5);
-      border:1px solid rgba(110,245,211,.3);
-      border-radius:999px;
-      padding:.4rem 1rem .35rem;
-      display:flex;
-      gap:.9rem;
-      align-items:center;
-      backdrop-filter:blur(12px);
-      z-index:999;
-    }
-    .dock a { color:#fff; text-decoration:none; font-size:1.05rem; }
-    .music-pill {
-      background:rgba(110,245,211,.08);
-      border:1px solid rgba(110,245,211,.4);
-      border-radius:999px;
-      padding:.15rem .7rem;
-      font-size:.75rem;
-    }
-    @media(max-width:540px){
-      h1{font-size:2.6rem;}
-      .subtitle{font-size:1.25rem;}
-      .nav-row{gap:.5rem;}
-      .nav-btn{font-size:1rem;}
+    .room-nav a.active {
+      background: rgba(255,60,109,0.25);
+      border-color: rgba(255,60,109,0.85);
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top-chip">TimmyTime</div>
-    <h1>Creator Stage 9</h1>
-    <div class="subtitle">Reel Area</div>
-
-    <div class="reel-panel">
-      <div class="tag-pill">Final slot / promo</div>
-      <div class="reel-frame">
-        <iframe
-          src="https://www.youtube.com/embed/9bZkp7q19f0"
-          title="Creator Stage 9 Reel"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen>
-        </iframe>
-      </div>
-      <div class="reel-desc">Use this for the finale or to send people back to the ship.</div>
-    </div>
-
-    <div class="footline">Stage 9 clears the runway.</div>
-
-    <div class="nav-row">
-      <a class="nav-btn" href="/bubbleworld-ship/room8.html">← Room 8</a>
-      <a class="nav-btn" href="/bubbleworld-ship/">Ship Home →</a>
-    </div>
+  <div class="bubbles">
+    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
   </div>
 
-  <div class="dock">
-    <a href="/bubbleworld-ship/">🏠 Ship</a>
-    <div class="music-pill">Timmy Time Music</div>
+  <div class="wrap">
+    <header>
+      <div class="timmy-pill">Timmy Time • Creator Stage</div>
+      <h1>Room 9</h1>
+      <p>Fifth YouTube short — full run.</p>
+    </header>
+
+    <div class="yt-holder">
+      <iframe src="https://www.youtube.com/embed/Io7X8O-IKG4?rel=0&modestbranding=1"
+              title="Timmy YouTube Short 5" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+
+    <nav class="room-nav">
+      <a href="room4.html">4</a>
+      <a href="room5.html">5</a>
+      <a href="room6.html">6</a>
+      <a href="room7.html">7</a>
+      <a href="room8.html">8</a>
+      <a href="room9.html" class="active">9</a>
+    </nav>
   </div>
 </body>
 </html>
