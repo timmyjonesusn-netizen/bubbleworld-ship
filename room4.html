@@ -2,237 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Creator Stage 4 — TimmyTime • Bubble World</title>
+  <title>BubbleWorld Ship • Room 4 (Creator Stage)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Open Graph for FB / IG / X -->
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="TIMMYTIME • BUBBLE WORLD">
-  <meta property="og:title" content="Creator Stage 4 — Reel Area">
-  <meta property="og:description" content="Ship it shiny. Small reel, big feel. | Watch on the neon ship.">
-  <meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/room4.html">
-  <meta property="og:image" content="https://img.youtube.com/vi/BRoTqtY70ZQ/hqdefault.jpg">
-  <meta property="og:image:secure_url" content="https://img.youtube.com/vi/BRoTqtY70ZQ/hqdefault.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Creator Stage 4 — Reel Area">
-  <meta name="twitter:description" content="Ship it shiny. Small reel, big feel.">
-  <meta name="twitter:image" content="https://img.youtube.com/vi/BRoTqtY70ZQ/hqdefault.jpg">
-
-  <!-- Canonical -->
-  <link rel="canonical" href="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/room4.html">
-
   <style>
     :root {
-      --bg: #020304;
-      --panel: rgba(5, 8, 10, 0.7);
-      --accent: #6ef5d3;
-      --text: #ffffff;
-      --sub: rgba(255, 255, 255, 0.7);
-      --round: 1.5rem;
+      --bg: radial-gradient(circle at 15% 0%, #ff914d 0%, #5d00ff 55%, #000 100%);
     }
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
+    *{box-sizing:border-box;}
+    body{
+      margin:0;min-height:100vh;background:var(--bg);
+      background-size:cover;background-attachment:fixed;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:#fff;display:flex;align-items:center;justify-content:center;padding:1.2rem;
     }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      background: radial-gradient(circle at top, rgba(0,255,200,0.2), rgba(0,0,0,1)), #000;
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow-x: hidden;
+    main{
+      width:min(1100px,100%);background:rgba(0,0,0,0.3);
+      border:1px solid rgba(255,255,255,0.07);border-radius:26px;
+      backdrop-filter:blur(15px);box-shadow:0 20px 60px rgba(0,0,0,0.55);
+      padding:1.3rem 1.3rem 1rem;position:relative;overflow:hidden;
     }
-    /* matrix backdrop */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image: url("https://timmyjonesusn-netizen.github.io/bubbleworld-ship/assets/matrix-bg.jpg"), linear-gradient(180deg, rgba(0,255,200,0.12), rgba(0,0,0,1));
-      background-size: cover;
-      background-position: center;
-      opacity: 0.22;
-      pointer-events: none;
-      z-index: -2;
+    h1{font-size:2.4rem;margin:.2rem 0 .4rem;}
+    p.sub{opacity:.75;margin-bottom:1rem;}
+    .embed-box{
+      background:rgba(0,0,0,0.4);
+      border:1px solid rgba(255,255,255,0.02);
+      border-radius:16px;
+      min-height:220px;
+      display:flex;align-items:center;justify-content:center;
+      text-align:center;
+      margin-bottom:1rem;
+      padding:1rem;
     }
-
-    .top-chip {
-      margin: 1.1rem auto 0.5rem;
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(110,245,211,0.3);
-      border-radius: 999px;
-      padding: 0.35rem 1.4rem;
-      font-weight: 600;
-      backdrop-filter: blur(8px);
-      display: inline-block;
+    .nav-row{
+      display:flex;justify-content:space-between;align-items:center;
+      gap:1rem;margin-top:.5rem;
     }
-
-    .wrap {
-      width: min(100%, 900px);
-      margin: 0 auto;
-      padding: 0 1.25rem 5.5rem;
-      text-align: center;
+    .arrow-btn{
+      width:74px;height:74px;border-radius:999px;
+      border:1px solid rgba(255,255,255,0.15);
+      background:rgba(0,0,0,0.55);
+      display:inline-flex;align-items:center;justify-content:center;
+      color:#fff;text-decoration:none;font-size:2.3rem;
+      box-shadow:0 12px 35px rgba(0,0,0,0.4);
     }
-    h1 {
-      font-size: 3rem;
-      line-height: 1.05;
-      margin: 0.3rem 0 0.35rem;
-      text-shadow: 0 0 30px rgba(110,245,211,0.6);
+    .bottom{
+      border-top:1px solid rgba(255,255,255,0.04);
+      margin-top:.7rem;padding-top:.6rem;
+      display:flex;justify-content:space-between;gap:.5rem;align-items:center;
+      font-size:.7rem;opacity:.6;
     }
-    .subtitle {
-      font-size: 1.6rem;
-      color: var(--sub);
-      margin-bottom: 1.5rem;
+    .home-btn{
+      text-decoration:none;color:#fff;
+      background:rgba(0,0,0,0.35);border-radius:999px;
+      padding:.35rem .9rem;border:1px solid rgba(255,255,255,0.03);
+      font-size:.7rem;
     }
-
-    .reel-panel {
-      background: radial-gradient(circle, rgba(0,0,0,0.7), rgba(0,0,0,0.4));
-      border: 1px solid rgba(110,245,211,0.25);
-      border-radius: 1.4rem;
-      padding: 0.75rem;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
-      backdrop-filter: blur(5px);
-    }
-
-    .reel-frame {
-      position: relative;
-      width: 100%;
-      padding-top: 56.25%;
-      border-radius: 1rem;
-      overflow: hidden;
-      background: #000;
-      margin-bottom: 0.4rem;
-    }
-    .reel-frame iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    .reel-desc {
-      font-size: 1.05rem;
-      color: var(--sub);
-      margin-bottom: 0.35rem;
-    }
-    .tag-pill {
-      display: inline-block;
-      background: rgba(110,245,211,0.12);
-      border: 1px solid rgba(110,245,211,0.45);
-      border-radius: 999px;
-      padding: 0.25rem 0.9rem;
-      font-size: 0.7rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 0.65rem;
-    }
-
-    .footline {
-      margin-top: 1.4rem;
-      font-size: 1.35rem;
-    }
-
-    /* arrows */
-    .nav-row {
-      margin-top: 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-    .nav-btn {
-      flex: 1;
-      background: rgba(0,0,0,0.65);
-      border: 1px solid rgba(110,245,211,0.25);
-      border-radius: 999px;
-      padding: 0.7rem 0.4rem;
-      font-size: 1.1rem;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      text-decoration: none;
-      backdrop-filter: blur(6px);
-    }
-    .nav-btn:hover { background: rgba(0,0,0,0.8); }
-
-    /* bottom dock */
-    .dock {
-      position: fixed;
-      bottom: 0.65rem;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.5);
-      border: 1px solid rgba(110,245,211,0.3);
-      border-radius: 999px;
-      padding: 0.4rem 1rem 0.35rem;
-      display: flex;
-      gap: 0.9rem;
-      align-items: center;
-      backdrop-filter: blur(12px);
-      z-index: 999;
-    }
-    .dock a {
-      color: #fff;
-      text-decoration: none;
-      font-size: 1.05rem;
-    }
-    .music-pill {
-      background: rgba(110,245,211,0.08);
-      border: 1px solid rgba(110,245,211,0.4);
-      border-radius: 999px;
-      padding: 0.15rem 0.7rem;
-      font-size: 0.75rem;
-    }
-
-    @media (max-width: 540px) {
-      h1 { font-size: 2.6rem; }
-      .subtitle { font-size: 1.25rem; }
-      .nav-row { gap: 0.5rem; }
-      .nav-btn { font-size: 1rem; }
-      .dock { bottom: 0.45rem; }
+    @media(max-width:580px){
+      h1{font-size:2.1rem;}
+      .arrow-btn{width:62px;height:62px;font-size:2rem;}
+      .bottom{flex-wrap:wrap;}
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top-chip">TimmyTime</div>
-    <h1>Creator Stage 4</h1>
-    <div class="subtitle">Reel Area</div>
+  <main>
+    <h1>Room 4 • Creator Stage</h1>
+    <p class="sub">Your existing embedded videos stay here. Just drop your iframe below.</p>
 
-    <div class="reel-panel" id="reel-area">
-      <div class="tag-pill">Public mirror — live embed</div>
-      <div class="reel-frame">
-        <!-- YOUR EMBEDDED REEL -->
-        <iframe
-          src="https://www.youtube.com/embed/BRoTqtY70ZQ"
-          title="Creator Stage 4 Reel"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen>
-        </iframe>
-      </div>
-      <div class="reel-desc">
-        Ship it shiny. This room mirrors the reel you point at.
-      </div>
+    <div class="embed-box">
+      <!-- YOUR CURRENT ROOM 4 EMBED GOES HERE -->
+      <!-- Example: <iframe src="..." width="100%" height="200" frameborder="0" allowfullscreen></iframe> -->
+      <p>Room 4 embed area</p>
     </div>
-
-    <div class="footline">Small reel, big feel.</div>
 
     <div class="nav-row">
-      <a class="nav-btn" href="/bubbleworld-ship/room3.html">← Room 3</a>
-      <a class="nav-btn" href="/bubbleworld-ship/room5.html">Room 5 →</a>
+      <a class="arrow-btn" href="room3.html" aria-label="Previous room">‹</a>
+      <a class="arrow-btn" href="room5.html" aria-label="Next room">›</a>
     </div>
-  </div>
 
-  <div class="dock">
-    <a href="/bubbleworld-ship/">🏠 Ship</a>
-    <div class="music-pill">Timmy Time Music</div>
-  </div>
+    <div class="bottom">
+      <a class="home-btn" href="index.html">🏠 Ship</a>
+      <span>room4.html • video room • arrows on</span>
+    </div>
+  </main>
 </body>
 </html>
