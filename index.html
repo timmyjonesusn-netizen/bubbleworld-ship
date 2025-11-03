@@ -4,99 +4,70 @@
   <meta charset="utf-8">
   <title>Timmy • BubbleWorld Ship • Root Router</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <style>
     :root {
       --bg: radial-gradient(circle at 10% 0%, #1cff7a 0%, #004a2a 55%, #000 100%);
-      --glass: rgba(0,0,0,0.38);
     }
     *{box-sizing:border-box;}
     body{
-      margin:0;
-      min-height:100vh;
-      background:#000;
-      background-image:var(--bg);
-      background-size:cover;
-      background-attachment:fixed;
+      margin:0;min-height:100vh;background:var(--bg);
+      background-size:cover;background-attachment:fixed;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      color:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      color:#fff;display:flex;align-items:center;justify-content:center;
       padding:1.5rem;
     }
     .shell{
-      width:min(900px,100%);
-      background:var(--glass);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:22px;
-      backdrop-filter:blur(15px);
-      box-shadow:0 20px 60px rgba(0,0,0,0.5);
-      padding:1.5rem;
+      width:min(900px,100%);background:rgba(0,0,0,0.38);
+      border:1px solid rgba(255,255,255,0.08);border-radius:22px;
+      backdrop-filter:blur(15px);box-shadow:0 18px 50px rgba(0,0,0,0.45);
+      padding:1.4rem 1.4rem 1rem;
     }
-    h1{font-size:2.5rem;margin:.2rem 0 .5rem;}
-    p{opacity:.75;margin-bottom:1.2rem;}
+    h1{font-size:2.4rem;margin:.2rem 0 .5rem;}
+    p{opacity:.7;margin-bottom:1.1rem;}
     .rooms{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
-      gap:.8rem;
-      margin-bottom:1rem;
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+      gap:.8rem;margin-bottom:1rem;
     }
-    a.room{
-      text-decoration:none;
-      color:#fff;
-      background:rgba(0,0,0,0.3);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius:16px;
-      padding:.9rem .5rem;
-      text-align:center;
-      font-weight:600;
-      transition:all .2s ease;
+    .room{
+      text-decoration:none;color:#fff;
+      background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.12);
+      border-radius:16px;padding:.8rem .5rem;text-align:center;
+      font-weight:600;font-size:.95rem;
     }
-    a.room:hover{background:rgba(0,0,0,0.6);transform:translateY(-2px);}
+    .room small{display:block;opacity:.6;font-weight:400;font-size:.68rem;margin-top:.25rem;}
     .footer{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      border-top:1px solid rgba(255,255,255,0.05);
-      padding-top:.7rem;
-      font-size:.75rem;
-      opacity:.6;
+      display:flex;justify-content:space-between;align-items:center;
+      border-top:1px solid rgba(255,255,255,0.04);padding-top:.6rem;
+      font-size:.7rem;opacity:.6;
     }
     .arrow{
-      width:46px;
-      height:46px;
-      border-radius:999px;
+      width:46px;height:46px;border-radius:999px;
       border:1px solid rgba(255,255,255,0.12);
       background:rgba(0,0,0,0.35);
-      color:#fff;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size:1.3rem;
-      text-decoration:none;
+      display:inline-flex;align-items:center;justify-content:center;
+      color:#fff;text-decoration:none;font-size:1.25rem;
     }
   </style>
 </head>
 <body>
   <main class="shell">
     <h1>BubbleWorld Ship</h1>
-    <p>Root router • all pages in root. Rooms 2 & 3 fixed and live.</p>
+    <p>Router for engine + Suno rooms + video rooms.</p>
 
     <div class="rooms">
       <a class="room" href="engine.html">Room 1 • Engine</a>
-      <a class="room" href="room2.html">Room 2 • Play / Music</a>
-      <a class="room" href="room3.html">Room 3 • Warm Core</a>
-      <a class="room" href="room4.html">Room 4 • Creator Stage</a>
-      <a class="room" href="room5.html">Room 5 • Marketing Set</a>
-      <a class="room" href="room6.html">Room 6 • Reels Zone</a>
-      <a class="room" href="room7.html">Room 7 • UFC Drop</a>
-      <a class="room" href="room8.html">Room 8 • Yeti / Bill</a>
-      <a class="room" href="room9.html">Room 9 • Future</a>
+      <a class="room" href="room2.html">Room 2 • Suno Play</a>
+      <a class="room" href="room3.html">Room 3 • Suno Warm</a>
+      <a class="room" href="room4.html">Room 4 • Creator</a>
+      <a class="room" href="room5.html">Room 5 • Marketing</a>
+      <a class="room" href="room6.html">Room 6 • Reels</a>
+      <a class="room" href="room7.html">Room 7 • UFC</a>
+      <a class="room" href="room8.html">Room 8 • Yeti</a>
+      <a class="room" href="room9.html">Room 9 • Loop</a>
     </div>
 
     <div class="footer">
-      <span>Now routing engine ⇄ rooms 2 & 3 cleanly</span>
+      <span>root → engine → 2 → 3 → 4 → … → 9 → engine</span>
       <div>
         <a class="arrow" href="engine.html">‹</a>
         <a class="arrow" href="room2.html">›</a>
