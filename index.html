@@ -24,66 +24,65 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1.5rem;
+      padding: 1.4rem;
     }
     .shell {
-      width: min(900px, 100%);
-      background: rgba(0,0,0,0.35);
+      width: min(950px, 100%);
+      background: rgba(0,0,0,0.32);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 22px;
       backdrop-filter: blur(15px);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      padding: 1.5rem 1.5rem 1rem;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+      padding: 1.4rem 1.4rem 1rem;
     }
     .title {
-      font-size: 2.2rem;
+      font-size: 2.35rem;
       font-weight: 700;
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.35rem;
     }
     .subtitle {
       opacity: 0.7;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.2rem;
     }
     .rooms-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 0.8rem;
-      margin-bottom: 1.3rem;
+      gap: 0.75rem;
+      margin-bottom: 1.1rem;
     }
     .room-btn {
       border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.25);
+      background: rgba(0,0,0,0.35);
       border-radius: 16px;
-      padding: 0.85rem 0.7rem;
+      padding: 0.7rem 0.5rem;
       text-decoration: none;
       color: #fff;
       font-weight: 600;
       text-align: center;
-      transition: transform 0.15s ease-out, background 0.15s ease-out;
       font-size: 0.95rem;
+      transition: transform 0.1s ease-out, background 0.1s ease-out;
     }
     .room-btn small {
       display: block;
       font-weight: 400;
       opacity: 0.6;
       font-size: 0.7rem;
-      margin-top: 0.25rem;
+      margin-top: 0.3rem;
     }
     .room-btn:hover,
     .room-btn:active {
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.7);
       transform: translateY(-2px);
     }
     .footer {
       border-top: 1px solid rgba(255,255,255,0.04);
-      margin-top: 1.2rem;
       padding-top: 0.7rem;
       display: flex;
-      gap: 0.5rem;
       justify-content: space-between;
       align-items: center;
+      gap: 0.5rem;
       font-size: 0.7rem;
-      opacity: 0.55;
+      opacity: 0.6;
     }
     .arrows {
       display: flex;
@@ -94,17 +93,16 @@
       height: 34px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.35);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       color: #fff;
       text-decoration: none;
-      font-size: 1.1rem;
-      line-height: 1;
+      font-size: 1.05rem;
     }
-    @media (max-width: 480px) {
-      .title { font-size: 1.9rem; }
+    @media (max-width: 500px) {
+      .title { font-size: 2rem; }
       .rooms-grid { grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); }
     }
   </style>
@@ -112,45 +110,54 @@
 <body>
   <main class="shell">
     <div class="title">BubbleWorld Ship</div>
-    <div class="subtitle">Root router • all rooms now in root • no template hops.</div>
+    <div class="subtitle">Root router • all rooms live in repo root • no template hops.</div>
 
     <div class="rooms-grid">
-      <!-- Engine is now in root as engine.html -->
+      <!-- this is your real room 1 now -->
       <a class="room-btn" href="engine.html">Room 1 • Engine
-        <small>Ship core / law</small>
+        <small>green core</small>
       </a>
+
       <a class="room-btn" href="room2.html">Room 2
-        <small>Play / music</small>
+        <small>play / music</small>
       </a>
+
       <a class="room-btn" href="room3.html">Room 3
-        <small>Warm core</small>
+        <small>warm core</small>
       </a>
+
       <a class="room-btn" href="room4.html">Room 4
-        <small>Creator stage</small>
+        <small>creator stage</small>
       </a>
+
       <a class="room-btn" href="room5.html">Room 5
-        <small>Marketing set</small>
+        <small>marketing</small>
       </a>
+
       <a class="room-btn" href="room6.html">Room 6
-        <small>Reels zone</small>
+        <small>reels zone</small>
       </a>
+
       <a class="room-btn" href="room7.html">Room 7
-        <small>UFC drop</small>
+        <small>UFC</small>
       </a>
+
       <a class="room-btn" href="room8.html">Room 8
         <small>Yeti / Bill</small>
       </a>
+
       <a class="room-btn" href="room9.html">Room 9
-        <small>Spare / future</small>
+        <small>future slot</small>
       </a>
     </div>
 
     <div class="footer">
-      <span>Router matched to root files • 1–9 unified.</span>
+      <span>Router matched to: engine.html, room2.html … room9.html</span>
       <div class="arrows">
-        <!-- arrows go to engine and last room -->
+        <!-- go straight to engine -->
         <a class="arrow-btn" href="engine.html">‹</a>
-        <a class="arrow-btn" href="room9.html">›</a>
+        <!-- go straight to room2 (so 2/3 are NOT lost) -->
+        <a class="arrow-btn" href="room2.html">›</a>
       </div>
     </div>
   </main>
