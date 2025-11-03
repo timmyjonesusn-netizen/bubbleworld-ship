@@ -1,319 +1,37 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Timmy Time Lab v1.0.4 — Room 4 (Neuro)</title>
-<meta name="description" content="Timmy Time Lab — Room 4 Neuro. Matrix background, neon bubbles, big text UI.">
-<style>
-  :root{
-    --bg:#000;
-    --matrix:#0f0;
-    --accent:#ff6bd6; /* neon pink */
-    --accent2:#ffa64d; /* neon orange */
-    --text:#f5f5f5;
-  }
-  html,body{height:100%;margin:0;background:#000;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
-  body{overflow-x:hidden;}
-  /* Matrix background */
-  .matrix {
-    position:fixed; inset:0; pointer-events:none; z-index:-2; background:radial-gradient(ellipse at center, rgba(0,255,0,0.04), transparent 60%);
-  }
-  canvas#matrixCanvas{position:fixed;inset:0;z-index:-3;}
-  /* Neon bubbles */
-  .bubble{position:fixed; bottom:-10vh; border-radius:50%; opacity:.35; filter:blur(1px); animation:rise var(--dur) linear infinite;}
-  @keyframes rise{to{transform:translateY(-120vh) translateX(var(--drift)); opacity:.55;}}
-  /* Layout */
-  .wrap{min-height:100%; display:flex; flex-direction:column; align-items:center; padding:2rem 1rem 5rem;}
-  h1{font-size:3rem; margin:1rem 0 .5rem; text-align:center; letter-spacing:.5px;}
-  .subtitle{opacity:.8; font-size:1.2rem; text-align:center; margin-bottom:1rem;}
-  /* Video area */
-  .video-shell{
-    width:min(100%, 900px);
-    aspect-ratio:16/9;
-    background:rgba(255,255,255,.03);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:16px;
-    overflow:hidden;
-    box-shadow:0 0 30px rgba(255,107,214,.18);
-  }
-  .video-shell iframe, .video-shell .fallback {
-    width:100%; height:100%; border:0; display:block;
-    background:#000;
-  }
-  .fallback{display:flex; align-items:center; justify-content:center; font-size:1.25rem; color:#ccc; padding:1rem; text-align:center;}
-  /* Add Link panel — below video, not bottom */
-  .adder{
-    width:min(100%, 900px);
-    margin:2rem 0 0; /* ensures “well below the video” */
-    background:rgba(255,255,255,.03);
-    border:1px solid rgba(255,255,255,.10);
-    border-radius:14px;
-    padding:1rem;
-    box-shadow:0 6px 24px rgba(0,0,0,.35);
-  }
-  .adder h2{font-size:1.5rem; margin:.25rem 0 1rem;}
-  .row{display:flex; gap:.5rem; align-items:center;}
-  input[type="url"]{
-    flex:1; font-size:1.1rem; padding:.9rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,.18);
-    background:rgba(0,0,0,.35); color:var(--text); outline:none;
-  }
-  input[type="url"]::placeholder{color:#aaa;}
-  button.embed{
-    font-size:1.1rem; padding:.95rem 1.2rem; border-radius:12px; border:0; cursor:pointer;
-    background:linear-gradient(135deg, var(--accent), var(--accent2)); color:#111; font-weight:700;
-  }
-  .tips{font-size:.95rem; opacity:.8; margin-top:.75rem; line-height:1.25rem;}
-  .tips strong{color:#fff;}
-  /* Arrows */
-  .nav-arrows{
-    position:fixed; left:0; right:0; bottom:25vh; display:flex; justify-content:space-between; pointer-events:none;
-    padding:0 1rem; z-index:5;
-  }
-  .nav-arrows a{
-    pointer-events:auto; text-decoration:none; color:var(--text); font-size:2.5rem; line-height:1; 
-    background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.15); padding:.6rem 1rem; border-radius:12px; backdrop-filter:blur(6px);
-  }
-  /* Music pill */
-  .music-pill{
-    position:fixed; right:1rem; top:1rem; z-index:6; text-decoration:none; color:#111; font-weight:700;
-    background:linear-gradient(135deg, var(--accent2), var(--accent)); padding:.6rem .9rem; border-radius:999px; border:0;
-    box-shadow:0 6px 20px rgba(255,166,77,.35);
-  }
-  /* Big, readable body text */
-  p, li, .btn{font-size:1.15rem;}
-  /* Safe area for iPhone */
-  .safe{padding-bottom:env(safe-area-inset-bottom);}
-</style>
+  <meta charset="utf-8">
+  <title>Creator Stage 4 — TimmyTime • Bubble World</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TIMMYTIME • BUBBLE WORLD">
+  <meta property="og:title" content="Creator Stage 4 — Reel Area">
+  <meta property="og:description" content="Ship it shiny. Small reel, big feel. | Watch on the neon ship.">
+  <meta property="og:url" content="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/room4.html">
+
+  <!-- Thumbnail -->
+  <meta property="og:image" content="https://img.youtube.com/vi/BRoTqtY70ZQ/hqdefault.jpg">
+  <meta property="og:image:secure_url" content="https://img.youtube.com/vi/BRoTqtY70ZQ/hqdefault.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Creator Stage 4 — Reel Area">
+  <meta name="twitter:description" content="Ship it shiny. Small reel, big feel.">
+  <meta name="twitter:image" content="https://img.youtube.com/vi/BRoTqtY70ZQ/hqdefault.jpg">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://timmyjonesusn-netizen.github.io/bubbleworld-ship/room4.html">
+
+  <!-- Redirect AFTER tags so scrapers can read OG -->
+  <meta http-equiv="refresh" content="0; url=/bubbleworld-ship/#room4">
+  <script>location.replace('/bubbleworld-ship/#room4');</script>
 </head>
 <body>
-  <!-- Matrix background -->
-  <canvas id="matrixCanvas"></canvas>
-  <div class="matrix"></div>
-
-  <a class="music-pill" href="#music" onclick="alert('Timmy Time Music — always on deck!');return false;">Timmy Time Music</a>
-
-  <div class="wrap safe">
-    <h1>Timmy Time Lab v1.0.4</h1>
-    <div class="subtitle">Room 4 — Neuro Link • Clean embeds (no raw URLs)</div>
-
-    <!-- VIDEO/EMBED AREA -->
-    <div id="videoShell" class="video-shell">
-      <div class="fallback">No video yet — paste a link below and hit <strong>Embed</strong>.</div>
-    </div>
-
-    <!-- ADD LINK PANEL (below video, not at bottom) -->
-    <section class="adder" aria-label="Add a link to embed">
-      <h2>+ Add Link</h2>
-      <div class="row">
-        <input id="linkInput" type="url" inputmode="url" placeholder="Paste YouTube / Vimeo / Suno playlist link… then press Enter or Embed" autocomplete="off" />
-        <button class="embed" id="embedBtn" type="button">Embed</button>
-      </div>
-      <div class="tips">
-        We auto-convert to a privacy-friendly <strong>embed</strong> (no visible external URL).  
-        <strong>YouTube:</strong> watch/shorts/playlist → youtube-nocookie embed.  
-        <strong>Vimeo:</strong> converted to player embed.  
-        <strong>Suno:</strong> attempted iframe (some pages block embedding).
-      </div>
-    </section>
-  </div>
-
-  <!-- ARROWS @ ~25vh -->
-  <div class="nav-arrows">
-    <a href="room3.html" aria-label="Previous room">⟵</a>
-    <a href="room5.html" aria-label="Next room">⟶</a>
-  </div>
-
-<script>
-/* --------------------------- Matrix Code Background --------------------------- */
-(function(){
-  const c = document.getElementById('matrixCanvas');
-  const ctx = c.getContext('2d');
-  const katakana = 'アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  let columns, drops;
-  function resize(){
-    c.width = window.innerWidth; c.height = window.innerHeight;
-    columns = Math.floor(c.width/20);
-    drops = Array.from({length:columns}, ()=>Math.random()*c.height);
-  }
-  function draw(){
-    ctx.fillStyle='rgba(0,0,0,0.08)';
-    ctx.fillRect(0,0,c.width,c.height);
-    ctx.fillStyle='#0f0';
-    ctx.font='16px monospace';
-    for(let i=0;i<columns;i++){
-      const text = katakana[Math.floor(Math.random()*katakana.length)];
-      ctx.fillText(text, i*20, drops[i]);
-      drops[i] += 20;
-      if(drops[i] > c.height && Math.random() > 0.975) drops[i]=0;
-    }
-    requestAnimationFrame(draw);
-  }
-  window.addEventListener('resize', resize);
-  resize(); draw();
-})();
-
-/* --------------------------- Neon Bubbles (subtle) --------------------------- */
-(function spawnBubbles(){
-  const n = 10;
-  for(let i=0;i<n;i++){
-    const b = document.createElement('div');
-    b.className='bubble';
-    const size = Math.random()*60+20; // 20–80px
-    b.style.width=size+'px'; b.style.height=size+'px';
-    b.style.left=(Math.random()*100)+'vw';
-    b.style.background = Math.random()>0.5 ? 'radial-gradient(circle, rgba(255,107,214,.55), rgba(255,107,214,0))'
-                                           : 'radial-gradient(circle, rgba(255,166,77,.55), rgba(255,166,77,0))';
-    b.style.setProperty('--dur', (Math.random()*20+18)+'s');
-    b.style.setProperty('--drift', (Math.random()*30-15)+'vw');
-    document.body.appendChild(b);
-  }
-})();
-
-/* --------------------------- Embed Logic --------------------------- */
-/* Persist locally (no server) so FB won’t see raw URLs. */
-const STORAGE_KEY = 'room4_latest_embed';
-const shell = document.getElementById('videoShell');
-const input = document.getElementById('linkInput');
-const btn = document.getElementById('embedBtn');
-
-function setShell(html){
-  shell.innerHTML = html;
-}
-
-/* Try to restore previous embed */
-(function restore(){
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if(saved){
-    setShell(saved);
-  }
-})();
-
-/* Helpers */
-function youtubeIdFrom(url){
-  // Handles youtube.com/watch?v=ID, youtu.be/ID, shorts/ID
-  try{
-    const u = new URL(url);
-    const host = u.hostname.replace('www.','');
-    if(host==='youtu.be'){
-      return {id: u.pathname.slice(1), list: null, type:'video'};
-    }
-    if(host.endsWith('youtube.com')){
-      const path = u.pathname;
-      const list = u.searchParams.get('list');
-      if(path.startsWith('/watch')){
-        const id = u.searchParams.get('v');
-        if(id) return {id, list, type: list && !u.searchParams.get('v') ? 'playlist' : 'video'};
-        if(list) return {id:null, list, type:'playlist'};
-      }
-      if(path.startsWith('/shorts/')){
-        const id = path.split('/')[2];
-        if(id) return {id, list:null, type:'video'};
-      }
-      if(path.startsWith('/playlist') && list){
-        return {id:null, list, type:'playlist'};
-      }
-    }
-  }catch(e){}
-  return null;
-}
-function vimeoIdFrom(url){
-  // vimeo.com/123456789
-  try{
-    const u = new URL(url);
-    if(u.hostname.replace('www.','')==='vimeo.com'){
-      const id = u.pathname.split('/').filter(Boolean)[0];
-      if(/^\d+$/.test(id)) return id;
-    }
-  }catch(e){}
-  return null;
-}
-function sunoPlaylistFrom(url){
-  try{
-    const u = new URL(url);
-    const host = u.hostname.replace('www.','');
-    if(host==='suno.com' && u.pathname.startsWith('/playlist/')){
-      return u.pathname.split('/')[2]; // playlist id
-    }
-  }catch(e){}
-  return null;
-}
-
-/* Build safe embed HTML (no visible outbound link) */
-function buildEmbed(urlOrIframe){
-  const txt = urlOrIframe.trim();
-
-  // If user pasted an <iframe>, extract src (still avoid exposing full URL text).
-  if(/^<iframe[\s\S]*?>/i.test(txt)){
-    const srcMatch = txt.match(/src\s*=\s*["']([^"']+)["']/i);
-    if(srcMatch){
-      const src = srcMatch[1];
-      return `<iframe src="${src}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen referrerpolicy="no-referrer" loading="lazy"></iframe>`;
-    }
-  }
-
-  // YouTube
-  const y = youtubeIdFrom(txt);
-  if(y){
-    if(y.type==='playlist' && y.list){
-      const src = `https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(y.list)}&rel=0`;
-      return `<iframe src="${src}" title="YouTube playlist" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen referrerpolicy="no-referrer" loading="lazy"></iframe>`;
-    }
-    if(y.id){
-      const src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(y.id)}?rel=0`;
-      return `<iframe src="${src}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen referrerpolicy="no-referrer" loading="lazy"></iframe>`;
-    }
-  }
-
-  // Vimeo
-  const v = vimeoIdFrom(txt);
-  if(v){
-    const src = `https://player.vimeo.com/video/${encodeURIComponent(v)}`;
-    return `<iframe src="${src}" title="Vimeo video" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
-      referrerpolicy="no-referrer" loading="lazy"></iframe>`;
-  }
-
-  // Suno (may block iframe; we attempt)
-  const sp = sunoPlaylistFrom(txt);
-  if(sp){
-    const src = `https://suno.com/playlist/${encodeURIComponent(sp)}`;
-    return `<iframe src="${src}" title="Suno playlist" allow="autoplay"
-      sandbox="allow-scripts allow-same-origin allow-popups" referrerpolicy="no-referrer" loading="lazy"></iframe>
-      <div class="fallback" style="font-size:.95rem;opacity:.75;">If the Suno playlist does not display, the site may block embedding. The URL is kept hidden to avoid FB scraping.</div>`;
-  }
-
-  // Unknown provider — try a sandboxed iframe (keeps URL hidden from page text)
-  try{
-    const u = new URL(txt);
-    const src = u.href;
-    return `<iframe src="${src}" title="Embedded content"
-      sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-      referrerpolicy="no-referrer" loading="lazy"></iframe>
-      <div class="fallback" style="font-size:.95rem;opacity:.75;">If this site blocks embedding (X-Frame-Options), try YouTube/Vimeo or paste an embed iframe.</div>`;
-  }catch(e){
-    return `<div class="fallback">Unrecognized input. Paste a full URL or iframe embed code.</div>`;
-  }
-}
-
-function handleEmbed(){
-  const val = input.value.trim();
-  if(!val) return;
-  const html = buildEmbed(val);
-  setShell(html);
-  localStorage.setItem(STORAGE_KEY, html);
-  input.value = '';
-  // Gentle flash
-  shell.style.boxShadow = '0 0 50px rgba(255,166,77,.45)';
-  setTimeout(()=>{ shell.style.boxShadow = '0 0 30px rgba(255,107,214,.18)'; }, 350);
-}
-
-btn.addEventListener('click', handleEmbed);
-input.addEventListener('keydown', (e)=>{
-  if(e.key==='Enter'){ e.preventDefault(); handleEmbed(); }
-});
-</script>
+  <noscript><a href="/bubbleworld-ship/#room4">Continue to Room 4</a></noscript>
 </body>
 </html>
