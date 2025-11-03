@@ -8,66 +8,57 @@
     :root { --bg: radial-gradient(circle at 10% 0%, #ff00c8 0%, #00193d 60%, #000 100%); }
     *{box-sizing:border-box;}
     body{
-      margin:0;min-height:100vh;background:var(--bg);background-size:cover;
-      background-attachment:fixed;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      color:#fff;display:flex;align-items:center;justify-content:center;padding:1.2rem;
+      margin:0;min-height:100vh;background:var(--bg);background-size:cover;background-attachment:fixed;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#fff;
+      display:flex;align-items:center;justify-content:center;padding:1.2rem;
     }
     main{
-      width:min(1100px,100%);background:rgba(0,0,0,0.35);
-      border:1px solid rgba(255,255,255,0.07);border-radius:26px;
-      backdrop-filter:blur(15px);box-shadow:0 20px 60px rgba(0,0,0,0.55);
-      padding:1.3rem 1.3rem 1rem;position:relative;overflow:hidden;
+      width:min(1100px,100%);background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.07);
+      border-radius:26px;backdrop-filter:blur(15px);box-shadow:0 20px 60px rgba(0,0,0,0.55);
+      padding:1.3rem 1.3rem 1rem;
     }
     h1{font-size:2.4rem;margin:.2rem 0 .4rem;}
     p.sub{opacity:.75;margin-bottom:1rem;}
     .embed-box{
-      background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.02);
-      border-radius:16px;min-height:220px;display:flex;align-items:center;justify-content:center;
-      text-align:center;margin-bottom:1rem;padding:1rem;
+      background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.02);border-radius:16px;
+      min-height:220px;display:flex;align-items:center;justify-content:center;text-align:center;
+      margin-bottom:1rem;padding:1rem;
     }
     .nav-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;}
     .arrow-btn{
-      width:74px;height:74px;border-radius:999px;
-      border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.55);
-      display:inline-flex;align-items:center;justify-content:center;
-      color:#fff;text-decoration:none;font-size:2.3rem;
-      box-shadow:0 12px 35px rgba(0,0,0,0.4);
+      width:74px;height:74px;border-radius:999px;border:1px solid rgba(255,255,255,0.15);
+      background:rgba(0,0,0,0.55);display:inline-flex;align-items:center;justify-content:center;
+      color:#fff;text-decoration:none;font-size:2.3rem;box-shadow:0 12px 35px rgba(0,0,0,0.4);
     }
     .bottom{
       border-top:1px solid rgba(255,255,255,0.04);margin-top:.7rem;padding-top:.6rem;
-      display:flex;justify-content:space-between;gap:.5rem;align-items:center;
-      font-size:.7rem;opacity:.6;
+      display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-size:.7rem;opacity:.6;
     }
     .home-btn{
-      text-decoration:none;color:#fff;background:rgba(0,0,0,0.35);
-      border-radius:999px;padding:.35rem .9rem;border:1px solid rgba(255,255,255,0.03);
-      font-size:.7rem;
+      text-decoration:none;color:#fff;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.03);
+      border-radius:999px;padding:.35rem .9rem;font-size:.7rem;
     }
-    @media(max-width:580px){
-      h1{font-size:2.1rem;}
-      .arrow-btn{width:62px;height:62px;font-size:2rem;}
-      .bottom{flex-wrap:wrap;}
-    }
+    @media(max-width:580px){h1{font-size:2.1rem;} .arrow-btn{width:62px;height:62px;font-size:2rem;} .bottom{flex-wrap:wrap;}}
   </style>
 </head>
 <body>
   <main>
     <h1>Room 8 • Yeti / Mr. Bill</h1>
-    <p class="sub">Put the funny / claymation / Yeti reel embed right here.</p>
+    <p class="sub">Funny / character / alt embeds go here.</p>
 
     <div class="embed-box">
-      <!-- ROOM 8 EMBED -->
+      <!-- paste your existing Room 8 embed here -->
       <p>Room 8 embed area</p>
     </div>
 
     <div class="nav-row">
-      <a class="arrow-btn" href="room7.html" aria-label="Previous room">‹</a>
-      <a class="arrow-btn" href="room9.html" aria-label="Next room">›</a>
+      <a class="arrow-btn" href="room7.html">‹</a>
+      <a class="arrow-btn" href="room9.html">›</a>
     </div>
 
     <div class="bottom">
       <a class="home-btn" href="index.html">🏠 Ship</a>
-      <span>room8.html • video room • arrows on</span>
+      <span>room8.html • arrows on • 7 ⇄ 9</span>
     </div>
   </main>
 </body>
