@@ -2,158 +2,186 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Timmy • BubbleWorld Ship • Engine Hop</title>
+  <title>Timmy • BubbleWorld Ship • Engine Router</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     :root {
-      --bg: radial-gradient(circle at top, #0f172a 0%, #020617 45%, #000 100%);
-      --panel: rgba(0,0,0,0.35);
+      --bg: radial-gradient(circle at 10% 0%, #1cff7a 0%, #004a2a 55%, #000 100%);
+      --glass: rgba(0,0,0,0.38);
       --line: rgba(255,255,255,0.18);
     }
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       min-height: 100vh;
-      background: var(--bg);
+      background: #000;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 1.5rem 1rem 2rem;
     }
-    .wrap {
-      max-width: 520px;
-      width: 100%;
-      position: relative;
-    }
-    .tag {
-      display: inline-flex;
-      padding: 0.4rem 1rem;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.12);
-      font-size: 0.8rem;
-      margin-bottom: 1rem;
-    }
-    h1 {
-      font-size: 3rem;
-      line-height: 1.05;
-      margin: 0 0 0.5rem;
-    }
-    .sub {
-      opacity: 0.7;
-      margin-bottom: 2.4rem;
-    }
-    .room-label {
-      font-size: 1.4rem;
-      font-weight: 600;
-      margin-bottom: 0.3rem;
-    }
-    .room-note {
-      opacity: 0.6;
-      font-size: 0.8rem;
-      letter-spacing: 0.02em;
-    }
-    .arrows {
+    /* bubble / matrix background */
+    .bg-layer {
       position: fixed;
-      top: 50%;
-      left: 0;
-      right: 0;
-      transform: translateY(-50%);
+      inset: 0;
+      background: radial-gradient(circle at 10% 0%, rgba(28,255,122,0.4) 0%, rgba(0,0,0,0) 45%), #000;
       pointer-events: none;
+      z-index: 1;
     }
-    .arrow-btn {
+    .bubble {
       position: absolute;
-      top: 0;
-      pointer-events: auto;
-      width: 3.7rem;
-      height: 3.7rem;
+      bottom: -8rem;
+      width: 6rem;
+      height: 6rem;
+      background: rgba(210,255,230,0.03);
+      border: 1px solid rgba(210,255,230,0.25);
+      border-radius: 50%;
+      animation: rise 20s linear infinite;
+      filter: drop-shadow(0 0 10px rgba(140,255,196,0.45));
+    }
+    .bubble:nth-child(2) { left: 12%; width: 4rem; height: 4rem; animation-duration: 14s; }
+    .bubble:nth-child(3) { left: 30%; width: 8rem; height: 8rem; animation-duration: 25s; }
+    .bubble:nth-child(4) { left: 50%; width: 3.5rem; height: 3.5rem; animation-duration: 16s; }
+    .bubble:nth-child(5) { left: 70%; width: 5rem; height: 5rem; animation-duration: 21s; }
+    .bubble:nth-child(6) { left: 84%; width: 7rem; height: 7rem; animation-duration: 26s; }
+    @keyframes rise {
+      0% { transform: translateY(0); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(-110vh); opacity: 0; }
+    }
+
+    /* iframe shell */
+    .viewport {
+      position: relative;
+      z-index: 5;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+
+    /* thumb-zone arrows */
+    .nav-arrow {
+      position: fixed;
+      bottom: 1rem;
+      width: 3.4rem;
+      height: 3.4rem;
       border-radius: 999px;
-      background: rgba(0,0,0,0.38);
-      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.25);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.7rem;
+      z-index: 50;
+      backdrop-filter: blur(8px);
       cursor: pointer;
-      backdrop-filter: blur(10px);
-      transition: transform 0.08s;
+      user-select: none;
+      -webkit-user-select: none;
     }
-    .arrow-btn:active {
+    .nav-left {
+      left: 1rem;
+    }
+    .nav-right {
+      right: 1rem;
+    }
+    .nav-arrow:active {
       transform: scale(0.97);
     }
-    .arrow-left { left: 0.65rem; }
-    .arrow-right { right: 0.65rem; }
 
-    .foot {
-      margin-top: 2.5rem;
-      font-size: 0.7rem;
-      opacity: 0.35;
+    /* tiny top label so you know what room you're on */
+    .room-label {
+      position: fixed;
+      top: 0.6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 40;
+      background: rgba(0,0,0,0.42);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 0.25rem 1rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.02em;
+      backdrop-filter: blur(6px);
     }
 
-    @media (max-width: 540px) {
-      h1 { font-size: 2.4rem; }
-      .arrow-btn {
+    @media (max-width: 520px) {
+      .nav-arrow {
         width: 3.2rem;
         height: 3.2rem;
+        font-size: 1.6rem;
+      }
+      .room-label {
+        font-size: 0.68rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="tag">Timmy Time • Engine Hop</div>
-    <h1>BubbleWorld Ship</h1>
-    <p class="sub">Tap ➜ to launch the next room. All rooms are root-level <code>room#.html</code>.</p>
-
-    <div id="roomLabel" class="room-label">Room 1</div>
-    <div id="roomNote" class="room-note">early deck</div>
-
-    <div class="foot">Links: room1.html → room9.html • 2 &amp; 3 are in the hop list</div>
+  <!-- background -->
+  <div class="bg-layer">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
   </div>
 
-  <div class="arrows">
-    <div class="arrow-btn arrow-left" onclick="hop(-1)" aria-label="Previous room">‹</div>
-    <div class="arrow-btn arrow-right" onclick="hop(1)" aria-label="Next room">›</div>
+  <!-- shell -->
+  <div class="viewport">
+    <div id="roomTag" class="room-label">Room 1 • Engine</div>
+    <iframe id="roomFrame" src="room1.html" title="BubbleWorld Ship"></iframe>
   </div>
+
+  <!-- thumb arrows -->
+  <div class="nav-arrow nav-left" onclick="hop(-1)" aria-label="Previous room">‹</div>
+  <div class="nav-arrow nav-right" onclick="hop(1)" aria-label="Next room">›</div>
 
   <script>
-    // your rooms in order — this is the fix: 2 and 3 are explicitly here
+    // full 1–9 loop, no skipping
     var rooms = [
-      { file: 'room1.html', label: 'Room 1', note: 'early deck' },
-      { file: 'room2.html', label: 'Room 2', note: 'music / vibe' },
-      { file: 'room3.html', label: 'Room 3', note: 'core panel' },
-      { file: 'room4.html', label: 'Room 4', note: 'creator stage' },
-      { file: 'room5.html', label: 'Room 5', note: 'yt short 1' },
-      { file: 'room6.html', label: 'Room 6', note: 'yt short 2' },
-      { file: 'room7.html', label: 'Room 7', note: 'yt short 3' },
-      { file: 'room8.html', label: 'Room 8', note: 'yt short 4' },
-      { file: 'room9.html', label: 'Room 9', note: 'yt short 5' }
+      { file: 'room1.html', label: 'Room 1 • Engine' },
+      { file: 'room2.html', label: 'Room 2 • Music / Vibe' },
+      { file: 'room3.html', label: 'Room 3 • Music / Core' },
+      { file: 'room4.html', label: 'Room 4 • Creator Stage' },
+      { file: 'room5.html', label: 'Room 5 • Short Set 1' },
+      { file: 'room6.html', label: 'Room 6 • Short Set 2' },
+      { file: 'room7.html', label: 'Room 7 • Short Set 3' },
+      { file: 'room8.html', label: 'Room 8 • Short Set 4' },
+      { file: 'room9.html', label: 'Room 9 • Short Set 5' }
     ];
 
-    var current = 0; // start on Room 1
+    var current = 0;
 
-    function updatePanel() {
-      document.getElementById('roomLabel').textContent = rooms[current].label;
-      document.getElementById('roomNote').textContent = rooms[current].note;
+    function loadRoom(index) {
+      var frame = document.getElementById('roomFrame');
+      var tag = document.getElementById('roomTag');
+      frame.src = rooms[index].file;
+      tag.textContent = rooms[index].label;
+      current = index;
     }
 
     function hop(dir) {
-      // go to the page immediately
       var next = current + dir;
       if (next < 0) {
-        next = rooms.length - 1;
+        next = rooms.length - 1; // go from 1 back to 9
       } else if (next >= rooms.length) {
-        next = 0;
+        next = 0; // go from 9 back to 1
       }
-      window.location.href = rooms[next].file;
+      loadRoom(next);
     }
 
-    // show first room info
-    updatePanel();
+    // ensure first load is engine
+    loadRoom(0);
   </script>
 </body>
 </html>
