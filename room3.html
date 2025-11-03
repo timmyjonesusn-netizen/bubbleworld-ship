@@ -2,93 +2,120 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>BubbleWorld Ship • Room 3 (Suno B)</title>
+  <title>Room 3 • Timmy Time Music</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="Timmy Time • Room 3">
+  <meta property="og:description" content="BubbleWorld Ship — Room 3 Suno 5.">
   <style>
-    :root { --bg: radial-gradient(circle at 15% 5%, #ffb36a 0%, #a43fff 55%, #000 100%); }
-    *{box-sizing:border-box;}
-    body{
-      margin:0;min-height:100vh;background:var(--bg);background-size:cover;
-      background-attachment:fixed;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      color:#fff;display:flex;align-items:center;justify-content:center;padding:1.2rem;
+    :root {
+      --bg: radial-gradient(circle at 10% 0%, #6f3cff 0%, #2b0b85 55%, #000 100%);
     }
-    main{
-      width:min(1100px,100%);background:rgba(0,0,0,0.3);
-      border:1px solid rgba(255,255,255,0.08);border-radius:26px;
-      backdrop-filter:blur(15px);box-shadow:0 20px 60px rgba(0,0,0,0.55);
-      padding:1.3rem 1.3rem 1rem;
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #000;
+      background-image: var(--bg);
+      background-size: cover;
+      background-attachment: fixed;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #fff;
+      padding: 78px 16px 32px;
     }
-    h1{font-size:2.6rem;margin:.2rem 0 .5rem;}
-    p.sub{opacity:.75;margin-bottom:1.1rem;}
-    .playlist{
-      background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.03);
-      border-radius:16px;padding:.6rem .6rem .2rem;margin-bottom:.75rem;
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 64px;
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      z-index: 10;
     }
-    .playlist h2{font-size:.85rem;margin:0 0 .4rem;opacity:.75;}
-    iframe{width:100%;height:190px;border:none;border-radius:12px;background:#000;}
-    .nav-row{
-      display:flex;justify-content:space-between;align-items:center;
-      gap:1rem;margin-top:.75rem;
+    .pill {
+      background: linear-gradient(90deg, #ff00ff, #ff8400);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
     }
-    .arrow-btn{
-      width:74px;height:74px;border-radius:999px;
-      border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.55);
-      display:inline-flex;align-items:center;justify-content:center;
-      color:#fff;text-decoration:none;font-size:2.3rem;
-      box-shadow:0 12px 35px rgba(0,0,0,0.45);
+    .nav-btn {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 6px 14px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.75rem;
     }
-    .bottom{
-      border-top:1px solid rgba(255,255,255,0.04);margin-top:.7rem;padding-top:.6rem;
-      display:flex;justify-content:space-between;gap:.5rem;align-items:center;
-      font-size:.7rem;opacity:.6;
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
     }
-    .home-btn,.music-pill{
-      text-decoration:none;color:#fff;background:rgba(0,0,0,0.4);
-      border-radius:999px;padding:.35rem .9rem;border:1px solid rgba(255,255,255,0.04);
-      font-size:.7rem;
+    h1 { font-size: 2.6rem; margin-bottom: 6px; }
+    .embed-card {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 18px;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
     }
-    @media(max-width:580px){
-      h1{font-size:2.2rem;}
-      .arrow-btn{width:62px;height:62px;font-size:2rem;}
-      .bottom{flex-wrap:wrap;}
+    .embed-head {
+      padding: 12px 14px 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    iframe {
+      width: 100%;
+      min-height: 220px;
+      border: none;
+      background: #000;
+    }
+    @media (min-width: 900px) {
+      .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .embed-card:nth-child(6) { grid-column: span 2; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1>Room 3 • Warm Suno Deck</h1>
-    <p class="sub">Suno set B (the other 5 you locked).</p>
+  <header>
+    <div>BubbleWorld Ship • Room 3</div>
+    <div class="pill">Timmy Time Music</div>
+    <a class="nav-btn" href="index.html">← Engine</a>
+  </header>
 
-    <div class="playlist">
-      <h2>Set 3 • Vibe 1</h2>
+  <main class="wrap">
+    <div style="grid-column: 1 / -1;">
+      <h1>Room 3 — Suno 5</h1>
+      <p>These are the Nov 3 playlists you said to keep forever.</p>
+    </div>
+
+    <div class="embed-card">
+      <div class="embed-head"><div>Playlist 1</div></div>
       <iframe src="https://suno.com/playlist/2e2eefa6-6828-40ba-bf5b-02bf338e3243"></iframe>
     </div>
-    <div class="playlist">
-      <h2>Set 3 • Vibe 2</h2>
+    <div class="embed-card">
+      <div class="embed-head"><div>Playlist 2</div></div>
       <iframe src="https://suno.com/playlist/b11f5b9a-b2d1-46f2-a307-e62491ae2479"></iframe>
     </div>
-    <div class="playlist">
-      <h2>Set 3 • Vibe 3</h2>
+    <div class="embed-card">
+      <div class="embed-head"><div>Playlist 3</div></div>
       <iframe src="https://suno.com/playlist/a2e8eb9c-2d15-44d9-831b-89bf66ede586"></iframe>
     </div>
-    <div class="playlist">
-      <h2>Set 3 • Vibe 4</h2>
+    <div class="embed-card">
+      <div class="embed-head"><div>Playlist 4</div></div>
       <iframe src="https://suno.com/playlist/d04a7c63-52b7-4695-b47f-64f3a3dae677"></iframe>
     </div>
-    <div class="playlist">
-      <h2>Set 3 • Vibe 5</h2>
+    <div class="embed-card">
+      <div class="embed-head"><div>Playlist 5</div></div>
       <iframe src="https://suno.com/playlist/6a6ee9ad-5eb6-45c6-9554-de377cc664dc"></iframe>
-    </div>
-
-    <div class="nav-row">
-      <a class="arrow-btn" href="room2.html">‹</a>
-      <a class="arrow-btn" href="room4.html">›</a>
-    </div>
-
-    <div class="bottom">
-      <a class="home-btn" href="index.html">🏠 Ship</a>
-      <a class="music-pill" href="room2.html">🎵 Timmy Time Music</a>
-      <span>room3.html • root • Suno B</span>
     </div>
   </main>
 </body>
