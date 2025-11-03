@@ -2,162 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Timmy • BubbleWorld Ship • Index Router</title>
+  <title>Timmy • BubbleWorld Ship • Root Router</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     :root {
       --bg: radial-gradient(circle at 10% 0%, #1cff7a 0%, #004a2a 55%, #000 100%);
-      --panel: rgba(0,0,0,0.35);
-      --line: rgba(255,255,255,0.18);
+      --glass: rgba(0,0,0,0.38);
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #000;
-      background-image: var(--bg);
-      background-attachment: fixed;
-      background-size: cover;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.4rem;
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      min-height:100vh;
+      background:#000;
+      background-image:var(--bg);
+      background-size:cover;
+      background-attachment:fixed;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:1.5rem;
     }
-    .shell {
-      width: min(950px, 100%);
-      background: rgba(0,0,0,0.32);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 22px;
-      backdrop-filter: blur(15px);
-      box-shadow: 0 18px 50px rgba(0,0,0,0.45);
-      padding: 1.4rem 1.4rem 1rem;
+    .shell{
+      width:min(900px,100%);
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:22px;
+      backdrop-filter:blur(15px);
+      box-shadow:0 20px 60px rgba(0,0,0,0.5);
+      padding:1.5rem;
     }
-    .title {
-      font-size: 2.35rem;
-      font-weight: 700;
-      margin-bottom: 0.35rem;
+    h1{font-size:2.5rem;margin:.2rem 0 .5rem;}
+    p{opacity:.75;margin-bottom:1.2rem;}
+    .rooms{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+      gap:.8rem;
+      margin-bottom:1rem;
     }
-    .subtitle {
-      opacity: 0.7;
-      margin-bottom: 1.2rem;
+    a.room{
+      text-decoration:none;
+      color:#fff;
+      background:rgba(0,0,0,0.3);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:16px;
+      padding:.9rem .5rem;
+      text-align:center;
+      font-weight:600;
+      transition:all .2s ease;
     }
-    .rooms-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 0.75rem;
-      margin-bottom: 1.1rem;
+    a.room:hover{background:rgba(0,0,0,0.6);transform:translateY(-2px);}
+    .footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-top:1px solid rgba(255,255,255,0.05);
+      padding-top:.7rem;
+      font-size:.75rem;
+      opacity:.6;
     }
-    .room-btn {
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.35);
-      border-radius: 16px;
-      padding: 0.7rem 0.5rem;
-      text-decoration: none;
-      color: #fff;
-      font-weight: 600;
-      text-align: center;
-      font-size: 0.95rem;
-      transition: transform 0.1s ease-out, background 0.1s ease-out;
-    }
-    .room-btn small {
-      display: block;
-      font-weight: 400;
-      opacity: 0.6;
-      font-size: 0.7rem;
-      margin-top: 0.3rem;
-    }
-    .room-btn:hover,
-    .room-btn:active {
-      background: rgba(0,0,0,0.7);
-      transform: translateY(-2px);
-    }
-    .footer {
-      border-top: 1px solid rgba(255,255,255,0.04);
-      padding-top: 0.7rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.7rem;
-      opacity: 0.6;
-    }
-    .arrows {
-      display: flex;
-      gap: 0.4rem;
-    }
-    .arrow-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.35);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      text-decoration: none;
-      font-size: 1.05rem;
-    }
-    @media (max-width: 500px) {
-      .title { font-size: 2rem; }
-      .rooms-grid { grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); }
+    .arrow{
+      width:46px;
+      height:46px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.12);
+      background:rgba(0,0,0,0.35);
+      color:#fff;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.3rem;
+      text-decoration:none;
     }
   </style>
 </head>
 <body>
   <main class="shell">
-    <div class="title">BubbleWorld Ship</div>
-    <div class="subtitle">Root router • all rooms live in repo root • no template hops.</div>
+    <h1>BubbleWorld Ship</h1>
+    <p>Root router • all pages in root. Rooms 2 & 3 fixed and live.</p>
 
-    <div class="rooms-grid">
-      <!-- this is your real room 1 now -->
-      <a class="room-btn" href="engine.html">Room 1 • Engine
-        <small>green core</small>
-      </a>
-
-      <a class="room-btn" href="room2.html">Room 2
-        <small>play / music</small>
-      </a>
-
-      <a class="room-btn" href="room3.html">Room 3
-        <small>warm core</small>
-      </a>
-
-      <a class="room-btn" href="room4.html">Room 4
-        <small>creator stage</small>
-      </a>
-
-      <a class="room-btn" href="room5.html">Room 5
-        <small>marketing</small>
-      </a>
-
-      <a class="room-btn" href="room6.html">Room 6
-        <small>reels zone</small>
-      </a>
-
-      <a class="room-btn" href="room7.html">Room 7
-        <small>UFC</small>
-      </a>
-
-      <a class="room-btn" href="room8.html">Room 8
-        <small>Yeti / Bill</small>
-      </a>
-
-      <a class="room-btn" href="room9.html">Room 9
-        <small>future slot</small>
-      </a>
+    <div class="rooms">
+      <a class="room" href="engine.html">Room 1 • Engine</a>
+      <a class="room" href="room2.html">Room 2 • Play / Music</a>
+      <a class="room" href="room3.html">Room 3 • Warm Core</a>
+      <a class="room" href="room4.html">Room 4 • Creator Stage</a>
+      <a class="room" href="room5.html">Room 5 • Marketing Set</a>
+      <a class="room" href="room6.html">Room 6 • Reels Zone</a>
+      <a class="room" href="room7.html">Room 7 • UFC Drop</a>
+      <a class="room" href="room8.html">Room 8 • Yeti / Bill</a>
+      <a class="room" href="room9.html">Room 9 • Future</a>
     </div>
 
     <div class="footer">
-      <span>Router matched to: engine.html, room2.html … room9.html</span>
-      <div class="arrows">
-        <!-- go straight to engine -->
-        <a class="arrow-btn" href="engine.html">‹</a>
-        <!-- go straight to room2 (so 2/3 are NOT lost) -->
-        <a class="arrow-btn" href="room2.html">›</a>
+      <span>Now routing engine ⇄ rooms 2 & 3 cleanly</span>
+      <div>
+        <a class="arrow" href="engine.html">‹</a>
+        <a class="arrow" href="room2.html">›</a>
       </div>
     </div>
   </main>
