@@ -2,64 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>BubbleWorld Ship • Room 5 (Marketing Set)</title>
+  <title>Room 5 • Reels Zone</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    :root { --bg: radial-gradient(circle at 0% 10%, #ff5f8a 0%, #7000ff 55%, #000 100%); }
-    *{box-sizing:border-box;}
-    body{
-      margin:0;min-height:100vh;background:var(--bg);background-size:cover;background-attachment:fixed;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#fff;
-      display:flex;align-items:center;justify-content:center;padding:1.2rem;
-    }
-    main{
-      width:min(1100px,100%);background:rgba(0,0,0,0.32);border:1px solid rgba(255,255,255,0.07);
-      border-radius:26px;backdrop-filter:blur(15px);box-shadow:0 20px 60px rgba(0,0,0,0.55);
-      padding:1.3rem 1.3rem 1rem;
-    }
-    h1{font-size:2.4rem;margin:.2rem 0 .4rem;}
-    p.sub{opacity:.75;margin-bottom:1rem;}
-    .embed-box{
-      background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.02);border-radius:16px;
-      min-height:220px;display:flex;align-items:center;justify-content:center;text-align:center;
-      margin-bottom:1rem;padding:1rem;
-    }
-    .nav-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;}
-    .arrow-btn{
-      width:74px;height:74px;border-radius:999px;border:1px solid rgba(255,255,255,0.15);
-      background:rgba(0,0,0,0.55);display:inline-flex;align-items:center;justify-content:center;
-      color:#fff;text-decoration:none;font-size:2.3rem;box-shadow:0 12px 35px rgba(0,0,0,0.4);
-    }
-    .bottom{
-      border-top:1px solid rgba(255,255,255,0.04);margin-top:.7rem;padding-top:.6rem;
-      display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-size:.7rem;opacity:.6;
-    }
-    .home-btn{
-      text-decoration:none;color:#fff;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.03);
-      border-radius:999px;padding:.35rem .9rem;font-size:.7rem;
-    }
-    @media(max-width:580px){h1{font-size:2.1rem;} .arrow-btn{width:62px;height:62px;font-size:2rem;} .bottom{flex-wrap:wrap;}}
+    :root{--bg:radial-gradient(circle at 10% 0%, #00bfff 0%, #003749 55%, #000 100%)}
+    *{box-sizing:border-box;margin:0}
+    body{min-height:100vh;background:var(--bg) fixed;background-size:cover;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#fff;}
+    .wrap{min-height:100vh;max-width:1080px;margin:0 auto;padding:90px 16px 110px;}
+    .panel{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.03);
+      border-radius:30px;padding:26px 20px;}
+    h1{font-size:3rem;margin-bottom:10px;}
+    .sub{opacity:.7;margin-bottom:16px;}
+    .embed-box{background:#000;border-radius:20px;overflow:hidden;}
+    iframe{width:100%;height:420px;border:0;display:block;}
+    .open-btn{display:inline-block;margin-top:10px;background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:5px 14px;
+      color:#fff;text-decoration:none;font-size:.7rem;}
+    .arrow{position:fixed;bottom:82px;width:56px;height:56px;border-radius:50%;
+      border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.42);
+      display:flex;align-items:center;justify-content:center;font-size:1.8rem;
+      text-decoration:none;color:#fff;backdrop-filter:blur(8px);}
+    .arrow.left{left:16px}.arrow.right{right:16px}
+    .bottom-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);
+      backdrop-filter:blur(10px);padding:10px 16px 14px;display:flex;align-items:center;
+      justify-content:space-between;font-size:.8rem;}
+    .home-btn{background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.08);
+      border-radius:999px;padding:5px 14px;text-decoration:none;color:#fff;}
   </style>
 </head>
 <body>
-  <main>
-    <h1>Room 5 • Marketing Set</h1>
-    <p class="sub">Keep your current marketing video here.</p>
-
-    <div class="embed-box">
-      <!-- paste your existing Room 5 embed here -->
-      <p>Room 5 embed area</p>
+  <div class="wrap">
+    <div class="panel">
+      <h1>Room 5 • Reel</h1>
+      <p class="sub">YouTube Short embed.</p>
+      <div class="embed-box">
+        <iframe src="https://www.youtube.com/embed/Io7X8O-IKG4" allowfullscreen></iframe>
+      </div>
+      <a class="open-btn" href="https://youtube.com/shorts/Io7X8O-IKG4?si=qlEZTPiZX2HMrzxx" target="_blank">Open original short</a>
     </div>
+  </div>
 
-    <div class="nav-row">
-      <a class="arrow-btn" href="room4.html">‹</a>
-      <a class="arrow-btn" href="room6.html">›</a>
-    </div>
+  <a class="arrow left" href="room4.html">‹</a>
+  <a class="arrow right" href="room6.html">›</a>
 
-    <div class="bottom">
-      <a class="home-btn" href="index.html">🏠 Ship</a>
-      <span>room5.html • arrows on • 4 ⇄ 6</span>
-    </div>
-  </main>
+  <div class="bottom-bar">
+    <a class="home-btn" href="index.html">🏠 Ship</a>
+    <div>room5.html · 4 ⇄ 6</div>
+  </div>
 </body>
 </html>
