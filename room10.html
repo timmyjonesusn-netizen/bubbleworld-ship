@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>BubbleWorld Ship · Engine Room</title>
+  <title>Room 10 · VibeCore Zero-Point Chamber</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
 
@@ -10,97 +10,99 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at 50% 50%, rgba(0,255,150,0.18), transparent 60%), #02120d;
-      color: #fff;
-      font-family: system-ui, -apple-system, sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: #000;
+      font-family: system-ui, sans-serif;
+      color: white;
+      text-align: center;
     }
 
-    .engine-shell {
-      max-width: 900px;
-      width: 92%;
+    .shell {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.2);
       padding: 2rem;
-      border-radius: 30px;
-      background: rgba(0, 15, 10, 0.85);
-      backdrop-filter: blur(12px);
-      text-align: center;
-      box-shadow:
-        0 0 40px rgba(0,255,150,0.25),
-        0 0 30px rgba(0, 255, 255, 0.18);
+      border-radius: 20px;
+      width: 85%;
+      max-width: 800px;
+      box-shadow: 0 0 20px rgba(0,255,200,0.3);
     }
 
     h1 {
-      font-size: 3rem;
+      font-size: 2.6rem;
       margin-bottom: 0.4rem;
-      text-shadow: 0 0 15px rgba(0,255,150,0.65);
     }
 
-    .engine-sub {
-      font-size: 1.3rem;
+    p {
+      font-size: 1.2rem;
       opacity: 0.85;
       margin-bottom: 2rem;
     }
 
-    .room-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
+    a.launch {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: linear-gradient(90deg, #00ffc8, #ff00c8);
+      border-radius: 999px;
+      color: black;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 0 0 20px rgba(255,0,200,0.4);
     }
 
-    .room-button {
-      padding: 1rem 0.5rem;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      cursor: pointer;
-      transition: 0.2s ease;
-      font-size: 1.1rem;
-      text-transform: capitalize;
+    /* Arrows */
+    .edge {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 0.5rem 0.8rem;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 999px;
+      color: white;
+      text-decoration: none;
+      font-size: 0.9rem;
+      width: 4rem;
+      text-align: center;
+      backdrop-filter: blur(8px);
     }
 
-    .room-button:hover {
-      background: rgba(0,255,150,0.22);
-      border-color: rgba(0,255,150,0.4);
-      box-shadow: 0 0 12px rgba(0,255,150,0.45);
+    .left { left: .5rem; }
+    .right { right: .5rem; }
+
+    small {
+      display: block;
+      font-size: .65rem;
+      opacity: .7;
     }
   </style>
-
-  <script>
-    function go(page) {
-      window.location.href = page;
-    }
-  </script>
 </head>
 
 <body>
 
-  <main class="engine-shell">
+  <!-- Arrows -->
+  <a class="edge left" href="index.html">
+    <small>Back</small>
+    Engine
+  </a>
 
-    <h1>Engine Room</h1>
-    <p class="engine-sub">Navigation Hub</p>
+  <a class="edge right" href="room9.html">
+    <small>Prev</small>
+    Room 9
+  </a>
 
-    <div class="room-grid">
+  <div class="shell">
+    <h1>Room 10 · VibeCore</h1>
+    <p>This chamber opens your VibeCode project safely in a new tab.</p>
 
-      <div class="room-button" onclick="go('room2.html')">Room 2</div>
-      <div class="room-button" onclick="go('room3.html')">Room 3</div>
-      <div class="room-button" onclick="go('room4.html')">Room 4</div>
-      <div class="room-button" onclick="go('room5.html')">Room 5</div>
-      <div class="room-button" onclick="go('room6.html')">Room 6</div>
-      <div class="room-button" onclick="go('room7.html')">Room 7</div>
-      <div class="room-button" onclick="go('room8.html')">Room 8</div>
-      <div class="room-button" onclick="go('room9.html')">Room 9</div>
-
-      <!-- ⭐️ NEW ROOM 10 BUTTON -->
-      <div class="room-button" onclick="go('room10.html')">
-        Room 10 · VibeCore
-      </div>
-
-    </div>
-
-  </main>
+    <a class="launch" 
+       href="https://www.vibecodeapp.com/projects/019a9e30-f74e-76da-8e53-ab6bf0301d76"
+       target="_blank">
+      ✨ ENTER VIBECODE
+    </a>
+  </div>
 
 </body>
 </html>
