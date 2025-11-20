@@ -4,21 +4,53 @@
   <meta charset="UTF-8" />
   <title>BubbleWorld Ship · Engine Room</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Instant redirect to the original engine page -->
-  <meta http-equiv="refresh" content="0; url=engine.html" />
-
-  <script>
-    // Fallback redirect for some browsers
-    window.location.replace("engine.html");
-  </script>
+  <link rel="stylesheet" href="style.css" />
+  <script src="main.js"></script>
 </head>
-<body>
-  <!-- Fallback link if redirects fail -->
-  <p style="font-family: system-ui, sans-serif; text-align:center; margin-top:30vh;">
-    Loading Engine Room…  
-    <br><br>
-    <a href="engine.html">Click here if you are not redirected.</a>
-  </p>
+
+<body class="engine-room">
+  <main class="engine-shell">
+
+    <h1 class="engine-title">Room</h1>
+    <p class="engine-sub">Navigation Hub</p>
+
+    <div class="room-grid">
+
+      <div class="room-button" onclick="go('room2.html')">
+        <span>Room 2</span>
+      </div>
+
+      <div class="room-button" onclick="go('room3.html')">
+        <span>Room 3</span>
+      </div>
+
+      <div class="room-button" onclick="go('room4.html')">
+        <span>Room 4</span>
+      </div>
+
+      <div class="room-button" onclick="go('room5.html')">
+        <span>Room 5</span>
+      </div>
+
+      <div class="room-button" onclick="go('room6.html')">
+        <span>Room 6</span>
+      </div>
+
+      <div class="room-button" onclick="go('room7.html')">
+        <span>Room 7</span>
+      </div>
+
+      <div class="room-button" onclick="go('room8.html')">
+        <span>Room 8</span>
+      </div>
+
+      <div class="room-button" onclick="go('room9.html')">
+        <span>Room 9</span>
+      </div>
+
+      <!-- No Room 10 button here on purpose -->
+
+    </div>
+  </main>
 </body>
 </html>
