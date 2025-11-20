@@ -5,85 +5,74 @@
   <title>BubbleWorld Ship • Root Hub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Correct static paths -->
-  <link rel="stylesheet" href="static/style.css" />
-  <link rel="stylesheet" href="static/base.css" />
-
-  <!-- JavaScript -->
-  <script src="static/main.js" defer></script>
-  <script src="static/bubbles.js" defer></script>
-  <script src="static/matrix.js" defer></script>
-
-  <style>
-    /* Safety fallback in case CSS fails */
-    body {
-      background: #001900;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
-      color: white;
-    }
-    .fallback {
-      padding: 20px;
-    }
-  </style>
+  <!-- Use the same styling + JS as your Engine Room -->
+  <link rel="stylesheet" href="style.css" />
+  <script src="main.js" defer></script>
 </head>
 
 <body class="engine-room">
-
   <main class="engine-shell">
     <h1 class="engine-title">BubbleWorld Ship</h1>
     <p class="engine-sub">Navigation Hub • All Rooms in Root</p>
 
     <div class="room-grid">
 
+      <!-- Room 1 – Engine (sacred baseline) -->
       <div class="room-button" onclick="go('engine.html')">
         <span>Room 1 • Engine</span>
       </div>
 
+      <!-- Room 2 – Suno A -->
       <div class="room-button" onclick="go('room2.html')">
         <span>Room 2 • Suno A</span>
       </div>
 
+      <!-- Room 3 – Suno B -->
       <div class="room-button" onclick="go('room3.html')">
         <span>Room 3 • Suno B</span>
       </div>
 
+      <!-- Room 4 – Creator -->
       <div class="room-button" onclick="go('room4.html')">
         <span>Room 4 • Creator</span>
       </div>
 
+      <!-- Room 5 – Marketing -->
       <div class="room-button" onclick="go('room5.html')">
         <span>Room 5 • Marketing</span>
       </div>
 
+      <!-- Room 6 – Reels -->
       <div class="room-button" onclick="go('room6.html')">
         <span>Room 6 • Reels</span>
       </div>
 
+      <!-- Room 7 – UFC -->
       <div class="room-button" onclick="go('room7.html')">
         <span>Room 7 • UFC</span>
       </div>
 
+      <!-- Room 8 – Yeti/Bill -->
       <div class="room-button" onclick="go('room8.html')">
         <span>Room 8 • Yeti/Bill</span>
       </div>
 
+      <!-- Room 9 – Loop -->
       <div class="room-button" onclick="go('room9.html')">
         <span>Room 9 • Loop</span>
       </div>
 
+      <!-- Room 10 – New Realm -->
       <div class="room-button" onclick="go('room10.html')">
         <span>Room 10 • New Realm</span>
       </div>
 
     </div>
+
+    <!-- Bottom nav: home just refreshes the hub -->
+    <footer class="nav-footer">
+      <button class="nav-arrow" onclick="go('index.html')">🏠</button>
+    </footer>
   </main>
-
-  <!-- Bottom nav -->
-  <footer class="nav-footer">
-    <button class="nav-arrow" onclick="go('index.html')">🏡</button>
-  </footer>
-
 </body>
 </html>
