@@ -2,107 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Room 10 · VibeCore Zero-Point Chamber</title>
+  <title>Room 10 · VibeCore Chamber</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
-
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      font-family: system-ui, sans-serif;
-      color: white;
-      text-align: center;
-    }
-
-    .shell {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.2);
-      padding: 2rem;
-      border-radius: 20px;
-      width: 85%;
-      max-width: 800px;
-      box-shadow: 0 0 20px rgba(0,255,200,0.3);
-    }
-
-    h1 {
-      font-size: 2.6rem;
-      margin-bottom: 0.4rem;
-    }
-
-    p {
-      font-size: 1.2rem;
-      opacity: 0.85;
-      margin-bottom: 2rem;
-    }
-
-    a.launch {
-      display: inline-block;
-      padding: 1rem 2rem;
-      background: linear-gradient(90deg, #00ffc8, #ff00c8);
-      border-radius: 999px;
-      color: black;
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-decoration: none;
-      box-shadow: 0 0 20px rgba(255,0,200,0.4);
-    }
-
-    /* Arrows */
-    .edge {
-      position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      padding: 0.5rem 0.8rem;
-      background: rgba(0,0,0,0.6);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 999px;
-      color: white;
-      text-decoration: none;
-      font-size: 0.9rem;
-      width: 4rem;
-      text-align: center;
-      backdrop-filter: blur(8px);
-    }
-
-    .left { left: .5rem; }
-    .right { right: .5rem; }
-
-    small {
-      display: block;
-      font-size: .65rem;
-      opacity: .7;
-    }
-  </style>
 </head>
 
-<body>
+<body class="engine-room">
 
-  <!-- Arrows -->
-  <a class="edge left" href="index.html">
+  <!-- LEFT ARROW → ENGINE ROOM -->
+  <a class="edge-nav left" href="index.html">
     <small>Back</small>
-    Engine
+    <strong>Engine</strong>
   </a>
 
-  <a class="edge right" href="room9.html">
+  <!-- RIGHT ARROW → ROOM 9 -->
+  <a class="edge-nav right" href="room9.html">
     <small>Prev</small>
-    Room 9
+    <strong>Room 9</strong>
   </a>
 
-  <div class="shell">
-    <h1>Room 10 · VibeCore</h1>
-    <p>This chamber opens your VibeCode project safely in a new tab.</p>
+  <main class="engine-shell">
+    <h1 class="engine-title">Room 10 · VibeCore</h1>
+    <p class="engine-sub">Zero-Point Chamber</p>
 
-    <a class="launch" 
-       href="https://www.vibecodeapp.com/projects/019a9e30-f74e-76da-8e53-ab6bf0301d76"
-       target="_blank">
-      ✨ ENTER VIBECODE
-    </a>
-  </div>
+    <div class="room-grid" style="margin-top:2rem;">
+
+      <div class="room-button" onclick="window.open('https://www.vibecodeapp.com/projects/019a9e30-f74e-76da-8e53-ab6bf0301d76','_blank')">
+        <span>✨ Launch VibeCode</span>
+      </div>
+
+    </div>
+  </main>
 
 </body>
 </html>
