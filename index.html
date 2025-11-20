@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Engine Room</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <title>BubbleWorld Ship · Engine Room</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Instant redirect to the original engine page -->
+  <meta http-equiv="refresh" content="0; url=engine.html" />
+
+  <script>
+    // Fallback redirect for some browsers
+    window.location.replace("engine.html");
+  </script>
 </head>
-
-<body style="background:black; color:white; text-align:center; padding-top:20vh; font-size:2rem; font-family:sans-serif;">
-
-  <h1>ENGINE ROOM</h1>
-  <p>Temporary Safe Mode</p>
-
-  <p style="margin-top:2rem; font-size:1.5rem;">
-    <a href="room2.html" style="color:#0ff;">Enter Room 2</a>
+<body>
+  <!-- Fallback link if redirects fail -->
+  <p style="font-family: system-ui, sans-serif; text-align:center; margin-top:30vh;">
+    Loading Engine Room…  
+    <br><br>
+    <a href="engine.html">Click here if you are not redirected.</a>
   </p>
-
-  <p style="margin-top:1rem; font-size:1.5rem;">
-    <a href="room3.html" style="color:#0ff;">Enter Room 3</a>
-  </p>
-
-  <p style="margin-top:1rem; font-size:1.5rem;">
-    <a href="room9.html" style="color:#0ff;">Enter Room 9</a>
-  </p>
-
 </body>
 </html>
