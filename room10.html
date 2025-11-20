@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Room 10 · VibeCode</title>
+  <title>Room 10 · VibeCore</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="stylesheet" href="style.css" />
@@ -12,15 +12,23 @@
 <body class="engine-room">
 
   <main class="engine-shell">
-    <h1 class="engine-title">Room 10 • VibeCode</h1>
-    <p class="engine-sub">Tap to Enter</p>
 
-    <div style="margin-top: 80px; text-align:center;">
-      <a href="https://vibecode.app" class="big-pill">
-        ✨ Enter VibeCode
-      </a>
+    <h1 class="engine-title">Room 10</h1>
+    <p class="engine-sub">VibeCore Integration Chamber</p>
+
+    <div class="room-grid">
+      <div class="room-button" onclick="go('https://www.vibecodeapp.com/projects/019a9e30-f74e-76da-8e53-ab6bf0301d76')">
+        <span>Open VibeCode</span>
+      </div>
     </div>
+
   </main>
+
+  <footer class="nav-footer">
+    <button class="nav-arrow" onclick="go('room9.html')">⬅</button>
+    <button class="nav-arrow" onclick="go('index.html')">🏠</button>
+    <button class="nav-arrow" onclick="go('index.html')">➡</button>
+  </footer>
 
 </body>
 </html>
