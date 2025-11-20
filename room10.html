@@ -2,24 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Room 10 · VibeCore</title>
+  <title>Room 10 • New Realm</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <link rel="stylesheet" href="style.css" />
   <script src="main.js" defer></script>
 </head>
 
-<body class="engine-room">
+<body class="room">
+  <main class="room-shell">
 
-  <main class="engine-shell">
+    <h1 class="room-title">Room 10</h1>
+    <p class="room-sub">New Realm • VibeCode</p>
 
-    <h1 class="engine-title">Room 10</h1>
-    <p class="engine-sub">VibeCore Integration Chamber</p>
-
-    <div class="room-grid">
-      <div class="room-button" onclick="go('https://www.vibecodeapp.com/projects/019a9e30-f74e-76da-8e53-ab6bf0301d76')">
-        <span>Open VibeCode</span>
-      </div>
+    <!-- VibeCode embed container -->
+    <div class="room-content" style="text-align:center; margin-top:2rem;">
+      <a href="https://www.vibecodeapp.com/s/cmi6ng92f002807hqm7o9g1cw"
+         target="_blank"
+         class="vibe-link"
+         style="display:inline-block;
+                padding:1.2rem 2.4rem;
+                background:#1cff7a;
+                border-radius:24px;
+                color:#000;
+                font-size:1.4rem;
+                font-weight:700;
+                text-decoration:none;
+                box-shadow:0 8px 20px rgba(0, 255, 122, 0.45);">
+        🚀 Enter VibeCode Project
+      </a>
     </div>
 
   </main>
@@ -27,8 +37,7 @@
   <footer class="nav-footer">
     <button class="nav-arrow" onclick="go('room9.html')">⬅</button>
     <button class="nav-arrow" onclick="go('index.html')">🏠</button>
-    <button class="nav-arrow" onclick="go('index.html')">➡</button>
+    <button class="nav-arrow" onclick="go('engine.html')">➡</button>
   </footer>
-
 </body>
 </html>
