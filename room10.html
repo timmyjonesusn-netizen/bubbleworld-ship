@@ -5,6 +5,107 @@
   <title>Room 10 · VibeCore Zero-Point</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 0, 160, 0.25), transparent 55%),
+        radial-gradient(circle at 80% 80%, rgba(255, 140, 0, 0.25), transparent 55%),
+        #03040a;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chamber {
+      max-width: 900px;
+      width: 92%;
+      padding: 2rem;
+      border-radius: 22px;
+      text-align: center;
+      background: rgba(10, 12, 28, 0.85);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 0 40px rgba(255, 0, 200, 0.25), 0 0 30px rgba(0, 255, 200, 0.25);
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 20px rgba(255, 0, 200, 0.7);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      margin-bottom: 1.2rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(4px);
+      font-size: 0.9rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    p {
+      max-width: 600px;
+      margin: 0 auto 1.7rem;
+      font-size: 1.2rem;
+      opacity: 0.9;
+      line-height: 1.55;
+    }
+
+    .launch-btn {
+      display: inline-block;
+      padding: 1rem 1.8rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 999px;
+      letter-spacing: 0.08em;
+      background: linear-gradient(90deg, #00ffc8, #ff00c8);
+      color: #050005;
+      text-decoration: none;
+      box-shadow: 0 0 20px rgba(255, 0, 200, 0.5), 0 0 25px rgba(0, 255, 200, 0.45);
+    }
+
+    .launch-btn:hover {
+      filter: brightness(1.1);
+    }
+
+    /* Arrows */
+    .edge-nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 0.5rem 0.8rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      border-radius: 999px;
+      color: white;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 0.9rem;
+      width: 4rem;
+    }
+
+    .edge-nav.left { left: 0.6rem; }
+    .edge-nav.right { right: 0.6rem; }
+
+    .edge-nav small {
+      display: block;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    .edge-nav strong {
+      font-size: 1rem;
+    }
+  </style>
 </head>
 
 <body>
@@ -15,44 +116,29 @@
     <strong>Engine</strong>
   </a>
 
-  <!-- RIGHT ARROW → ROOM 9 ONLY -->
+  <!-- RIGHT ARROW → ROOM 9 -->
   <a class="edge-nav right" href="room9.html">
     <small>Prev</small>
     <strong>Room 9</strong>
   </a>
 
-  <main class="room10-shell">
-    <h1 class="room-title">Room 10 · VibeCore</h1>
+  <div class="chamber">
+    <h1>Room 10 · VibeCore</h1>
+    <div class="tag">Zero-Point Chamber</div>
 
-    <div class="zero-point-chip">
-      <span>Zero-Point Chamber</span>
-      <span class="registers">0 → 10 → −10 → 11R</span>
-    </div>
-
-    <p class="room-subtitle">
-      Holographic VibeCode interface.
+    <p>
+      The VibeCore gateway cannot be embedded, so this chamber opens your intelligence engine directly.
+      Step through the portal to activate your VibeCode universe.
     </p>
 
-    <section class="vibecode-panel" aria-label="VibeCode Project Panel">
-      <div class="vibecode-frame-wrap">
-        <iframe
-          src="https://www.vibecodeapp.com/projects/019a9e30-f74e-76da-8e53-ab6bf0301d76"
-          loading="lazy"
-          allowfullscreen
-        ></iframe>
-      </div>
-    </section>
-
     <a
-      class="primary-button"
+      class="launch-btn"
       href="https://www.vibecodeapp.com/projects/019a9e30-f74e-76da-8e53-ab6bf0301d76"
       target="_blank"
-      rel="noopener noreferrer"
     >
-      ✨ Open in VibeCode
+      ✨ Enter VibeCode
     </a>
-
-  </main>
+  </div>
 
 </body>
 </html>
