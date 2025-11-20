@@ -1,78 +1,98 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>BubbleWorld Ship • Root Hub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Use the same styling + JS as your Engine Room -->
-  <link rel="stylesheet" href="style.css" />
-  <script src="main.js" defer></script>
+  <meta charset="utf-8">
+  <title>Timmy • BubbleWorld Ship • Router</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { --bg: radial-gradient(circle at 10% 0%, #1cff7a 0%, #004a2a 55%, #000 100%); }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      background-attachment: fixed;
+      background-size: cover;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.4rem;
+    }
+    .shell {
+      width: min(900px, 100%);
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+      padding: 1.4rem 1.4rem 1rem;
+    }
+    h1 { font-size: 2.4rem; margin: 0 0 .4rem; }
+    p { opacity: .7; margin-bottom: 1.1rem; }
+    .rooms {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: .8rem;
+      margin-bottom: 1rem;
+    }
+    a.room {
+      text-decoration: none;
+      color: #fff;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: .8rem .5rem;
+      text-align: center;
+      font-weight: 600;
+      font-size: .9rem;
+    }
+    .footer {
+      border-top: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: .6rem;
+      font-size: .7rem;
+      opacity: .6;
+    }
+    .arrow {
+      width: 46px; height: 46px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.35);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #fff; text-decoration: none; font-size: 1.25rem;
+    }
+  </style>
 </head>
+<body>
+  <main class="shell">
+    <h1>BubbleWorld Ship</h1>
+    <p>Root router — all rooms live in root. Engine is arrows-only.</p>
 
-<body class="engine-room">
-  <main class="engine-shell">
-    <h1 class="engine-title">BubbleWorld Ship</h1>
-    <p class="engine-sub">Navigation Hub • All Rooms in Root</p>
+    <div class="rooms">
+      <a class="room" href="engine.html">Room 1 • Engine</a>
+      <a class="room" href="room2.html">Room 2 • Suno A</a>
+      <a class="room" href="room3.html">Room 3 • Suno B</a>
+      <a class="room" href="room4.html">Room 4 • Creator</a>
+      <a class="room" href="room5.html">Room 5 • Marketing</a>
+      <a class="room" href="room6.html">Room 6 • Reels</a>
+      <a class="room" href="room7.html">Room 7 • UFC</a>
+      <a class="room" href="room8.html">Room 8 • Yeti/Bill</a>
+      <a class="room" href="room9.html">Room 9 • Loop</a>
 
-    <div class="room-grid">
-
-      <!-- Room 1 – Engine (sacred baseline) -->
-      <div class="room-button" onclick="go('engine.html')">
-        <span>Room 1 • Engine</span>
-      </div>
-
-      <!-- Room 2 – Suno A -->
-      <div class="room-button" onclick="go('room2.html')">
-        <span>Room 2 • Suno A</span>
-      </div>
-
-      <!-- Room 3 – Suno B -->
-      <div class="room-button" onclick="go('room3.html')">
-        <span>Room 3 • Suno B</span>
-      </div>
-
-      <!-- Room 4 – Creator -->
-      <div class="room-button" onclick="go('room4.html')">
-        <span>Room 4 • Creator</span>
-      </div>
-
-      <!-- Room 5 – Marketing -->
-      <div class="room-button" onclick="go('room5.html')">
-        <span>Room 5 • Marketing</span>
-      </div>
-
-      <!-- Room 6 – Reels -->
-      <div class="room-button" onclick="go('room6.html')">
-        <span>Room 6 • Reels</span>
-      </div>
-
-      <!-- Room 7 – UFC -->
-      <div class="room-button" onclick="go('room7.html')">
-        <span>Room 7 • UFC</span>
-      </div>
-
-      <!-- Room 8 – Yeti/Bill -->
-      <div class="room-button" onclick="go('room8.html')">
-        <span>Room 8 • Yeti/Bill</span>
-      </div>
-
-      <!-- Room 9 – Loop -->
-      <div class="room-button" onclick="go('room9.html')">
-        <span>Room 9 • Loop</span>
-      </div>
-
-      <!-- Room 10 – New Realm -->
-      <div class="room-button" onclick="go('room10.html')">
-        <span>Room 10 • New Realm</span>
-      </div>
-
+      <!-- ⭐ Room 10 added correctly -->
+      <a class="room" href="room10.html">Room 10 • New Realm</a>
     </div>
 
-    <!-- Bottom nav: home just refreshes the hub -->
-    <footer class="nav-footer">
-      <button class="nav-arrow" onclick="go('index.html')">🏠</button>
-    </footer>
+    <div class="footer">
+      <span>engine → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → engine</span>
+      <div>
+        <a class="arrow" href="engine.html">‹</a>
+        <a class="arrow" href="room2.html">›</a>
+      </div>
+    </div>
   </main>
 </body>
 </html>
