@@ -2,21 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>BubbleWorld Ship • Navigation Hub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BubbleWorld Ship • Navigation Hub</title>
 
-    <!-- Correct static paths (the root cause of the white screen) -->
-    <link rel="stylesheet" href="static/base.css">
-    <link rel="stylesheet" href="static/style.css">
-    <link rel="stylesheet" href="static/bubbles.css">
-    <link rel="stylesheet" href="static/matrix.css">
-
-    <script src="static/main.js" defer></script>
-
-    <style>
-        /* fallback safety so text stays visible even if CSS fails */
-        body { background:#001a00; color:white; font-family:Arial; }
-    </style>
+    <!-- Correct static asset paths -->
+    <link rel="stylesheet" href="static/base.css" />
+    <link rel="stylesheet" href="static/style.css" />
 </head>
 
 <body class="engine-room">
@@ -63,7 +54,7 @@
             <span>Room 9 • Loop</span>
         </div>
 
-        <!-- Fully integrated Room 10 (correctly placed, not an add-on) -->
+        <!-- Fully integrated Room 10 -->
         <div class="room-button" onclick="go('room10.html')">
             <span>Room 10 • New Realm</span>
         </div>
@@ -71,9 +62,15 @@
     </div>
 </main>
 
+<!-- Bottom navigation -->
 <footer class="nav-footer">
     <button class="nav-arrow" onclick="go('index.html')">🏡</button>
 </footer>
+
+<!-- Correct JS paths -->
+<script src="static/main.js"></script>
+<script src="static/bubbles.js"></script>
+<script src="static/matrix.js"></script>
 
 </body>
 </html>
