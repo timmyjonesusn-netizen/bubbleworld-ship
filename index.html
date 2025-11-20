@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>BubbleWorld Ship • Navigation Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Correct static paths (the root cause of the white screen) -->
+    <link rel="stylesheet" href="static/base.css">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/bubbles.css">
+    <link rel="stylesheet" href="static/matrix.css">
+
+    <script src="static/main.js" defer></script>
+
+    <style>
+        /* fallback safety so text stays visible even if CSS fails */
+        body { background:#001a00; color:white; font-family:Arial; }
+    </style>
+</head>
+
+<body class="engine-room">
+
+<main class="engine-shell">
+    <h1 class="engine-title">BubbleWorld Ship</h1>
+    <p class="engine-sub">Navigation Hub • All Rooms in Root</p>
+
+    <div class="room-grid">
+
+        <div class="room-button" onclick="go('engine.html')">
+            <span>Room 1 • Engine</span>
+        </div>
+
+        <div class="room-button" onclick="go('room2.html')">
+            <span>Room 2 • Suno A</span>
+        </div>
+
+        <div class="room-button" onclick="go('room3.html')">
+            <span>Room 3 • Suno B</span>
+        </div>
+
+        <div class="room-button" onclick="go('room4.html')">
+            <span>Room 4 • Creator</span>
+        </div>
+
+        <div class="room-button" onclick="go('room5.html')">
+            <span>Room 5 • Marketing</span>
+        </div>
+
+        <div class="room-button" onclick="go('room6.html')">
+            <span>Room 6 • Reels</span>
+        </div>
+
+        <div class="room-button" onclick="go('room7.html')">
+            <span>Room 7 • UFC</span>
+        </div>
+
+        <div class="room-button" onclick="go('room8.html')">
+            <span>Room 8 • Yeti/Bill</span>
+        </div>
+
+        <div class="room-button" onclick="go('room9.html')">
+            <span>Room 9 • Loop</span>
+        </div>
+
+        <!-- Fully integrated Room 10 (correctly placed, not an add-on) -->
+        <div class="room-button" onclick="go('room10.html')">
+            <span>Room 10 • New Realm</span>
+        </div>
+
+    </div>
+</main>
+
+<footer class="nav-footer">
+    <button class="nav-arrow" onclick="go('index.html')">🏡</button>
+</footer>
+
+</body>
+</html>
