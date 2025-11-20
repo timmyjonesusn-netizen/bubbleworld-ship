@@ -1,43 +1,61 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Room 10 • New Realm</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
-  <script src="main.js" defer></script>
+
+  <!-- Correct CSS paths (this is what fixes the white page + tiny emojis) -->
+  <link rel="stylesheet" href="static/base.css">
+  <link rel="stylesheet" href="static/style.css">
+
+  <style>
+    /* Optional — slight color accent for Room 10 */
+    :root {
+      --room-accent: #7b4dff;
+    }
+    h1 span {
+      color: var(--room-accent);
+    }
+  </style>
+
+  <script>
+    function go(page) {
+      window.location.href = page;
+    }
+  </script>
 </head>
 
-<body class="room">
-  <main class="room-shell">
+<body>
 
-    <h1 class="room-title">Room 10</h1>
-    <p class="room-sub">New Realm • VibeCode</p>
+  <!-- MAIN WRAPPER -->
+  <main class="room-container">
 
-    <!-- VibeCode embed container -->
-    <div class="room-content" style="text-align:center; margin-top:2rem;">
-      <a href="https://www.vibecodeapp.com/s/cmi6ng92f002807hqm7o9g1cw"
-         target="_blank"
-         class="vibe-link"
-         style="display:inline-block;
-                padding:1.2rem 2.4rem;
-                background:#1cff7a;
-                border-radius:24px;
-                color:#000;
-                font-size:1.4rem;
-                font-weight:700;
-                text-decoration:none;
-                box-shadow:0 8px 20px rgba(0, 255, 122, 0.45);">
-        🚀 Enter VibeCode Project
-      </a>
-    </div>
+    <h1><span>Room 10</span> • New Realm</h1>
+    <p class="room-subtitle">Exploring a brand-new dimension of the BubbleWorld Ship.</p>
+
+    <!-- CONTENT AREA -->
+    <section class="room-content">
+
+      <div class="embed-wrapper">
+        <iframe 
+          src="https://www.vibecodeapp.com/s/cmi6ng92f002807hqm7o9g1cw"
+          class="embed-frame"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+    </section>
 
   </main>
 
+  <!-- BOTTOM NAV -->
   <footer class="nav-footer">
-    <button class="nav-arrow" onclick="go('room9.html')">⬅</button>
-    <button class="nav-arrow" onclick="go('index.html')">🏠</button>
-    <button class="nav-arrow" onclick="go('engine.html')">➡</button>
+    <button class="nav-arrow" onclick="go('room9.html')">⬅️</button>
+    <button class="nav-arrow" onclick="go('index.html')">🏡</button>
+    <button class="nav-arrow" onclick="go('engine.html')">➡️</button>
   </footer>
+
 </body>
 </html>
