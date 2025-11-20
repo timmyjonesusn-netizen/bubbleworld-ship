@@ -4,11 +4,17 @@
   <meta charset="UTF-8" />
   <title>BubbleWorld Ship · Engine Room</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="stylesheet" href="style.css" />
-  <script src="main.js"></script>
+  <script>
+    function go(page) {
+      window.location.href = page;
+    }
+  </script>
 </head>
 
 <body class="engine-room">
+
   <main class="engine-shell">
 
     <h1 class="engine-title">Engine Room</h1>
@@ -16,44 +22,20 @@
 
     <div class="room-grid">
 
-      <div class="room-button" onclick="go('room2.html')">
-        <span>Room 2</span>
-      </div>
+      <div class="room-button" onclick="go('room2.html')">Room 2</div>
+      <div class="room-button" onclick="go('room3.html')">Room 3</div>
+      <div class="room-button" onclick="go('room4.html')">Room 4</div>
+      <div class="room-button" onclick="go('room5.html')">Room 5</div>
+      <div class="room-button" onclick="go('room6.html')">Room 6</div>
+      <div class="room-button" onclick="go('room7.html')">Room 7</div>
+      <div class="room-button" onclick="go('room8.html')">Room 8</div>
+      <div class="room-button" onclick="go('room9.html')">Room 9</div>
 
-      <div class="room-button" onclick="go('room3.html')">
-        <span>Room 3</span>
-      </div>
-
-      <div class="room-button" onclick="go('room4.html')">
-        <span>Room 4</span>
-      </div>
-
-      <div class="room-button" onclick="go('room5.html')">
-        <span>Room 5</span>
-      </div>
-
-      <div class="room-button" onclick="go('room6.html')">
-        <span>Room 6</span>
-      </div>
-
-      <div class="room-button" onclick="go('room7.html')">
-        <span>Room 7</span>
-      </div>
-
-      <div class="room-button" onclick="go('room8.html')">
-        <span>Room 8</span>
-      </div>
-
-      <div class="room-button" onclick="go('room9.html')">
-        <span>Room 9</span>
-      </div>
-
-      <!-- ⭐️ NEW: ROOM 10 ENTRY -->
-      <div class="room-button" onclick="go('room10.html')">
-        <span>Room 10 · VibeCore</span>
-      </div>
-
+      <!-- Room 10 intentionally NOT listed -->
+      
     </div>
+
   </main>
+
 </body>
 </html>
