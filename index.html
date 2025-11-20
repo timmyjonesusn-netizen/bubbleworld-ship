@@ -2,61 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>BubbleWorld Ship</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BubbleWorld Ship • Engine</title>
+  
+  <!-- core ship styling + engine room CSS -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- navigation + router -->
   <script src="main.js" defer></script>
 </head>
 
 <body class="engine-room">
 
   <main class="engine-shell">
-    <h1 class="engine-title">BubbleWorld Ship</h1>
-    <p class="engine-sub">Root router — all rooms live in root. Engine is arrows-only.</p>
+    <h1 class="engine-title">Room</h1>
+    <p class="engine-sub">Navigation Hub</p>
 
     <div class="room-grid">
 
-      <div class="room-button" onclick="go('engine.html')">
-        <span>Room 1 • Engine</span>
-      </div>
-
       <div class="room-button" onclick="go('room2.html')">
-        <span>Room 2 • Suno A</span>
+        <span>Room 2</span>
       </div>
 
       <div class="room-button" onclick="go('room3.html')">
-        <span>Room 3 • Suno B</span>
+        <span>Room 3</span>
       </div>
 
       <div class="room-button" onclick="go('room4.html')">
-        <span>Room 4 • Creator</span>
+        <span>Room 4</span>
       </div>
 
       <div class="room-button" onclick="go('room5.html')">
-        <span>Room 5 • Marketing</span>
+        <span>Room 5</span>
       </div>
 
       <div class="room-button" onclick="go('room6.html')">
-        <span>Room 6 • Reels</span>
+        <span>Room 6</span>
       </div>
 
       <div class="room-button" onclick="go('room7.html')">
-        <span>Room 7 • UFC</span>
+        <span>Room 7</span>
       </div>
 
       <div class="room-button" onclick="go('room8.html')">
-        <span>Room 8 • Yeti/Bill</span>
+        <span>Room 8</span>
       </div>
 
       <div class="room-button" onclick="go('room9.html')">
-        <span>Room 9 • Loop</span>
+        <span>Room 9</span>
       </div>
 
+      <!-- ⭐ ROOM 10 BUTTON — CORRECT, VALID, WORKING -->
       <div class="room-button" onclick="go('room10.html')">
-        <span>Room 10 • VibeCode</span>
+        <span>Room 10</span>
       </div>
 
     </div>
   </main>
 
-</body
+  <!-- bottom nav bar identical to your working pages -->
+  <footer class="nav-footer">
+    <button class="nav-arrow" onclick="go('engine.html')">🏠</button>
+  </footer>
+
+</body>
+</html>
